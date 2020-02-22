@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"www.chaohang.top","root":"/","scheme":"Muse","version":"7.7.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="使用七牛 sdk 上传视频并做分片操作。 step1 生成 token123456789101112131415161718192021222324const qiniu &#x3D; require(&quot;qiniu&quot;);var accessKey &#x3D; proc.env.QINIU_ACCESS_KEY;var secretKey &#x3D; proc.env.QINIU_SECRET_KEY;var mac &#x3D; n">
+<meta property="og:type" content="article">
+<meta property="og:title" content="七牛视频切片方案">
+<meta property="og:url" content="https://www.chaohang.top/2018/08/07/%E4%B8%83%E7%89%9B%E8%A7%86%E9%A2%91%E5%88%87%E7%89%87%E6%96%B9%E6%A1%88/index.html">
+<meta property="og:site_name" content="张小超的博客">
+<meta property="og:description" content="使用七牛 sdk 上传视频并做分片操作。 step1 生成 token123456789101112131415161718192021222324const qiniu &#x3D; require(&quot;qiniu&quot;);var accessKey &#x3D; proc.env.QINIU_ACCESS_KEY;var secretKey &#x3D; proc.env.QINIU_SECRET_KEY;var mac &#x3D; n">
+<meta property="article:published_time" content="2018-08-07T14:23:28.000Z">
+<meta property="article:modified_time" content="2018-08-07T14:23:28.000Z">
+<meta property="article:author" content="张小超">
+<meta property="article:tag" content="JavaScript">
+<meta property="article:tag" content="node.js">
+<meta property="article:tag" content="七牛">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://www.chaohang.top/2018/08/07/%E4%B8%83%E7%89%9B%E8%A7%86%E9%A2%91%E5%88%87%E7%89%87%E6%96%B9%E6%A1%88/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true
+  };
+</script>
+
+  <title>七牛视频切片方案 | 张小超的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">张小超的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <h1 class="site-subtitle" itemprop="description">超超不会飞</h1>
+      
+  </div>
+
+  <div class="site-nav-right"></div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>About</a>
+
+  </li>
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.chaohang.top/2018/08/07/%E4%B8%83%E7%89%9B%E8%A7%86%E9%A2%91%E5%88%87%E7%89%87%E6%96%B9%E6%A1%88/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="张小超">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="张小超的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          七牛视频切片方案
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2018-08-07 22:23:28" itemprop="dateCreated datePublished" datetime="2018-08-07T22:23:28+08:00">2018-08-07</time>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine: </span>
+    
+    <a title="valine" href="/2018/08/07/%E4%B8%83%E7%89%9B%E8%A7%86%E9%A2%91%E5%88%87%E7%89%87%E6%96%B9%E6%A1%88/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2018/08/07/%E4%B8%83%E7%89%9B%E8%A7%86%E9%A2%91%E5%88%87%E7%89%87%E6%96%B9%E6%A1%88/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>使用七牛 sdk 上传视频并做分片操作。</p>
+<h3 id="step1-生成-token"><a href="#step1-生成-token" class="headerlink" title="step1 生成 token"></a>step1 生成 token</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> qiniu = <span class="built_in">require</span>(<span class="string">"qiniu"</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> accessKey = proc.env.QINIU_ACCESS_KEY;</span><br><span class="line"><span class="keyword">var</span> secretKey = proc.env.QINIU_SECRET_KEY;</span><br><span class="line"><span class="keyword">var</span> mac = <span class="keyword">new</span> qiniu.auth.digest.Mac(accessKey, secretKey);</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> bucket = proc.env.QINIU_TEST_BUCKET;  <span class="comment">// 对象存储空间</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//带数据处理的凭证</span></span><br><span class="line"><span class="keyword">var</span> origin_filename = <span class="string">"avthumb_test_target.mp4"</span>;  <span class="comment">// 源文件名</span></span><br><span class="line"><span class="keyword">var</span> save_as_filename = <span class="string">`<span class="subst">$&#123;origin_filename&#125;</span>.m3n8`</span>;  <span class="comment">// 分片后的文件名</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> saveMp4Entry = qiniu.util.urlsafeBase64Encode(<span class="string">`<span class="subst">$&#123;bucket&#125;</span>:<span class="subst">$&#123;save_as_filename&#125;</span>`</span>);</span><br><span class="line"><span class="keyword">var</span> avthumbMp4Fop = <span class="string">"avthumb/m3u8/noDomain/1/segtime/15/vb/440k|saveas/"</span> + saveMp4Entry;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> options = &#123;</span><br><span class="line">  scope: bucket,</span><br><span class="line">  expires: <span class="number">3600</span>,  <span class="comment">// 凭证有效时间</span></span><br><span class="line">  persistentOps: avthumbMp4Fop,  <span class="comment">// 视频上传后触发预转持久化，切片处理</span></span><br><span class="line">  persistentPipeline: <span class="string">"video-pipe"</span>,  <span class="comment">// 多媒体处理队列</span></span><br><span class="line">  persistentNotifyUrl: <span class="string">"http://api.example.com/qiniu/pfop/notify"</span>,  <span class="comment">// 回调通知地址</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">var</span> putPolicy = <span class="keyword">new</span> qiniu.rs.PutPolicy(options);</span><br><span class="line"><span class="built_in">console</span>.log(putPolicy.uploadToken(mac));</span><br></pre></td></tr></table></figure>
+<p>生成不同作用的凭证可以查看官方提供的示例<a href="https://github.com/qiniu/nodejs-sdk/blob/master/examples/create_uptoken.js" target="_blank" rel="noopener">nodejs-sdk example</a>。</p>
+<p>以上代码为生成上传视频并进行切片处理的凭证。上传相关的文档查看<a href="https://developer.qiniu.com/kodo/manual/1206/put-policy" target="_blank" rel="noopener">七牛上传策略</a>。</p>
+<p>切片动作是由<code>persistentOps</code>参数触发并启动一个异步任务，</p>
+<h2 id="persistentOps-详解"><a href="#persistentOps-详解" class="headerlink" title="persistentOps 详解"></a><strong>persistentOps 详解</strong></h2><a id="more"></a>
+<blockquote>
+<p><code>persistentOps</code> 字段用于指定预转数据处理命令和保存处理结果的存储空间与资源名。<br>为此字段指定非空值，则在成功上传一个文件后，会启动一个<strong>异步数据处理任务</strong>。<code>persistentId</code> 字段，唯一标识此任务。<br>当 <code>returnBody</code> 中指定了 <code>persistentId</code> 魔法变量时，客户端收到的响应内容 <code>returnBody</code> 中会有 <code>persistentId</code>；当没有指定 <code>returnBody</code> 时，默认也会返回 <code>persistentId</code>。</p>
+<ul>
+<li>使用默认的存储空间和资源名<pre><code>* 当只指定了数据处理命令时，服务端会选择上传文件的 Bucket 作为数据处理结果的存储空间，Key 由七牛服务器自动生成。
+</code></pre></li>
+<li><strong>使用指定的存储空间和资源名</strong><ul>
+<li>在数据处理命令后用管道符<code>|</code>拼接<code>saveas/&lt;encodedEntryURI&gt;</code>指令，指示七牛服务器使用<a href="https://developer.qiniu.com/kodo/api/data-format" target="_blank" rel="noopener">EncodedEntryURI</a>格式中指定的 Bucket 与 Key 来保存处理结果。如 <em>avthumb/flv|saveas/cWJ1Y2tldDpxa2V5</em>，是将上传的视频文件转码<code>flv</code>格式后存储为<code>qbucket:qkey</code>，其中<code>cWJ1Y2tldDpxa2V5</code>是<code>qbucket:qkey</code>的<a href="https://developer.qiniu.com/kodo/manual/appendix#urlsafe-base64" target="_blank" rel="noopener">URL安全的Base64编码</a>结果。以上方式可以同时作用于多个数据处理命令，用<code>;</code>分隔，如 <code>avthumb/mp4|saveas/cWJ1Y2tldDpxa2V5;avthumb/flv|saveas/cWJ1Y2tldDpxa2V5Mg==</code></li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<p>摘自<a href="https://developer.qiniu.com/kodo/manual/1208/upload-token" target="_blank" rel="noopener">七牛上传凭证</a></p>
+</blockquote>
+<p>数据处理命令可以查看官方文档，比如<a href="https://developer.qiniu.com/dora/manual/1485/audio-and-video-slice" target="_blank" rel="noopener">视频切片接口</a>。</p>
+<h3 id="step2-前端直传"><a href="#step2-前端直传" class="headerlink" title="step2 前端直传"></a>step2 前端直传</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">POST http:<span class="comment">//up.qiniu.com</span></span><br><span class="line">格式： form-data</span><br><span class="line">参数：</span><br><span class="line">key: 文件名，上文代码中的 <span class="string">`origin_filename`</span></span><br><span class="line">token: 上传token</span><br><span class="line">file: 具体文件</span><br><span class="line"></span><br><span class="line"><span class="comment">// 上传成功的响应体</span></span><br><span class="line"><span class="comment">// 状态码 200</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="string">"hash"</span>: <span class="string">"luVJbz9RtE3Ha7c9XaDerE6rPyvP"</span>,</span><br><span class="line">    <span class="string">"key"</span>: <span class="string">"prTEDwvJY18YBD_720_p1.mp4"</span>,</span><br><span class="line">    <span class="string">"persistentId"</span>: <span class="string">"z0.5b56c9b938b9f324a573edb4"</span> <span class="comment">// 可以使用persistentId，检测当前处理状态</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">作者：youthcity</span><br><span class="line">链接：https:<span class="comment">//www.jianshu.com/p/f73b39ae02dc</span></span><br><span class="line">來源：简书</span><br><span class="line">简书著作权归作者所有，任何形式的转载都请联系作者获得授权并注明出处。</span><br></pre></td></tr></table></figure>
+<h3 id="step3-轮询获取结果"><a href="#step3-轮询获取结果" class="headerlink" title="step3 轮询获取结果"></a>step3 轮询获取结果</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">GET api.qiniu.com/status/get/prefop?id=$&#123;persistentId&#125;</span><br><span class="line"></span><br><span class="line">&#123;</span><br><span class="line">    <span class="string">"code"</span>: <span class="number">0</span>, <span class="comment">//   状态码0成功，1等待处理，2正在处理，3处理失败，4通知提交失败。</span></span><br><span class="line">    <span class="string">"desc"</span>: <span class="string">"The fop was completed successfully"</span>,</span><br><span class="line">    <span class="string">"id"</span>: <span class="string">"z0.5b56c9b938b9f324a573edb4"</span>,</span><br><span class="line">    <span class="string">"inputBucket"</span>: <span class="string">"ocean"</span>,</span><br><span class="line">    <span class="string">"inputKey"</span>: <span class="string">"prTEDwvJY18YBD_720_p1.mp4"</span>,</span><br><span class="line">    <span class="string">"items"</span>: [</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="string">"cmd"</span>: <span class="string">"avthumb/m3u8/noDomain/1/segtime/15/vb/440k|saveas/b2NlYW46aGxzX3ByVEVEd3ZKWTE4WUJEXzcyMF9wMS5tM3U4"</span>,</span><br><span class="line">            <span class="string">"code"</span>: <span class="number">0</span>,</span><br><span class="line">            <span class="string">"desc"</span>: <span class="string">"The fop was completed successfully"</span>,</span><br><span class="line">            <span class="string">"hash"</span>: <span class="string">"FraV6PX6Xp7mYYgAnY0sniTK-pPt"</span>,</span><br><span class="line">            <span class="string">"key"</span>: <span class="string">"hls_prTEDwvJY18YBD_720_p1.m3u8"</span>,</span><br><span class="line">            <span class="string">"returnOld"</span>: <span class="number">0</span></span><br><span class="line">        &#125;</span><br><span class="line">    ],</span><br><span class="line">    <span class="string">"pipeline"</span>: <span class="string">"1381326751.k12_video"</span>,</span><br><span class="line">    <span class="string">"reqid"</span>: <span class="string">"FQIAAKAxpZfFOkQV"</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">作者：youthcity</span><br><span class="line">链接：https:<span class="comment">//www.jianshu.com/p/f73b39ae02dc</span></span><br><span class="line">來源：简书</span><br><span class="line">简书著作权归作者所有，任何形式的转载都请联系作者获得授权并注明出处。</span><br></pre></td></tr></table></figure>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a href="https://developer.qiniu.com/kodo/manual/1208/upload-token" target="_blank" rel="noopener">七牛上传凭证</a></p>
+<p><a href="https://developer.qiniu.com/kodo/manual/1206/put-policy" target="_blank" rel="noopener">七牛上传策略</a></p>
+<p><a href="https://developer.qiniu.com/dora/manual/1485/audio-and-video-slice" target="_blank" rel="noopener">视频切片接口</a></p>
+<p><a href="https://www.jianshu.com/p/f73b39ae02dc" target="_blank" rel="noopener">七牛上传开发（三）使用NodeJS生成带数据处理的凭证</a></p>
+<p><a href="https://github.com/qiniu/nodejs-sdk/blob/master/examples/create_uptoken.js" target="_blank" rel="noopener">nodejs-sdk example</a></p>
+<blockquote>
+<p>本文首发于我的个人博客 <a href="http://chaohang.top" target="_blank" rel="noopener">http://chaohang.top</a></p>
+<p>作者<a href="http://chaohang.top" target="_blank" rel="noopener">张小超</a></p>
+<p>转载请注明出处</p>
+</blockquote>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/JavaScript/" rel="tag"># JavaScript</a>
+              <a href="/tags/node-js/" rel="tag"># node.js</a>
+              <a href="/tags/%E4%B8%83%E7%89%9B/" rel="tag"># 七牛</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2018/01/10/Sequelize-%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C/" rel="prev" title="Sequelize 基本操作">
+      <i class="fa fa-chevron-left"></i> Sequelize 基本操作
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2018/09/25/%E7%94%A8node-js%E5%86%99%E4%B8%80%E4%B8%AAjenkins%E5%8F%91%E7%89%88%E8%84%9A%E6%9C%AC/" rel="next" title="用node.js写一个jenkins发版脚本">
+      用node.js写一个jenkins发版脚本 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let activeClass = CONFIG.comments.activeClass;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#step1-生成-token"><span class="nav-number">1.</span> <span class="nav-text">step1 生成 token</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#persistentOps-详解"><span class="nav-number"></span> <span class="nav-text">persistentOps 详解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#step2-前端直传"><span class="nav-number">1.</span> <span class="nav-text">step2 前端直传</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#step3-轮询获取结果"><span class="nav-number">2.</span> <span class="nav-text">step3 轮询获取结果</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考资料"><span class="nav-number"></span> <span class="nav-text">参考资料</span></a></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">张小超</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">45</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">33</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">张小超</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">Theme – <a href="https://muse.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> v7.7.1
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="http://cdn.chaohang.top/js%2Fbusuanzi%2F2.3%2Fbusuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('http://cdn.chaohang.top/js%2Fvaline%2F1.3.10%2FValine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'L0Iqsf0FUlKjzj6KJCTnwSf0-9Nh9j0Va',
+      appKey     : 'KxXflLfIf2O0c32s49pBtVxE',
+      placeholder: "留下你的爪印🐾",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : 'zh-cn' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

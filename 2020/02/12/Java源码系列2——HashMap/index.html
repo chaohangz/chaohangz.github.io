@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"www.chaohang.top","root":"/","scheme":"Muse","version":"7.7.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="HashMap 的源码很多也很复杂，本文只是摘取简单常用的部分代码进行分析。能力有限，欢迎指正。 HASH 值的计算前置知识——位运算按位异或操作符^：1^1&#x3D;0, 0^0&#x3D;0, 1^0&#x3D;0, 值相同为0，值不同为1。按位异或就是对二进制中的每一位进行异或运算。 1234   1111 0000 1111 1110^  1111 1111 0000 1111____________________">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java源码系列2——HashMap">
+<meta property="og:url" content="https://www.chaohang.top/2020/02/12/Java%E6%BA%90%E7%A0%81%E7%B3%BB%E5%88%972%E2%80%94%E2%80%94HashMap/index.html">
+<meta property="og:site_name" content="张小超的博客">
+<meta property="og:description" content="HashMap 的源码很多也很复杂，本文只是摘取简单常用的部分代码进行分析。能力有限，欢迎指正。 HASH 值的计算前置知识——位运算按位异或操作符^：1^1&#x3D;0, 0^0&#x3D;0, 1^0&#x3D;0, 值相同为0，值不同为1。按位异或就是对二进制中的每一位进行异或运算。 1234   1111 0000 1111 1110^  1111 1111 0000 1111____________________">
+<meta property="og:image" content="http://cdn.chaohang.top/20200119175532.jpg">
+<meta property="article:published_time" content="2020-02-12T07:58:48.000Z">
+<meta property="article:modified_time" content="2020-02-12T07:58:48.000Z">
+<meta property="article:author" content="张小超">
+<meta property="article:tag" content="Java">
+<meta property="article:tag" content="Java源码系列">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://cdn.chaohang.top/20200119175532.jpg">
+
+<link rel="canonical" href="https://www.chaohang.top/2020/02/12/Java%E6%BA%90%E7%A0%81%E7%B3%BB%E5%88%972%E2%80%94%E2%80%94HashMap/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true
+  };
+</script>
+
+  <title>Java源码系列2——HashMap | 张小超的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">张小超的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <h1 class="site-subtitle" itemprop="description">超超不会飞</h1>
+      
+  </div>
+
+  <div class="site-nav-right"></div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>About</a>
+
+  </li>
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.chaohang.top/2020/02/12/Java%E6%BA%90%E7%A0%81%E7%B3%BB%E5%88%972%E2%80%94%E2%80%94HashMap/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="张小超">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="张小超的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          Java源码系列2——HashMap
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2020-02-12 15:58:48" itemprop="dateCreated datePublished" datetime="2020-02-12T15:58:48+08:00">2020-02-12</time>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine: </span>
+    
+    <a title="valine" href="/2020/02/12/Java%E6%BA%90%E7%A0%81%E7%B3%BB%E5%88%972%E2%80%94%E2%80%94HashMap/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2020/02/12/Java%E6%BA%90%E7%A0%81%E7%B3%BB%E5%88%972%E2%80%94%E2%80%94HashMap/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p><code>HashMap</code> 的源码很多也很复杂，本文只是摘取简单常用的部分代码进行分析。能力有限，欢迎指正。</p>
+<h2 id="HASH-值的计算"><a href="#HASH-值的计算" class="headerlink" title="HASH 值的计算"></a>HASH 值的计算</h2><h3 id="前置知识——位运算"><a href="#前置知识——位运算" class="headerlink" title="前置知识——位运算"></a>前置知识——位运算</h3><p>按位异或操作符<code>^</code>：1^1=0, 0^0=0, 1^0=0, 值相同为0，值不同为1。按位异或就是对二进制中的每一位进行异或运算。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">   1111 0000 1111 1110</span><br><span class="line">^  1111 1111 0000 1111</span><br><span class="line">______________________</span><br><span class="line">   0000 1111 1111 0001</span><br></pre></td></tr></table></figure>
+<a id="more"></a>
+<p>按位右移补零操作符<code>&gt;&gt;&gt;</code>：左操作数按右操作数指定的位数右移，移动得到的空位以零填充。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">        1110 1101 1001 1111</span><br><span class="line">&gt;&gt;&gt; 4  </span><br><span class="line">___________________________</span><br><span class="line">        0000 1110 1101 1001</span><br></pre></td></tr></table></figure>
+<h3 id="扰动函数"><a href="#扰动函数" class="headerlink" title="扰动函数"></a>扰动函数</h3><h4 id="为什么要做扰动？"><a href="#为什么要做扰动？" class="headerlink" title="为什么要做扰动？"></a>为什么要做扰动？</h4><p>理论上哈希值是一个<code>int</code>类型，如果直接拿哈希值做下标的话，考虑到2进制32位带符号的int表值范围从-2147483648到2147483648。前后加起来大概40亿的映射空间。这么大的数组，内存是存不下的，所以这个散列值是不能直接拿来用的。用之前还要先做对数组的长度取模运算，得到的余数才能用来访问数组下标。</p>
+<p>因为只取最后几位，所以哈希碰撞的可能性大大增加，这时候扰动函数的价值就来了。</p>
+<h4 id="扰动计算"><a href="#扰动计算" class="headerlink" title="扰动计算"></a>扰动计算</h4><p><img src="http://cdn.chaohang.top/20200119175532.jpg" alt></p>
+<p>先调用<code>hashCode()</code>方法得出hash值，再进行扰动操作。</p>
+<p>右位移16位，正好是32bit的一半（<code>int</code> 是32位的），自己的高半区和低半区做异或，就是为了<strong>混合原始哈希码的高位和低位，以此来加大低位的随机性</strong>。而且混合后的低位掺杂了高位的部分特征，这样高位的信息也变相保留下来。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> <span class="title">hash</span><span class="params">(Object key)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">int</span> h;</span><br><span class="line">  <span class="keyword">return</span> (key == <span class="keyword">null</span>) ? <span class="number">0</span> : (h = key.hashCode()) ^ (h &gt;&gt;&gt; <span class="number">16</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="取模，计算出下标"><a href="#取模，计算出下标" class="headerlink" title="取模，计算出下标"></a>取模，计算出下标</h3><p>在计算下标的时候，让列表长度对哈希值做取模操作，让计算出来的哈希值在列表范围内，n 为<code>list</code>长度</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">i = (n - <span class="number">1</span>) &amp; hash</span><br></pre></td></tr></table></figure>
+<h4 id="为什么HashMap的数组长度要取2的整次幂"><a href="#为什么HashMap的数组长度要取2的整次幂" class="headerlink" title="为什么HashMap的数组长度要取2的整次幂"></a>为什么<code>HashMap</code>的数组长度要取2的整次幂</h4><p>因为这样（数组长度 - 1）正好相当于一个“<strong>低位掩码</strong>”。<code>&amp;</code>操作的结果就是散列值的高位全部归零，只保留低位值，用来做数组的下标访问。以初始长度16为例，16-1=15，2进制表示是0000 1111。和某散列值做<code>&amp;</code>操作如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">    1010 0011 0110 1111 0101</span><br><span class="line">&amp;   0000 0000 0000 0000 1111</span><br><span class="line">____________________________</span><br><span class="line">    0000 0000 0000 0000 0101</span><br></pre></td></tr></table></figure>
+<h2 id="是什么存入了-table"><a href="#是什么存入了-table" class="headerlink" title="是什么存入了 table"></a>是什么存入了 <code>table</code></h2><p><code>HashMap</code>存入<code>table</code>的值并不只有value，而是构造成一个 Node 对象实例存入 table。</p>
+<p>Node对象里有：hash, key, value, next(哈希冲突时的链表)</p>
+<h2 id="理论最大容量"><a href="#理论最大容量" class="headerlink" title="理论最大容量"></a>理论最大容量</h2><p><code>int MAXIMUM_CAPACITY = 1 &lt;&lt; 30;</code> </p>
+<p>2的30次方</p>
+<h2 id="负载因子"><a href="#负载因子" class="headerlink" title="负载因子"></a>负载因子</h2><p>负载因子是用来计算负载容量（所能容纳的最大Node个数）的，当前list长度 length，负载因子 loadFactor</p>
+<p>负载容量计算公式为：</p>
+<p><code>threshold = length * loadFactor</code></p>
+<p>默认负载因子为 0.75。也就是说，当Node个数达到当前list长度的75%时，就要进行扩容，否则会增加哈希碰撞的可能性。<strong>负载因子的作用是在空间和时间效率上取得一个平衡。</strong></p>
+<p><code>float DEFAULT_LOAD_FACTOR = 0.75f</code></p>
+<h2 id="扩容做了哪些操作"><a href="#扩容做了哪些操作" class="headerlink" title="扩容做了哪些操作"></a>扩容做了哪些操作</h2><ol>
+<li><p>创建一个新的Entry空数组，长度是原数组的2倍。<br>当Node个数超过负载容量时，进行扩容。</p>
+<p><code>old &lt;&lt; 1</code> 左移一位相当于 old * 2。</p>
+</li>
+<li><p>重新Hash</p>
+<p>遍历原Entry数组，把所有的Entry重新Hash到新数组中。</p>
+<p><strong>为什么要重新hash？因为长度扩大以后，hash值也随之改变（数组下标的计算是数组长度对hashcode进行取模）。</strong></p>
+<p>这样就可以把原先哈希冲突的链表拉平，使数组变得稀疏。</p>
+</li>
+</ol>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">final</span> Node&lt;K,V&gt;[] resize() &#123;</span><br><span class="line">    <span class="comment">// 保存现有的数组</span></span><br><span class="line">    Node&lt;K,V&gt;[] oldTab = table;</span><br><span class="line">    <span class="comment">// 保存现有的数组长度</span></span><br><span class="line">    <span class="keyword">int</span> oldCap = (oldTab == <span class="keyword">null</span>) ? <span class="number">0</span> : oldTab.length;</span><br><span class="line">    <span class="comment">// 保存现有的负载容量</span></span><br><span class="line">    <span class="keyword">int</span> oldThr = threshold;</span><br><span class="line">    <span class="keyword">int</span> newCap, newThr = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">if</span> (oldCap &gt; <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="comment">// 如果现有容量已经超过最大值了，就没办扩容了，只好随你碰撞了</span></span><br><span class="line">        <span class="keyword">if</span> (oldCap &gt;= MAXIMUM_CAPACITY) &#123;</span><br><span class="line">            threshold = Integer.MAX_VALUE;</span><br><span class="line">            <span class="keyword">return</span> oldTab;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 原有容量左移一位，相当于 oldCap * 2</span></span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span> ((newCap = oldCap &lt;&lt; <span class="number">1</span>) &lt; MAXIMUM_CAPACITY &amp;&amp;</span><br><span class="line">                    oldCap &gt;= DEFAULT_INITIAL_CAPACITY)</span><br><span class="line">            <span class="comment">// 负载容量也扩大一倍</span></span><br><span class="line">            newThr = oldThr &lt;&lt; <span class="number">1</span>; <span class="comment">// double threshold</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (oldThr &gt; <span class="number">0</span>) <span class="comment">// initial capacity was placed in threshold</span></span><br><span class="line">        newCap = oldThr;</span><br><span class="line">    <span class="keyword">else</span> &#123;               <span class="comment">// zero initial threshold signifies using defaults</span></span><br><span class="line">        newCap = DEFAULT_INITIAL_CAPACITY;</span><br><span class="line">        newThr = (<span class="keyword">int</span>)(DEFAULT_LOAD_FACTOR * DEFAULT_INITIAL_CAPACITY);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 负载容量为0，根据数组大小和负载因子计算出来</span></span><br><span class="line">    <span class="keyword">if</span> (newThr == <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="keyword">float</span> ft = (<span class="keyword">float</span>)newCap * loadFactor;</span><br><span class="line">        newThr = (newCap &lt; MAXIMUM_CAPACITY &amp;&amp; ft &lt; (<span class="keyword">float</span>)MAXIMUM_CAPACITY ?</span><br><span class="line">                    (<span class="keyword">int</span>)ft : Integer.MAX_VALUE);</span><br><span class="line">    &#125;</span><br><span class="line">    threshold = newThr;</span><br><span class="line">    <span class="meta">@SuppressWarnings</span>(&#123;<span class="string">"rawtypes"</span>,<span class="string">"unchecked"</span>&#125;)</span><br><span class="line">        Node&lt;K,V&gt;[] newTab = (Node&lt;K,V&gt;[])<span class="keyword">new</span> Node[newCap];</span><br><span class="line">    table = newTab;</span><br><span class="line">    <span class="comment">// 遍历数组中所有元素，重新进行hash</span></span><br><span class="line">    <span class="keyword">if</span> (oldTab != <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; oldCap; ++j) &#123;</span><br><span class="line">            Node&lt;K,V&gt; e;</span><br><span class="line">            <span class="keyword">if</span> ((e = oldTab[j]) != <span class="keyword">null</span>) &#123;</span><br><span class="line">                <span class="comment">// 删除旧索引位置的值</span></span><br><span class="line">                oldTab[j] = <span class="keyword">null</span>;</span><br><span class="line">                <span class="keyword">if</span> (e.next == <span class="keyword">null</span>)</span><br><span class="line">                    <span class="comment">// 给新的索引位置赋值</span></span><br><span class="line">                    newTab[e.hash &amp; (newCap - <span class="number">1</span>)] = e;</span><br><span class="line">                <span class="keyword">else</span> <span class="keyword">if</span> (e <span class="keyword">instanceof</span> TreeNode)</span><br><span class="line">                    ((TreeNode&lt;K,V&gt;)e).split(<span class="keyword">this</span>, newTab, j, oldCap);</span><br><span class="line">                <span class="keyword">else</span> &#123; <span class="comment">// 优化链表</span></span><br><span class="line">                    <span class="comment">// 把原有链表拆成两个链表</span></span><br><span class="line">                    <span class="comment">// 链表1存放在低位（原索引位置）</span></span><br><span class="line">                    Node&lt;K,V&gt; loHead = <span class="keyword">null</span>, loTail = <span class="keyword">null</span>;</span><br><span class="line">                    <span class="comment">// 链表2存放在高位（原索引 + 旧数组长度）</span></span><br><span class="line">                    Node&lt;K,V&gt; hiHead = <span class="keyword">null</span>, hiTail = <span class="keyword">null</span>;</span><br><span class="line">                    Node&lt;K,V&gt; next;</span><br><span class="line">                    <span class="keyword">do</span> &#123;</span><br><span class="line">                        next = e.next;</span><br><span class="line">                        <span class="comment">// 链表1</span></span><br><span class="line">                        <span class="comment">// 这个位运算的原理可以参考第三篇参考资料</span></span><br><span class="line">                        <span class="keyword">if</span> ((e.hash &amp; oldCap) == <span class="number">0</span>) &#123;</span><br><span class="line">                            <span class="keyword">if</span> (loTail == <span class="keyword">null</span>)</span><br><span class="line">                                loHead = e;</span><br><span class="line">                            <span class="keyword">else</span></span><br><span class="line">                                loTail.next = e;</span><br><span class="line">                            loTail = e;</span><br><span class="line">                        &#125;</span><br><span class="line">                        <span class="comment">// 链表2</span></span><br><span class="line">                        <span class="keyword">else</span> &#123;</span><br><span class="line">                            <span class="keyword">if</span> (hiTail == <span class="keyword">null</span>)</span><br><span class="line">                                hiHead = e;</span><br><span class="line">                            <span class="keyword">else</span></span><br><span class="line">                                hiTail.next = e;</span><br><span class="line">                            hiTail = e;</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125; <span class="keyword">while</span> ((e = next) != <span class="keyword">null</span>);</span><br><span class="line">                    <span class="comment">// 链表1存放于原索引位置</span></span><br><span class="line">                    <span class="keyword">if</span> (loTail != <span class="keyword">null</span>) &#123;</span><br><span class="line">                        loTail.next = <span class="keyword">null</span>;</span><br><span class="line">                        newTab[j] = loHead;</span><br><span class="line">                    &#125;</span><br><span class="line">                    <span class="comment">// 链表2存放原索引加上旧数组长度的偏移量</span></span><br><span class="line">                    <span class="keyword">if</span> (hiTail != <span class="keyword">null</span>) &#123;</span><br><span class="line">                        hiTail.next = <span class="keyword">null</span>;</span><br><span class="line">                        newTab[j + oldCap] = hiHead;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> newTab;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="树化改造"><a href="#树化改造" class="headerlink" title="树化改造"></a>树化改造</h2><p>链表长度太长，会被改造成红黑树。</p>
+<p>当链表的长度超过<code>MIN_TREEIFY_CAPACITY</code> 最大树化临界值，就会进行树化改造。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">final</span> <span class="keyword">void</span> <span class="title">treeifyBin</span><span class="params">(Node&lt;K,V&gt;[] tab, <span class="keyword">int</span> hash)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">int</span> n, index; Node&lt;K,V&gt; e;</span><br><span class="line">  <span class="keyword">if</span> (tab == <span class="keyword">null</span> || (n = tab.length) &lt; MIN_TREEIFY_CAPACITY)</span><br><span class="line">    resize();</span><br><span class="line">  <span class="keyword">else</span> <span class="keyword">if</span> ((e = tab[index = (n - <span class="number">1</span>) &amp; hash]) != <span class="keyword">null</span>) &#123;</span><br><span class="line">    ...</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>为什么要树化？</p>
+<p><strong>本质上是个安全问题。</strong>因为链表查询影响性能，如果有人恶意造成哈希碰撞，就会构成哈希碰撞拒绝服务攻击，服务端CPU被大量占用用于链表查询，造成服务变慢或不可用。</p>
+<h2 id="源码系列文章"><a href="#源码系列文章" class="headerlink" title="源码系列文章"></a>源码系列文章</h2><p><a href="http://chaohang.top/2020/02/11/Java%E6%BA%90%E7%A0%81%E7%B3%BB%E5%88%971%E2%80%94%E2%80%94ArrayList/" target="_blank" rel="noopener">Java源码系列1——ArrayList</a></p>
+<p><a href="http://chaohang.top/2020/02/12/Java%E6%BA%90%E7%A0%81%E7%B3%BB%E5%88%972%E2%80%94%E2%80%94HashMap/" target="_blank" rel="noopener">Java源码系列2——HashMap</a></p>
+<p><a href="http://chaohang.top/2020/02/16/Java%E6%BA%90%E7%A0%81%E7%B3%BB%E5%88%973%E2%80%94%E2%80%94LinkedHashMap/" target="_blank" rel="noopener">Java源码系列3——LinkedHashMap</a></p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://tech.meituan.com/2016/06/24/java-hashmap.html" target="_blank" rel="noopener">Java 8系列之重新认识HashMap</a></p>
+<p><a href="https://www.zhihu.com/question/20733617/answer/111577937" target="_blank" rel="noopener">JDK 源码中 HashMap 的 hash 方法原理是什么？胖君的回答</a></p>
+<p><a href="https://segmentfault.com/a/1190000012926722" target="_blank" rel="noopener">HashMap 源码详细分析(JDK1.8)</a></p>
+<blockquote>
+<p>本文首发于我的个人博客 <a href="http://chaohang.top" target="_blank" rel="noopener">http://chaohang.top</a></p>
+<p>作者<a href="http://chaohang.top" target="_blank" rel="noopener">张小超</a></p>
+<p>转载请注明出处</p>
+</blockquote>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Java/" rel="tag"># Java</a>
+              <a href="/tags/Java%E6%BA%90%E7%A0%81%E7%B3%BB%E5%88%97/" rel="tag"># Java源码系列</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/02/11/Java%E6%BA%90%E7%A0%81%E7%B3%BB%E5%88%971%E2%80%94%E2%80%94ArrayList/" rel="prev" title="Java源码系列1——ArrayList">
+      <i class="fa fa-chevron-left"></i> Java源码系列1——ArrayList
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/02/16/Java%E6%BA%90%E7%A0%81%E7%B3%BB%E5%88%973%E2%80%94%E2%80%94LinkedHashMap/" rel="next" title="Java源码系列3——LinkedHashMap">
+      Java源码系列3——LinkedHashMap <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let activeClass = CONFIG.comments.activeClass;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#HASH-值的计算"><span class="nav-number">1.</span> <span class="nav-text">HASH 值的计算</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#前置知识——位运算"><span class="nav-number">1.1.</span> <span class="nav-text">前置知识——位运算</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#扰动函数"><span class="nav-number">1.2.</span> <span class="nav-text">扰动函数</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#为什么要做扰动？"><span class="nav-number">1.2.1.</span> <span class="nav-text">为什么要做扰动？</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#扰动计算"><span class="nav-number">1.2.2.</span> <span class="nav-text">扰动计算</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#取模，计算出下标"><span class="nav-number">1.3.</span> <span class="nav-text">取模，计算出下标</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#为什么HashMap的数组长度要取2的整次幂"><span class="nav-number">1.3.1.</span> <span class="nav-text">为什么HashMap的数组长度要取2的整次幂</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#是什么存入了-table"><span class="nav-number">2.</span> <span class="nav-text">是什么存入了 table</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#理论最大容量"><span class="nav-number">3.</span> <span class="nav-text">理论最大容量</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#负载因子"><span class="nav-number">4.</span> <span class="nav-text">负载因子</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#扩容做了哪些操作"><span class="nav-number">5.</span> <span class="nav-text">扩容做了哪些操作</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#树化改造"><span class="nav-number">6.</span> <span class="nav-text">树化改造</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#源码系列文章"><span class="nav-number">7.</span> <span class="nav-text">源码系列文章</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考"><span class="nav-number">8.</span> <span class="nav-text">参考</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">张小超</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">45</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">33</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">张小超</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">Theme – <a href="https://muse.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> v7.7.1
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="http://cdn.chaohang.top/js%2Fbusuanzi%2F2.3%2Fbusuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('http://cdn.chaohang.top/js%2Fvaline%2F1.3.10%2FValine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'L0Iqsf0FUlKjzj6KJCTnwSf0-9Nh9j0Va',
+      appKey     : 'KxXflLfIf2O0c32s49pBtVxE',
+      placeholder: "留下你的爪印🐾",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : 'zh-cn' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

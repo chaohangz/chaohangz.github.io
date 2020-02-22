@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"www.chaohang.top","root":"/","scheme":"Muse","version":"7.7.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="WebSocket 简介 WebSocket 是 HTML5 开始提供的一种在单个 TCP 连接上进行全双工通讯的协议。WebSocket 使得客户端和服务器之间的数据交换变得更加简单，允许服务端主动向客户端推送数据。在 WebSocket API 中，浏览器和服务器只需要完成一次握手，两者之间就直接可以创建持久性的连接，并进行双向数据传输。在 WebSocket API 中，浏览器和服务器只需要">
+<meta property="og:type" content="article">
+<meta property="og:title" content="实现一个简单的WebSocket聊天室">
+<meta property="og:url" content="https://www.chaohang.top/2019/04/14/%E5%AE%9E%E7%8E%B0%E4%B8%80%E4%B8%AA%E7%AE%80%E5%8D%95%E7%9A%84WebSocket%E8%81%8A%E5%A4%A9%E5%AE%A4/index.html">
+<meta property="og:site_name" content="张小超的博客">
+<meta property="og:description" content="WebSocket 简介 WebSocket 是 HTML5 开始提供的一种在单个 TCP 连接上进行全双工通讯的协议。WebSocket 使得客户端和服务器之间的数据交换变得更加简单，允许服务端主动向客户端推送数据。在 WebSocket API 中，浏览器和服务器只需要完成一次握手，两者之间就直接可以创建持久性的连接，并进行双向数据传输。在 WebSocket API 中，浏览器和服务器只需要">
+<meta property="og:image" content="http://cdn.chaohang.top/20200121113457.png">
+<meta property="og:image" content="http://cdn.chaohang.top/20200121113537.png">
+<meta property="og:image" content="http://cdn.chaohang.top/20200121113638.png">
+<meta property="og:image" content="http://cdn.chaohang.top/20200121113554.png">
+<meta property="og:image" content="http://cdn.chaohang.top/20200121113659.png">
+<meta property="article:published_time" content="2019-04-14T09:36:12.000Z">
+<meta property="article:modified_time" content="2019-04-14T09:36:12.000Z">
+<meta property="article:author" content="张小超">
+<meta property="article:tag" content="WebSocket">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://cdn.chaohang.top/20200121113457.png">
+
+<link rel="canonical" href="https://www.chaohang.top/2019/04/14/%E5%AE%9E%E7%8E%B0%E4%B8%80%E4%B8%AA%E7%AE%80%E5%8D%95%E7%9A%84WebSocket%E8%81%8A%E5%A4%A9%E5%AE%A4/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true
+  };
+</script>
+
+  <title>实现一个简单的WebSocket聊天室 | 张小超的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">张小超的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <h1 class="site-subtitle" itemprop="description">超超不会飞</h1>
+      
+  </div>
+
+  <div class="site-nav-right"></div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>About</a>
+
+  </li>
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.chaohang.top/2019/04/14/%E5%AE%9E%E7%8E%B0%E4%B8%80%E4%B8%AA%E7%AE%80%E5%8D%95%E7%9A%84WebSocket%E8%81%8A%E5%A4%A9%E5%AE%A4/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="张小超">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="张小超的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          实现一个简单的WebSocket聊天室
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2019-04-14 17:36:12" itemprop="dateCreated datePublished" datetime="2019-04-14T17:36:12+08:00">2019-04-14</time>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine: </span>
+    
+    <a title="valine" href="/2019/04/14/%E5%AE%9E%E7%8E%B0%E4%B8%80%E4%B8%AA%E7%AE%80%E5%8D%95%E7%9A%84WebSocket%E8%81%8A%E5%A4%A9%E5%AE%A4/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2019/04/14/%E5%AE%9E%E7%8E%B0%E4%B8%80%E4%B8%AA%E7%AE%80%E5%8D%95%E7%9A%84WebSocket%E8%81%8A%E5%A4%A9%E5%AE%A4/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="WebSocket-简介"><a href="#WebSocket-简介" class="headerlink" title="WebSocket 简介"></a>WebSocket 简介</h2><blockquote>
+<p>WebSocket 是 HTML5 开始提供的一种在单个 TCP 连接上进行全双工通讯的协议。<br>WebSocket 使得客户端和服务器之间的数据交换变得更加简单，允许服务端主动向客户端推送数据。在 WebSocket API 中，浏览器和服务器只需要完成一次握手，两者之间就直接可以创建持久性的连接，并进行双向数据传输。<br>在 WebSocket API 中，浏览器和服务器只需要做一个握手的动作，然后，浏览器和服务器之间就形成了一条快速通道。两者之间就直接可以数据互相传送。</p>
+</blockquote>
+<a id="more"></a>
+<blockquote>
+<p>为什么传统的HTTP协议不能做到WebSocket实现的功能？这是因为HTTP协议是一个请求－响应协议，请求必须先由浏览器发给服务器，服务器才能响应这个请求，再把数据发送给浏览器。换句话说，浏览器不主动请求，服务器是没法主动发数据给浏览器的。</p>
+</blockquote>
+<!--more-->
+<h2 id="Web"><a href="#Web" class="headerlink" title="Web"></a>Web</h2><p>我们先用 <code>express</code> 搭一个基础的服务端。</p>
+<p>创建 <code>index.js</code> 文件</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> app = <span class="built_in">require</span>(<span class="string">'express'</span>)();</span><br><span class="line"><span class="keyword">var</span> http = <span class="built_in">require</span>(<span class="string">'http'</span>).createServer(app);</span><br><span class="line"></span><br><span class="line">app.get(<span class="string">'/'</span>, <span class="function"><span class="keyword">function</span>(<span class="params">req, res</span>)</span>&#123;</span><br><span class="line">  res.send(<span class="string">'&lt;h1&gt;Hello world&lt;/h1&gt;'</span>);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">http.listen(<span class="number">3000</span>, <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">'listening on *:3000'</span>);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<p>run <code>node index.js</code>，并在浏览器打开 <code>http://localhost:3000</code>，访问成功即可看到</p>
+<p><img src="http://cdn.chaohang.top/20200121113457.png" alt></p>
+<h2 id="HTML"><a href="#HTML" class="headerlink" title="HTML"></a>HTML</h2><p>设计我们的主页，实现一个简单的聊天窗口。</p>
+<p>修改 <code>index.js</code></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">app.get(<span class="string">'/'</span>, <span class="function"><span class="keyword">function</span>(<span class="params">req, res</span>)</span>&#123;</span><br><span class="line">  res.sendFile(__dirname + <span class="string">'/index.html'</span>);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<p>创建 <code>index.html</code></p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;!doctype html&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">html</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">title</span>&gt;</span>Socket.IO chat<span class="tag">&lt;/<span class="name">title</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">style</span>&gt;</span><span class="undefined"></span></span><br><span class="line"><span class="undefined">      * &#123; margin: 0; padding: 0; box-sizing: border-box; &#125;</span></span><br><span class="line"><span class="undefined">      body &#123; font: 13px Helvetica, Arial; &#125;</span></span><br><span class="line"><span class="undefined">      form &#123; background: #000; padding: 3px; position: fixed; bottom: 0; width: 100%; &#125;</span></span><br><span class="line"><span class="undefined">      form input &#123; border: 0; padding: 10px; width: 90%; margin-right: .5%; &#125;</span></span><br><span class="line"><span class="undefined">      form button &#123; width: 9%; background: rgb(130, 224, 255); border: none; padding: 10px; &#125;</span></span><br><span class="line"><span class="undefined">      #messages &#123; list-style-type: none; margin: 0; padding: 0; &#125;</span></span><br><span class="line"><span class="undefined">      #messages li &#123; padding: 5px 10px; &#125;</span></span><br><span class="line"><span class="undefined">      #messages li:nth-child(odd) &#123; background: #eee; &#125;</span></span><br><span class="line"><span class="undefined">    </span><span class="tag">&lt;/<span class="name">style</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">ul</span> <span class="attr">id</span>=<span class="string">"messages"</span>&gt;</span><span class="tag">&lt;/<span class="name">ul</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">form</span> <span class="attr">action</span>=<span class="string">""</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">input</span> <span class="attr">id</span>=<span class="string">"m"</span> <span class="attr">autocomplete</span>=<span class="string">"off"</span> /&gt;</span><span class="tag">&lt;<span class="name">button</span>&gt;</span>Send<span class="tag">&lt;/<span class="name">button</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">form</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>重启应用并刷新页面你就可以看到一个如下图所示</p>
+<p><img src="http://cdn.chaohang.top/20200121113537.png" alt></p>
+<h2 id="Socket-io"><a href="#Socket-io" class="headerlink" title="Socket.io"></a>Socket.io</h2><p>引入<code>socket.io</code></p>
+<p><code>npm install --save socket.io</code></p>
+<p>修改 <code>index.js</code></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> app = <span class="built_in">require</span>(<span class="string">'express'</span>)();</span><br><span class="line"><span class="keyword">var</span> http = <span class="built_in">require</span>(<span class="string">'http'</span>).Server(app);</span><br><span class="line"><span class="keyword">var</span> io = <span class="built_in">require</span>(<span class="string">'socket.io'</span>)(http);</span><br><span class="line"></span><br><span class="line">app.get(<span class="string">'/'</span>, <span class="function"><span class="keyword">function</span>(<span class="params">req, res</span>)</span>&#123;</span><br><span class="line">  res.sendFile(__dirname + <span class="string">'/index.html'</span>);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">io.on(<span class="string">'connection'</span>, <span class="function"><span class="keyword">function</span>(<span class="params">socket</span>)</span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">'an user connected'</span>);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">http.listen(<span class="number">3000</span>, <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">'listening on *:3000'</span>);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<p>修改 <code>index.html</code>，在<code>&lt;/body&gt;</code>下添加如下代码</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">"/socket.io/socket.io.js"</span>&gt;</span><span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span><span class="undefined"></span></span><br><span class="line"><span class="javascript">  <span class="keyword">var</span> socket = io();</span></span><br><span class="line"><span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>重启应用并刷新页面，就可以看到命令行打印如下</p>
+<p><img src="http://cdn.chaohang.top/20200121113638.png" alt></p>
+<h2 id="Emitting-event"><a href="#Emitting-event" class="headerlink" title="Emitting event"></a>Emitting event</h2><p>当用户在聊天窗的输入框内输入，并提交时，触发 <code>emit</code> 事件，服务端监听到该事件并做出相应的反应。</p>
+<p>修改 <code>index.html</code></p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">"/socket.io/socket.io.js"</span>&gt;</span><span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">"https://code.jquery.com/jquery-1.11.1.js"</span>&gt;</span><span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span><span class="undefined"></span></span><br><span class="line"><span class="javascript">  $(<span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span></span><br><span class="line"><span class="javascript">    <span class="keyword">var</span> socket = io();</span></span><br><span class="line"><span class="javascript">    $(<span class="string">'form'</span>).submit(<span class="function"><span class="keyword">function</span>(<span class="params">e</span>)</span>&#123;</span></span><br><span class="line"><span class="javascript">      e.preventDefault(); <span class="comment">// 防止页面重新加载</span></span></span><br><span class="line"><span class="javascript">      socket.emit(<span class="string">'chat message'</span>, $(<span class="string">'#m'</span>).val());</span></span><br><span class="line"><span class="javascript">      $(<span class="string">'#m'</span>).val(<span class="string">''</span>);</span></span><br><span class="line"><span class="javascript">      <span class="keyword">return</span> <span class="literal">false</span>;</span></span><br><span class="line"><span class="undefined">    &#125;);</span></span><br><span class="line"><span class="undefined">  &#125;);</span></span><br><span class="line"><span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>服务端监听该事件，在 <code>index.js</code> 文件添加该代码</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">io.on(<span class="string">'connection'</span>, <span class="function"><span class="keyword">function</span>(<span class="params">socket</span>)</span>&#123;</span><br><span class="line">  socket.on(<span class="string">'chat message'</span>, <span class="function"><span class="keyword">function</span>(<span class="params">msg</span>)</span>&#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">'message: '</span> + msg);</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<h2 id="展示消息"><a href="#展示消息" class="headerlink" title="展示消息"></a>展示消息</h2><p>当服务端收到用户A发出的消息，服务端重新发出该消息，让客户端接收，客户端监听到该事件后展示该条消息，就可以实现用户 A, B, C 都接收到该消息。</p>
+<p>修改 <code>index.js</code></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">io.on(<span class="string">'connection'</span>, <span class="function"><span class="keyword">function</span>(<span class="params">socket</span>)</span>&#123;</span><br><span class="line">  socket.on(<span class="string">'chat message'</span>, <span class="function"><span class="keyword">function</span>(<span class="params">msg</span>)</span>&#123;</span><br><span class="line">    io.emit(<span class="string">'chat message'</span>, msg);</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<p>修改 <code>index.html</code>，实现消息的展示</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span><span class="undefined"></span></span><br><span class="line"><span class="javascript">  $(<span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span></span><br><span class="line"><span class="javascript">    <span class="keyword">var</span> socket = io();</span></span><br><span class="line"><span class="javascript">    $(<span class="string">'form'</span>).submit(<span class="function"><span class="keyword">function</span>(<span class="params">e</span>)</span>&#123;</span></span><br><span class="line"><span class="javascript">      e.preventDefault(); <span class="comment">// prevents page reloading</span></span></span><br><span class="line"><span class="javascript">      socket.emit(<span class="string">'chat message'</span>, $(<span class="string">'#m'</span>).val());</span></span><br><span class="line"><span class="javascript">      $(<span class="string">'#m'</span>).val(<span class="string">''</span>);</span></span><br><span class="line"><span class="javascript">      <span class="keyword">return</span> <span class="literal">false</span>;</span></span><br><span class="line"><span class="undefined">    &#125;);</span></span><br><span class="line"><span class="javascript">    socket.on(<span class="string">'chat message'</span>, <span class="function"><span class="keyword">function</span>(<span class="params">msg</span>)</span>&#123;</span></span><br><span class="line"><span class="javascript">      $(<span class="string">'#messages'</span>).append($(<span class="string">'&lt;li&gt;'</span>).text(msg));</span></span><br><span class="line"><span class="undefined">    &#125;);</span></span><br><span class="line"><span class="undefined">  &#125;);</span></span><br><span class="line"><span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>重启应用并刷新页面，可以打开多个浏览器页面同时访问 <code>localhost:3000</code>，就可以体验简单聊天室的效果。</p>
+<p><img src="http://cdn.chaohang.top/20200121113554.png" alt></p>
+<h2 id="设置昵称"><a href="#设置昵称" class="headerlink" title="设置昵称"></a>设置昵称</h2><p> 在每个用户进入的时候，随机生成一个数字作为用户的昵称，并且向所有用户广播该用户进入聊天室。当用户发送消息时，拼接上用户的昵称。</p>
+<p>修改 <code>index.js</code></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">io.on(<span class="string">'connection'</span>, (socket) =&gt; &#123;</span><br><span class="line">  <span class="keyword">const</span> nickname = <span class="string">'user'</span> + <span class="built_in">Math</span>.ceil((<span class="built_in">Math</span>.random() * <span class="number">1000</span>))</span><br><span class="line">  socket.broadcast.emit(<span class="string">'connection'</span>, nickname + <span class="string">' connected'</span>)</span><br><span class="line"></span><br><span class="line">  socket.on(<span class="string">'chat message'</span>, (msg) =&gt; &#123;</span><br><span class="line">    io.emit(<span class="string">'chat message'</span>, nickname + <span class="string">': '</span> + msg)</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<p>修改 <code>index.html</code>，监听 <code>connection</code> 事件</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span><span class="undefined"></span></span><br><span class="line"><span class="javascript">    $(() =&gt; &#123;</span></span><br><span class="line"><span class="javascript">      <span class="keyword">const</span> socket = io()</span></span><br><span class="line"><span class="javascript">      $(<span class="string">'form'</span>).submit(<span class="function">(<span class="params">e</span>) =&gt;</span> &#123;</span></span><br><span class="line"><span class="undefined">        e.preventDefault()</span></span><br><span class="line"><span class="javascript">        socket.emit(<span class="string">'chat message'</span>, $(<span class="string">'#m'</span>).val())</span></span><br><span class="line"><span class="javascript">        $(<span class="string">'#m'</span>).val(<span class="string">''</span>)</span></span><br><span class="line"><span class="javascript">        <span class="keyword">return</span> <span class="literal">false</span></span></span><br><span class="line"><span class="undefined">      &#125;);</span></span><br><span class="line"><span class="javascript">      socket.on(<span class="string">'chat message'</span>, (msg) =&gt; &#123;</span></span><br><span class="line"><span class="javascript">        $(<span class="string">'#messages'</span>).append($(<span class="string">'&lt;li&gt;'</span>).text(msg))</span></span><br><span class="line"><span class="undefined">      &#125;)</span></span><br><span class="line"><span class="javascript">      socket.on(<span class="string">'connection'</span>, (msg) =&gt; &#123;</span></span><br><span class="line"><span class="javascript">        $(<span class="string">'#messages'</span>).append($(<span class="string">'&lt;li&gt;'</span>).text(msg))</span></span><br><span class="line"><span class="undefined">      &#125;)</span></span><br><span class="line"><span class="undefined">    &#125;);</span></span><br><span class="line"><span class="undefined">  </span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>重启应用并打开多个客户端，可以看到如下效果</p>
+<p><img src="http://cdn.chaohang.top/20200121113659.png" alt></p>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p>本文大部分案例出自 <code>socket.io</code> 的入门文档 <a href="https://socket.io/get-started/chat/" target="_blank" rel="noopener">https://socket.io/get-started/chat/</a></p>
+<p><a href="https://en.wikipedia.org/wiki/WebSocket" target="_blank" rel="noopener">https://en.wikipedia.org/wiki/WebSocket</a></p>
+<p><a href="https://www.liaoxuefeng.com/wiki/001434446689867b27157e896e74d51a89c25cc8b43bdb3000/001472780997905c8f293615c5a42eab058b6dc29936a5c000" target="_blank" rel="noopener">廖雪峰官网 WebSocket</a></p>
+<p><a href="http://www.runoob.com/html/html5-websocket.html" target="_blank" rel="noopener">菜鸟教程 WebSocket</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/WebSocket/" rel="tag"># WebSocket</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2018/11/19/%E5%BE%AE%E4%BF%A1%E6%94%AF%E4%BB%98%E5%BC%80%E5%8F%91%E5%AE%9E%E8%AE%B0/" rel="prev" title="微信支付开发实记">
+      <i class="fa fa-chevron-left"></i> 微信支付开发实记
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/04/24/%E4%BD%BF%E7%94%A8-trash-%E9%81%BF%E5%85%8D-rm-rf-%E6%82%B2%E5%89%A7/" rel="next" title="使用 trash 避免 rm -rf 悲剧">
+      使用 trash 避免 rm -rf 悲剧 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let activeClass = CONFIG.comments.activeClass;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#WebSocket-简介"><span class="nav-number">1.</span> <span class="nav-text">WebSocket 简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Web"><span class="nav-number">2.</span> <span class="nav-text">Web</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#HTML"><span class="nav-number">3.</span> <span class="nav-text">HTML</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Socket-io"><span class="nav-number">4.</span> <span class="nav-text">Socket.io</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Emitting-event"><span class="nav-number">5.</span> <span class="nav-text">Emitting event</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#展示消息"><span class="nav-number">6.</span> <span class="nav-text">展示消息</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#设置昵称"><span class="nav-number">7.</span> <span class="nav-text">设置昵称</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考资料"><span class="nav-number">8.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">张小超</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">45</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">33</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">张小超</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">Theme – <a href="https://muse.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> v7.7.1
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="http://cdn.chaohang.top/js%2Fbusuanzi%2F2.3%2Fbusuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('http://cdn.chaohang.top/js%2Fvaline%2F1.3.10%2FValine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'L0Iqsf0FUlKjzj6KJCTnwSf0-9Nh9j0Va',
+      appKey     : 'KxXflLfIf2O0c32s49pBtVxE',
+      placeholder: "留下你的爪印🐾",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : 'zh-cn' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

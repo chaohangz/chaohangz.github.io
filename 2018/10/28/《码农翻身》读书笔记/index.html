@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"www.chaohang.top","root":"/","scheme":"Muse","version":"7.7.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="花了一天时间翻完了《码农翻身》（跳过了Java部分）。生动有趣的书看起来就是舒服，竟有引人入胜、手不释卷的感觉，一不小心就翻完了。是一本很好的入门科普读物，开阔技术视野。 下面是书中的摘抄和笔记 线程我是一个线程  不知道什么时候会被挑中执行 在执行的过程中随时可能被打断，让出CPU 一旦出现硬盘、数据库这样耗时的操作，也得让出CPU 数据来了，也不一定马上执行，还得等着被CPU挑选  三次握手T">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《码农翻身》读书笔记">
+<meta property="og:url" content="https://www.chaohang.top/2018/10/28/%E3%80%8A%E7%A0%81%E5%86%9C%E7%BF%BB%E8%BA%AB%E3%80%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/index.html">
+<meta property="og:site_name" content="张小超的博客">
+<meta property="og:description" content="花了一天时间翻完了《码农翻身》（跳过了Java部分）。生动有趣的书看起来就是舒服，竟有引人入胜、手不释卷的感觉，一不小心就翻完了。是一本很好的入门科普读物，开阔技术视野。 下面是书中的摘抄和笔记 线程我是一个线程  不知道什么时候会被挑中执行 在执行的过程中随时可能被打断，让出CPU 一旦出现硬盘、数据库这样耗时的操作，也得让出CPU 数据来了，也不一定马上执行，还得等着被CPU挑选  三次握手T">
+<meta property="og:image" content="http://cdn.chaohang.top/20200212113500.png">
+<meta property="og:image" content="http://cdn.chaohang.top/20200212113554.png">
+<meta property="og:image" content="http://cdn.chaohang.top/20200212113612.png">
+<meta property="og:image" content="http://cdn.chaohang.top/20200212113656.png">
+<meta property="article:published_time" content="2018-10-28T12:14:14.000Z">
+<meta property="article:modified_time" content="2018-10-28T12:14:14.000Z">
+<meta property="article:author" content="张小超">
+<meta property="article:tag" content="阅读">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://cdn.chaohang.top/20200212113500.png">
+
+<link rel="canonical" href="https://www.chaohang.top/2018/10/28/%E3%80%8A%E7%A0%81%E5%86%9C%E7%BF%BB%E8%BA%AB%E3%80%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true
+  };
+</script>
+
+  <title>《码农翻身》读书笔记 | 张小超的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">张小超的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <h1 class="site-subtitle" itemprop="description">超超不会飞</h1>
+      
+  </div>
+
+  <div class="site-nav-right"></div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>About</a>
+
+  </li>
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.chaohang.top/2018/10/28/%E3%80%8A%E7%A0%81%E5%86%9C%E7%BF%BB%E8%BA%AB%E3%80%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="张小超">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="张小超的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          《码农翻身》读书笔记
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2018-10-28 20:14:14" itemprop="dateCreated datePublished" datetime="2018-10-28T20:14:14+08:00">2018-10-28</time>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine: </span>
+    
+    <a title="valine" href="/2018/10/28/%E3%80%8A%E7%A0%81%E5%86%9C%E7%BF%BB%E8%BA%AB%E3%80%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2018/10/28/%E3%80%8A%E7%A0%81%E5%86%9C%E7%BF%BB%E8%BA%AB%E3%80%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>花了一天时间翻完了《码农翻身》（跳过了Java部分）。生动有趣的书看起来就是舒服，竟有引人入胜、手不释卷的感觉，一不小心就翻完了。是一本很好的入门科普读物，开阔技术视野。</p>
+<p>下面是书中的摘抄和笔记</p>
+<h3 id="线程"><a href="#线程" class="headerlink" title="线程"></a>线程</h3><p><a href="https://mp.weixin.qq.com/s?__biz=MzAxOTc0NzExNg==&amp;mid=416915373&amp;idx=1&amp;sn=f80a13b099237534a3ef777d511d831a&amp;scene=21#wechat_redirect" target="_blank" rel="noopener">我是一个线程</a></p>
+<ol>
+<li>不知道什么时候会被挑中执行</li>
+<li>在执行的过程中随时可能被打断，让出CPU</li>
+<li>一旦出现硬盘、数据库这样耗时的操作，也得让出CPU</li>
+<li>数据来了，也不一定马上执行，还得等着被CPU挑选</li>
+</ol>
+<h3 id="三次握手"><a href="#三次握手" class="headerlink" title="三次握手"></a>三次握手</h3><p><a href="https://mp.weixin.qq.com/s?__biz=MzAxOTc0NzExNg==&amp;mid=2665513375&amp;idx=1&amp;sn=e11745d5cb28fa1f89465f8d0e5fae1a&amp;chksm=80d679dcb7a1f0cadec0a1db45b3fa3f6eabde4a9e56a77acf551fbc1511e6b8f055ee2c97e3&amp;scene=27#wechat_redirect" target="_blank" rel="noopener">TCP/IP之大明内阁</a><br><a href="https://mp.weixin.qq.com/s?__biz=MzAxOTc0NzExNg==&amp;mid=2665513384&amp;idx=1&amp;sn=82c45e4430618270a744e212d2f57990&amp;chksm=80d679ebb7a1f0fd27fe1814765a0e60b1c293ca4e09403271b4bb3f38f317439956fdca1bc1&amp;scene=27#wechat_redirect" target="_blank" rel="noopener">TCP/IP之蓟辽督师</a><br><a href="https://mp.weixin.qq.com/s?__biz=MzAxOTc0NzExNg==&amp;mid=2665513094&amp;idx=1&amp;sn=a2accfc41107ac08d74ec3317995955e&amp;scene=27#wechat_redirect" target="_blank" rel="noopener">TCP/IP 之 大明王朝邮差</a></p>
+<p><img src="http://cdn.chaohang.top/20200212113500.png" alt="三次握手"></p>
+<p>发送的信息被拆分成小包裹，编上序号，打乱顺序后发送，由服务端发送，客户端接收，接收后返回确认接收信息。如果一定时间内没有收到确认信息，则代表信息丢失（可能是发出的包裹丢失，也可能是返回的确认信息丢失），重新发送该包裹。全部接收完成后按照序号重新组装成完整信息。</p>
+<h3 id="HTTPS"><a href="#HTTPS" class="headerlink" title="HTTPS"></a>HTTPS</h3><p><a href="https://mp.weixin.qq.com/s?__biz=MzAxOTc0NzExNg==&amp;mid=2665513779&amp;idx=1&amp;sn=a1de58690ad4f95111e013254a026ca2&amp;chksm=80d67b70b7a1f26697fa1626b3e9830dbdf4857d7a9528d22662f2e43af149265c4fd1b60024&amp;scene=27#wechat_redirect" target="_blank" rel="noopener">一个故事讲完https</a></p>
+<a id="more"></a>
+<p>这里面讲HTTPS讲的非常好，通俗易懂有趣。</p>
+<p><img src="http://cdn.chaohang.top/20200212113554.png" alt></p>
+<p><img src="http://cdn.chaohang.top/20200212113612.png" alt></p>
+<p>bill的公钥及身份信息通过HTTPS传输给CA服务器，并生成数字证书。</p>
+<p><img src="http://cdn.chaohang.top/20200212113656.png" alt></p>
+<p>验证完证书后，除了对称秘钥是用非对称加密传输，其他请求都使用对称加密通信。</p>
+<h4 id="如何确保CA公钥的安全"><a href="#如何确保CA公钥的安全" class="headerlink" title="如何确保CA公钥的安全"></a>如何确保CA公钥的安全</h4><p>ＣＡ本身也有证书来证明自己的身份，并且ＣＡ的信用是像树一样分级的，高层的ＣＡ给底层的ＣＡ做信用背书，而操作系统／浏览器中会内置一些顶层的ＣＡ的证书，相当于你自动信任了他们。　这些顶层的ＣＡ证书一定得安全地放入操作系统／浏览器当中，否则世界大乱。</p>
+<h3 id="OTHER"><a href="#OTHER" class="headerlink" title="OTHER"></a>OTHER</h3><p><a href="https://mp.weixin.qq.com/s?__biz=MzAxOTc0NzExNg==&amp;mid=2665513725&amp;idx=1&amp;sn=bdad37137c3660953511410c289edc86&amp;chksm=80d67abeb7a1f3a8cd8c62cfb3914aa9e1a425ce4986ec812c2e77c4ef8a10aab006032735b9&amp;scene=27#wechat_redirect" target="_blank" rel="noopener">机房夜话</a></p>
+<p>单点登录也讲得妙趣横生</p>
+<p><a href="https://mp.weixin.qq.com/s?__biz=MzAxOTc0NzExNg==&amp;mid=2665513744&amp;idx=1&amp;sn=93d0db97cfd67422bcd21c8afd00f495&amp;chksm=80d67b53b7a1f24537fdc7c10eb2783357c1f8c65ad55601a722216d2293ae3fb7b1c16e5449&amp;scene=27#wechat_redirect" target="_blank" rel="noopener">从密码到token， 一个授权的故事</a></p>
+<p>第三方授权，接入微信服务会经常用到。</p>
+<p><a href="https://mp.weixin.qq.com/s?__biz=MzAxOTc0NzExNg==&amp;mid=2665513387&amp;idx=1&amp;sn=99665948d0b968cf15c5e7a01ffe166c&amp;chksm=80d679e8b7a1f0febad077b57e8ad73bfb4b08de74814c45e1b1bd61ab4017b5041942403afb&amp;scene=27#wechat_redirect" target="_blank" rel="noopener">张大胖的socket</a></p>
+<h4 id="端口号"><a href="#端口号" class="headerlink" title="端口号"></a>端口号</h4><p>为了区分同一台服务器的不同进程。<br>进程号是动态的，如果服务器端的进程重启了，进程号就变了。端口号就是从来标识服务器端的进程。</p>
+<h3 id="老司机的忠告"><a href="#老司机的忠告" class="headerlink" title="老司机的忠告"></a>老司机的忠告</h3><ol>
+<li>凡事必先骑虎上背</li>
+<li>局部性原理<br>（1）时间局部性：如果程序中的某条指令一旦执行，则不久之后该条指令可能再次被执行；如果某数据被访问，则不久之后该数据可能再次被访问。<br>（2）空间局部性：是指一旦程序访问了某个存储单元，则不久之后，其附近的存储单元也将被访问。</li>
+<li>抽象是计算机科学中极为重要的武器之一</li>
+<li>要透彻地理解一门技术的本质</li>
+<li>写漂亮的代码</li>
+<li>书籍里的知识，体系更加完整，有深度——看书好过碎片阅读</li>
+<li>不要游走在各大语言的边缘</li>
+<li>坚持写作（输出）</li>
+</ol>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E9%98%85%E8%AF%BB/" rel="tag"># 阅读</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2018/10/20/%E7%9C%8B%E8%A7%81/" rel="prev" title="看见">
+      <i class="fa fa-chevron-left"></i> 看见
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2018/10/31/%E7%99%BD%E5%A4%9C%E8%A1%8C/" rel="next" title="白夜行">
+      白夜行 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let activeClass = CONFIG.comments.activeClass;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#线程"><span class="nav-number">1.</span> <span class="nav-text">线程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#三次握手"><span class="nav-number">2.</span> <span class="nav-text">三次握手</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#HTTPS"><span class="nav-number">3.</span> <span class="nav-text">HTTPS</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#如何确保CA公钥的安全"><span class="nav-number">3.1.</span> <span class="nav-text">如何确保CA公钥的安全</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#OTHER"><span class="nav-number">4.</span> <span class="nav-text">OTHER</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#端口号"><span class="nav-number">4.1.</span> <span class="nav-text">端口号</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#老司机的忠告"><span class="nav-number">5.</span> <span class="nav-text">老司机的忠告</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">张小超</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">45</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">33</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">张小超</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">Theme – <a href="https://muse.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> v7.7.1
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="http://cdn.chaohang.top/js%2Fbusuanzi%2F2.3%2Fbusuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('http://cdn.chaohang.top/js%2Fvaline%2F1.3.10%2FValine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'L0Iqsf0FUlKjzj6KJCTnwSf0-9Nh9j0Va',
+      appKey     : 'KxXflLfIf2O0c32s49pBtVxE',
+      placeholder: "留下你的爪印🐾",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : 'zh-cn' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

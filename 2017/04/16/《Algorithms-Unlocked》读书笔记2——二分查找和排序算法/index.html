@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"www.chaohang.top","root":"/","scheme":"Muse","version":"7.7.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="《Algorithms Unlocked》是 《算法导论》的合著者之一 Thomas H. Cormen 写的一本算法基础，算是啃CLRS前的开胃菜和辅助教材。如果CLRS的厚度让人望而生畏，这本200多页的小读本刚好合适带你入门。 书中没有涉及编程语言，直接用文字描述算法，我用 JavaScript 对书中的算法进行描述。 二分查找在排好序的数组中查找目标值x。在p到r区间中，总是取索引为q的中">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《Algorithms Unlocked》读书笔记2——二分查找和排序算法">
+<meta property="og:url" content="https://www.chaohang.top/2017/04/16/%E3%80%8AAlgorithms-Unlocked%E3%80%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B02%E2%80%94%E2%80%94%E4%BA%8C%E5%88%86%E6%9F%A5%E6%89%BE%E5%92%8C%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95/index.html">
+<meta property="og:site_name" content="张小超的博客">
+<meta property="og:description" content="《Algorithms Unlocked》是 《算法导论》的合著者之一 Thomas H. Cormen 写的一本算法基础，算是啃CLRS前的开胃菜和辅助教材。如果CLRS的厚度让人望而生畏，这本200多页的小读本刚好合适带你入门。 书中没有涉及编程语言，直接用文字描述算法，我用 JavaScript 对书中的算法进行描述。 二分查找在排好序的数组中查找目标值x。在p到r区间中，总是取索引为q的中">
+<meta property="og:image" content="http://omwf3ob75.bkt.clouddn.com/mergesort1.jpeg">
+<meta property="og:image" content="http://omwf3ob75.bkt.clouddn.com/mergersort2.jpeg">
+<meta property="og:image" content="http://omwf3ob75.bkt.clouddn.com/quicksort1.jpeg">
+<meta property="og:image" content="http://omwf3ob75.bkt.clouddn.com/quicksort2.jpeg">
+<meta property="article:published_time" content="2017-04-16T12:43:49.000Z">
+<meta property="article:modified_time" content="2017-04-16T12:43:49.000Z">
+<meta property="article:author" content="张小超">
+<meta property="article:tag" content="算法">
+<meta property="article:tag" content="阅读">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://omwf3ob75.bkt.clouddn.com/mergesort1.jpeg">
+
+<link rel="canonical" href="https://www.chaohang.top/2017/04/16/%E3%80%8AAlgorithms-Unlocked%E3%80%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B02%E2%80%94%E2%80%94%E4%BA%8C%E5%88%86%E6%9F%A5%E6%89%BE%E5%92%8C%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true
+  };
+</script>
+
+  <title>《Algorithms Unlocked》读书笔记2——二分查找和排序算法 | 张小超的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">张小超的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <h1 class="site-subtitle" itemprop="description">超超不会飞</h1>
+      
+  </div>
+
+  <div class="site-nav-right"></div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>About</a>
+
+  </li>
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.chaohang.top/2017/04/16/%E3%80%8AAlgorithms-Unlocked%E3%80%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B02%E2%80%94%E2%80%94%E4%BA%8C%E5%88%86%E6%9F%A5%E6%89%BE%E5%92%8C%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="张小超">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="张小超的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          《Algorithms Unlocked》读书笔记2——二分查找和排序算法
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2017-04-16 20:43:49" itemprop="dateCreated datePublished" datetime="2017-04-16T20:43:49+08:00">2017-04-16</time>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine: </span>
+    
+    <a title="valine" href="/2017/04/16/%E3%80%8AAlgorithms-Unlocked%E3%80%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B02%E2%80%94%E2%80%94%E4%BA%8C%E5%88%86%E6%9F%A5%E6%89%BE%E5%92%8C%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2017/04/16/%E3%80%8AAlgorithms-Unlocked%E3%80%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B02%E2%80%94%E2%80%94%E4%BA%8C%E5%88%86%E6%9F%A5%E6%89%BE%E5%92%8C%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p><a href="https://book.douban.com/subject/20421419/" target="_blank" rel="noopener">《Algorithms Unlocked》</a>是 《算法导论》的合著者之一 Thomas H. Cormen 写的一本算法基础，算是啃CLRS前的开胃菜和辅助教材。如果CLRS的厚度让人望而生畏，这本200多页的小读本刚好合适带你入门。</p>
+<p>书中没有涉及编程语言，直接用文字描述算法，我用 JavaScript 对书中的算法进行描述。</p>
+<h2 id="二分查找"><a href="#二分查找" class="headerlink" title="二分查找"></a>二分查找</h2><p>在排好序的数组中查找目标值x。在p到r区间中，总是取索引为q的中间值与x进行比较，如果array[q]大于x，则比较p到q-1区间，否则比较q+1到r区间，直到array[q]等于x或p&gt;r。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 利用二分法在已经排好序的数组中查找值x</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">binarySearch</span>(<span class="params">array, x</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">let</span> p = <span class="number">1</span>;</span><br><span class="line">  <span class="keyword">let</span> r = array.length - <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">while</span> (p &lt;= r) &#123;</span><br><span class="line">    <span class="keyword">let</span> q = <span class="built_in">Math</span>.round((p + r) / <span class="number">2</span>);  <span class="comment">//四舍五入取整</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (array[q] === x) &#123;</span><br><span class="line">      <span class="keyword">return</span> q;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      <span class="keyword">if</span> (array[q] &gt; x) &#123;</span><br><span class="line">        <span class="comment">// 如果q没有减一，遇到找不到x的情况，</span></span><br><span class="line">        <span class="comment">// 就会陷入while循环中出不来，因为p会一直等于r</span></span><br><span class="line">        r = q - <span class="number">1</span>; </span><br><span class="line">      &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        p = q + <span class="number">1</span>;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> <span class="string">'NOT-FOUND'</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<a id="more"></a>
+<p>也可以把二分查找写成递归风格。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 二分法递归风格</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">recursiveBinarySearch</span>(<span class="params">array, p, r, x</span>) </span>&#123;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> (p &gt; r) &#123;  <span class="comment">// 基础情况</span></span><br><span class="line">     <span class="built_in">console</span>.log(<span class="string">'NOT-FOUND'</span>);</span><br><span class="line">     <span class="keyword">return</span>;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">let</span> q = <span class="built_in">Math</span>.round((p + r) / <span class="number">2</span>);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> (array[q] === x) &#123;  <span class="comment">// 基础情况</span></span><br><span class="line">    <span class="built_in">console</span>.log(q);</span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (array[q] &gt; x) &#123;</span><br><span class="line">      recursiveBinarySearch(array, p, q<span class="number">-1</span>, x);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      recursiveBinarySearch(array, q+<span class="number">1</span>, r, x);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="排序"><a href="#排序" class="headerlink" title="排序"></a>排序</h2><h3 id="选择排序"><a href="#选择排序" class="headerlink" title="选择排序"></a>选择排序</h3><p>从第一个元素开始遍历，把该元素跟在它之后的所有元素进行比较，选出最小的元素放入该位置。</p>
+<p>以书架上的书本排序为例。我们看一眼书架上的第一本书的书名，接着与第二本进行比较，如果第二本书的书名第一个字母的顺序小于第一本，那我们忘掉第一本书的书名，记下第二本书的书名，此时我们并没有对书籍进行移动，只是比较了书名的顺序，并把顺序最小的书名记在脑子里。直到与最后一本进行比较结束，我们把脑子里顺序最小的书名对应的书与第一本书对调了一下位置。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">selectionSort</span> (<span class="params">array</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">let</span> i = <span class="number">0</span>; i &lt; array.length - <span class="number">1</span>; i++) &#123;</span><br><span class="line">    <span class="keyword">let</span> smallest = i;</span><br><span class="line">    <span class="keyword">let</span> key = array[i]; <span class="comment">// 保存当前值</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">let</span> j = i + <span class="number">1</span>; j &lt; array.length; j++) &#123;</span><br><span class="line">      <span class="comment">// 比较当前值和最小值，如果当前值小于最小值则把当前值的索引赋给smallest</span></span><br><span class="line">      <span class="keyword">if</span> (array[j] &lt; array[smallest]) &#123;</span><br><span class="line">        smallest = j;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 最小值和当前值交换</span></span><br><span class="line">    array[i] = array[smallest];</span><br><span class="line">    array[smallest] = key;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> array;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>选择排序效率很低，因为选择排序进行了较多的比较操作，但移动元素的操作次数很少。所以当遇到移动元素相当耗时——或者它们所占空间很大或者它们存储在一个存储较慢的设备中——那么选择排序可能是一个合适的算法。</p>
+<h3 id="插入排序"><a href="#插入排序" class="headerlink" title="插入排序"></a>插入排序</h3><p>以书架为例，假设前4个位置已经排好序了，我们拿起第五本书与第四本进行比较，如果第四本大于第五本，把第四本向右移动一个位置，再把第三本与第五本进行比较，如果第三本还大于第五本，把第三本向右移动一个位置，刚好放入第四本空出来的位置。直到遇到一本小于第五本的书或者已经没有书可以比较了，把第五本书插入小于它的那本书的后面。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">insertionSort</span> (<span class="params">array</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">let</span> i = <span class="number">1</span>; i &lt; array.length; i++) &#123;</span><br><span class="line">    <span class="keyword">let</span> key = array[i];  <span class="comment">// 把当前操作值保存到key中</span></span><br><span class="line">    <span class="keyword">let</span> j = i - <span class="number">1</span>;       <span class="comment">// j 为当前值的前一位</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 在j大于等于0且前一位大于当前值时，前一位向右移动一个位置</span></span><br><span class="line">    <span class="keyword">while</span> (j &gt;= <span class="number">0</span> &amp;&amp; array[j] &gt; key) &#123;</span><br><span class="line">      array[j+<span class="number">1</span>] = array[j];</span><br><span class="line">      j -= <span class="number">1</span>;</span><br><span class="line">    &#125;;</span><br><span class="line">    <span class="comment">// 直到遇到array[j]小于当前操作值或者j小于0时，把当前值插入所空出来的位置    </span></span><br><span class="line">    array[j+<span class="number">1</span>] = key;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> array;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>插入排序与选择排序时间差不多，如果移动操作太过耗时最好用选择排序。插入排序适用于数组一开始就已经“基本有序”的状态。</p>
+<h3 id="归并排序"><a href="#归并排序" class="headerlink" title="归并排序"></a>归并排序</h3><p>归并排序中使用一个被称为<strong>分治法</strong>的通用模式。在分治法中，我们将原问题分解为类似原问题的子问题，并递归的求解这些子问题，然后再合并这些子问题的解来得出原问题的解。</p>
+<ol>
+<li><strong>分解：</strong>把一个问题分解为多个子问题，这些子问题是更小实例上的原问题。</li>
+<li><strong>解决：</strong>递归地求解子问题。当子问题足够小时，按照基础情况来求解。</li>
+<li><strong>合并：</strong>把子问题的解合并成原问题的解。</li>
+</ol>
+<p>在归并排序中，我们把数组不断用二分法分解成两个小数组，直到每个数组只剩一个元素（基础情况）。再把小数组排好序并进行合并。</p>
+<p><img src="http://omwf3ob75.bkt.clouddn.com/mergesort1.jpeg" alt="mergesort1"></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// array: 数组</span></span><br><span class="line"><span class="comment">// p: 开始索引</span></span><br><span class="line"><span class="comment">// r: 末尾索引</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">mergeSort</span> (<span class="params">array, p, r</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (p &gt;= r) &#123;</span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="comment">// 不可以用四舍五入，找了一夜的bug竟然是因为四舍五入这个小蹄子</span></span><br><span class="line">    <span class="keyword">let</span> q = <span class="built_in">Math</span>.floor((p + r) / <span class="number">2</span>);</span><br><span class="line">    <span class="comment">// 递归调用，把数组拆分成两部分，直到每个数组只剩一个元素</span></span><br><span class="line">    mergeSort(array, p, q);</span><br><span class="line">    mergeSort(array, q + <span class="number">1</span>, r);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 把两个子数组排序并合并</span></span><br><span class="line">    merge(array, p, q, r);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> array;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>程序的真正工作发生在 <code>merge</code> 函数中。归并排序不是原址的。</p>
+<p>假设有两堆已经排好序的书，书堆A和书堆B。把A中的第一本与B中的第一本拿起来比较，小的那本放入书架中，再把A中的“第一本”和B中的“第一本”进行比较，此时的“第一本”不一定是刚才的第一本了，因为已经有一本书放入书架了，不过该书堆的“第一本”任然是该书堆中最小的一本。直到把两堆书全部放入书架。</p>
+<p><img src="http://omwf3ob75.bkt.clouddn.com/mergersort2.jpeg" alt="mergesort2"></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">merge</span> (<span class="params">array, p, q, r</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">let</span> n1 = q - p + <span class="number">1</span>;  <span class="comment">// 子数组的长度</span></span><br><span class="line">  <span class="keyword">let</span> n2 = r - q;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 把两个子数组拷贝到B、C数组中</span></span><br><span class="line">  <span class="comment">// slice不包含end参数，所以end参数要加一</span></span><br><span class="line">  <span class="keyword">let</span> arrB = array.slice(p, q + <span class="number">1</span>);</span><br><span class="line">  <span class="keyword">let</span> arrC = array.slice(q + <span class="number">1</span>, r + <span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 两个数组的最后一个元素设为无穷大值，确保了无需再检查数组中是否有剩余元素</span></span><br><span class="line">  arrB[n1] = <span class="built_in">Number</span>.MAX_VALUE;</span><br><span class="line">  arrC[n2] = <span class="built_in">Number</span>.MAX_VALUE;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 因为回填入原数组的个数是固定的，所以无穷大值不会被填入，也无需判断是否有剩余</span></span><br><span class="line">  <span class="comment">// 一旦B、C两个数组中的所有元素拷贝完就自动终止</span></span><br><span class="line">  <span class="comment">// 因为B、C中的元素已经按照非递减顺序排好了，所以最小索引值对应的就是最小值</span></span><br><span class="line">  <span class="comment">// 两个子数组的最小值比较，小的则为当前最小值</span></span><br><span class="line">  <span class="keyword">let</span> i = j = <span class="number">0</span>;</span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">let</span> k = p; k &lt; r + <span class="number">1</span>; k++) &#123;</span><br><span class="line">    <span class="keyword">if</span> (arrB[i] &lt; arrC[j]) &#123;</span><br><span class="line">      array[k] = arrB[i];</span><br><span class="line">      i++;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      array[k] = arrC[j];</span><br><span class="line">      j++;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>由于归并排序不是在原址上工作，需要拷贝出子数组，如果你的储存空间较小或空间非常宝贵，可能不适合使用归并排序。</p>
+<h3 id="快速排序"><a href="#快速排序" class="headerlink" title="快速排序"></a>快速排序</h3><p>与归并排序类似，快速排序也是使用分治模式。与归并排序不同的是，快速排序是在原址上工作的，归并排序是拷贝出两个子数组进行操作并不在原址上工作。</p>
+<p>在书架中随机挑选一本书作为<strong>主元</strong>（这里我们总是选择位于书架最末尾的那本书），所有小于主元的书放在主元左侧，所有大于或等于主元的书放在主元右侧，这时就把书分为左右两组（不包括主元），再分别对这两组书进行相同的操作（递归），直到子数组只剩一本书触发基础情况。</p>
+<p><img src="http://omwf3ob75.bkt.clouddn.com/quicksort1.jpeg" alt="quicksort1"></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">quickSort</span> (<span class="params">array, p, r</span>) </span>&#123;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> (p &gt;= r) &#123;</span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="keyword">let</span> q = partition(array, p, r);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 递归中不再包含array[q]，因为它已经处在正确的位置（左边所有元素都小于它，右边所有元素都大于或等于它）</span></span><br><span class="line">    <span class="comment">// 如果递归调用还包含array[q]，就会陷入死循环</span></span><br><span class="line">    quickSort(array, p, q - <span class="number">1</span>);</span><br><span class="line">    quickSort(array, q + <span class="number">1</span>, r);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> array;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>重要的操作都在 <code>partition</code> 函数中。这个函数把数组按照大于或小于主元分为左右两堆，并返回主元所在位置的索引q。注意，左右两堆数组并不是有序的（见上图），只是大于或小于主元。</p>
+<p>在书架中随机挑选一本书作为<strong>主元</strong>（这里我们总是选择位于书架最末尾的那本书），此时主元位于最末尾。还未进行比较的为未知组，称为<em>组U</em>，位于主元左侧。小于主元的称为<em>组L</em>，位于书架最左侧。大于或小于主元的称为<em>组R</em>，位于组L左侧组U右侧。如下图。</p>
+<p>我们拿起组U中最左侧的那本书，与主元进行比较，如果小于主元则放入组L，大于或等于主元则放入组R。放入组R的操作比较简单，只需要把组R和组U的分割线往右移一位，无需移动书籍。</p>
+<p>放入组L的操作则比较复杂。我们将它与组R中最左侧的书籍进行调换，并将组L和组R之间的分割线向右移一位，将组R和组U的分割线向右移一位。如下图</p>
+<p><img src="http://omwf3ob75.bkt.clouddn.com/quicksort2.jpeg" alt="quicksort2"></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 主元：数组中随机挑选单独的一个数（这里我们总是选数组中的最后一位）array[r]</span></span><br><span class="line"><span class="comment">// 组L（左侧组）：所有小于主元的数，array[p...q-1]</span></span><br><span class="line"><span class="comment">// 组R（右侧组）：所有大于或等于主元的数，array[q...u-1]</span></span><br><span class="line"><span class="comment">// 组U（未知组）：还未进行比较的数，array[u...r-1]</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">partition</span>(<span class="params">array, p, r</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">let</span> q = p;</span><br><span class="line">  <span class="comment">// 遍历array[p...r-1]</span></span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">let</span> u = p; u &lt; r; u++) &#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 如果未知数小于主元，放入组L</span></span><br><span class="line">    <span class="keyword">if</span> (array[u] &lt; array[r]) &#123;</span><br><span class="line"></span><br><span class="line">      <span class="comment">// 把未知数和组R最左侧值(array[q])进行交换，并让q和u往右移一位(加1)</span></span><br><span class="line">      <span class="keyword">let</span> key = array[q];</span><br><span class="line">      array[q] = array[u];</span><br><span class="line">      array[u] = key;</span><br><span class="line">      q += <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 如果未知数大于或等于主元，放入组R</span></span><br><span class="line">    <span class="comment">// 无需其他操作，只需要把u往右移一位</span></span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 把主元和组R最左侧值(array[q])进行交换，让主元位于组L合组R中间</span></span><br><span class="line">  <span class="keyword">let</span> key = array[q];</span><br><span class="line">  array[q] = array[r];</span><br><span class="line">  array[r] = key;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> q;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>本例的快速排序总是选择最末尾的元素作为主元，称为<em>确定的快速排序</em>。如果每次选择主元时都从数组中随机选择，则称为<em>随机快速排序</em>，随机快速排序在测试中会快于确定的快速排序。</p>
+<p>根据数据量的不同，储存空间的大小，存储速度的快慢，每个排序方法都有不同的表现，并不是说哪个方法一定是最快的，也不一定最快就是最好的，合适才是最好的。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E7%AE%97%E6%B3%95/" rel="tag"># 算法</a>
+              <a href="/tags/%E9%98%85%E8%AF%BB/" rel="tag"># 阅读</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2017/04/10/%E3%80%8AAlgorithms-Unlocked%E3%80%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B01%E2%80%94%E2%80%94%E5%BE%AA%E7%8E%AF%E5%92%8C%E9%80%92%E5%BD%92/" rel="prev" title="《Algorithms Unlocked》读书笔记1——循环和递归">
+      <i class="fa fa-chevron-left"></i> 《Algorithms Unlocked》读书笔记1——循环和递归
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2017/04/16/%E3%80%8AAlgorithms-Unlocked%E3%80%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B03%E2%80%94%E2%80%94%E8%AE%A1%E6%95%B0%E6%8E%92%E5%BA%8F/" rel="next" title="《Algorithms Unlocked》读书笔记3——计数排序">
+      《Algorithms Unlocked》读书笔记3——计数排序 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let activeClass = CONFIG.comments.activeClass;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#二分查找"><span class="nav-number">1.</span> <span class="nav-text">二分查找</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#排序"><span class="nav-number">2.</span> <span class="nav-text">排序</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#选择排序"><span class="nav-number">2.1.</span> <span class="nav-text">选择排序</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#插入排序"><span class="nav-number">2.2.</span> <span class="nav-text">插入排序</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#归并排序"><span class="nav-number">2.3.</span> <span class="nav-text">归并排序</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#快速排序"><span class="nav-number">2.4.</span> <span class="nav-text">快速排序</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">张小超</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">45</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">33</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">张小超</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">Theme – <a href="https://muse.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> v7.7.1
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="http://cdn.chaohang.top/js%2Fbusuanzi%2F2.3%2Fbusuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('http://cdn.chaohang.top/js%2Fvaline%2F1.3.10%2FValine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'L0Iqsf0FUlKjzj6KJCTnwSf0-9Nh9j0Va',
+      appKey     : 'KxXflLfIf2O0c32s49pBtVxE',
+      placeholder: "留下你的爪印🐾",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : 'zh-cn' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

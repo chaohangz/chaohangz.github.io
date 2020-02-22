@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"www.chaohang.top","root":"/","scheme":"Muse","version":"7.7.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="《Algorithms Unlocked》是 《算法导论》的合著者之一 Thomas H. Cormen 写的一本算法基础。 书中没有涉及编程语言，直接用文字描述算法，我用 JavaScript 对书中的算法进行描述。 循环和查找首先是三个简单的查找。目的是从数组中查找一个特定的值。 array: 一个数组 x: 要查找的值 1234567891011121314&#x2F;&#x2F; 简单的线性查找functio">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《Algorithms Unlocked》读书笔记1——循环和递归">
+<meta property="og:url" content="https://www.chaohang.top/2017/04/10/%E3%80%8AAlgorithms-Unlocked%E3%80%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B01%E2%80%94%E2%80%94%E5%BE%AA%E7%8E%AF%E5%92%8C%E9%80%92%E5%BD%92/index.html">
+<meta property="og:site_name" content="张小超的博客">
+<meta property="og:description" content="《Algorithms Unlocked》是 《算法导论》的合著者之一 Thomas H. Cormen 写的一本算法基础。 书中没有涉及编程语言，直接用文字描述算法，我用 JavaScript 对书中的算法进行描述。 循环和查找首先是三个简单的查找。目的是从数组中查找一个特定的值。 array: 一个数组 x: 要查找的值 1234567891011121314&#x2F;&#x2F; 简单的线性查找functio">
+<meta property="article:published_time" content="2017-04-10T13:35:03.000Z">
+<meta property="article:modified_time" content="2017-04-10T13:35:03.000Z">
+<meta property="article:author" content="张小超">
+<meta property="article:tag" content="算法">
+<meta property="article:tag" content="阅读">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://www.chaohang.top/2017/04/10/%E3%80%8AAlgorithms-Unlocked%E3%80%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B01%E2%80%94%E2%80%94%E5%BE%AA%E7%8E%AF%E5%92%8C%E9%80%92%E5%BD%92/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true
+  };
+</script>
+
+  <title>《Algorithms Unlocked》读书笔记1——循环和递归 | 张小超的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">张小超的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <h1 class="site-subtitle" itemprop="description">超超不会飞</h1>
+      
+  </div>
+
+  <div class="site-nav-right"></div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>About</a>
+
+  </li>
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.chaohang.top/2017/04/10/%E3%80%8AAlgorithms-Unlocked%E3%80%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B01%E2%80%94%E2%80%94%E5%BE%AA%E7%8E%AF%E5%92%8C%E9%80%92%E5%BD%92/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="张小超">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="张小超的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          《Algorithms Unlocked》读书笔记1——循环和递归
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2017-04-10 21:35:03" itemprop="dateCreated datePublished" datetime="2017-04-10T21:35:03+08:00">2017-04-10</time>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine: </span>
+    
+    <a title="valine" href="/2017/04/10/%E3%80%8AAlgorithms-Unlocked%E3%80%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B01%E2%80%94%E2%80%94%E5%BE%AA%E7%8E%AF%E5%92%8C%E9%80%92%E5%BD%92/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2017/04/10/%E3%80%8AAlgorithms-Unlocked%E3%80%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B01%E2%80%94%E2%80%94%E5%BE%AA%E7%8E%AF%E5%92%8C%E9%80%92%E5%BD%92/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>《Algorithms Unlocked》是 《算法导论》的合著者之一 Thomas H. Cormen 写的一本算法基础。</p>
+<p>书中没有涉及编程语言，直接用文字描述算法，我用 JavaScript 对书中的算法进行描述。</p>
+<h2 id="循环和查找"><a href="#循环和查找" class="headerlink" title="循环和查找"></a>循环和查找</h2><p>首先是三个简单的查找。目的是从数组中查找一个特定的值。</p>
+<p>array: 一个数组</p>
+<p>x: 要查找的值</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 简单的线性查找</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">linearSearch</span>(<span class="params">array, x</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">let</span> answer = <span class="string">'NOT-FOUND'</span>;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">let</span> i = <span class="number">0</span>; i &lt; array.length; i++) &#123;</span><br><span class="line">    <span class="keyword">if</span> (array[i] === x) &#123;</span><br><span class="line">      <span class="comment">// 虽然找到了i, 但没有返回继续查找，直到 for 结束</span></span><br><span class="line">      answer = i;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="built_in">console</span>.log(answer);</span><br><span class="line">  <span class="keyword">return</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>虽然找到了目标值，但for循环依然继续遍历直到结束，下面是优化</p>
+<a id="more"></a>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 优化的查找，找到目标后立刻返回</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">betterLinearSearch</span>(<span class="params">array, x</span>) </span>&#123;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">let</span> i = <span class="number">0</span>; i &lt; array.length; i++) &#123;</span><br><span class="line">    <span class="keyword">if</span> (array[i] === x) &#123;</span><br><span class="line">      <span class="comment">// 直接返回</span></span><br><span class="line">      <span class="built_in">console</span>.log(i);</span><br><span class="line">      <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">'NOT-FOUND'</span>);</span><br><span class="line">  <span class="keyword">return</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>还有一个问题是：假如直到最后都没有找到目标值，将试图访问越过数组末尾的元素。书上说：“在计算机程序中，当你试图访问越过数组末尾的元素时，结果通常是糟糕的。你的程序可能会崩溃，也可能会损坏数据。” </p>
+<p>宁可信其有，不可信其无啊。继续优化。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 更优的写法</span></span><br><span class="line"><span class="comment">// 总是让 for 循环可以结束</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">sentinelLinearSearch</span>(<span class="params">array, x</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">let</span> n = array.length - <span class="number">1</span>; <span class="comment">// 最后一个元素</span></span><br><span class="line"></span><br><span class="line">  <span class="comment">// 把数组最后一个值保存到last变量中</span></span><br><span class="line">  <span class="keyword">let</span> last = array[n]</span><br><span class="line">  <span class="comment">// 把数组最后一个值替换成目标值</span></span><br><span class="line">  array[n] = x;</span><br><span class="line">  </span><br><span class="line">  <span class="comment">// 判断数组中是否有目标值x，即使没有，数组的最后一个值也一定是目标值，避免越过数组末尾的访问</span></span><br><span class="line">  <span class="keyword">let</span> i = <span class="number">0</span>;</span><br><span class="line">  <span class="keyword">while</span> (array[i] !== x) &#123;</span><br><span class="line">    i++;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">//如果i小于数组长度，或者最后一个值为目标值x，则返回i</span></span><br><span class="line">  array[n] = last;</span><br><span class="line">  <span class="keyword">if</span> (i &lt; n || last === x) &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(i);</span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> <span class="string">'NOT-FOUND'</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>第三个方案在进行循环遍历的时候只进行了一个判断——array[i]是否等于x，而上面的两种方案在进行for循环时都要进行i是否大于length的判断和array[i]是否等于x两个判断。所以当数组大到一定程度的时候，第三个方案效率大于上面两个方案。</p>
+<h2 id="递归"><a href="#递归" class="headerlink" title="递归"></a>递归</h2><p>递归是指在函数中对函数自身进行调用。</p>
+<p>递归有两个特性：</p>
+<ol>
+<li>必须有一个或对个基础情况，它是指不用递归而直接计算出结果。比如下面例子中：当 n=0 时，基础情况发生，f(0) = 1;</li>
+<li>程序中的每个递归调用一定是通过一系列关于同一个问题的子问题的求解而最终迭代到基础情况。</li>
+</ol>
+<p>下面是一个经典的递归例子，计算阶乘。</p>
+<p>当n=0时，n! = 1 且 n! = n(n-1)(n-2)…3•2•1 (n≥0)</p>
+<p>比如：5! = 5•4•3•2•1 = 120</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 阶乘</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">factorial</span>(<span class="params">n</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (n &gt;= <span class="number">0</span>) &#123;</span><br><span class="line">    <span class="keyword">if</span> (n === <span class="number">0</span>) &#123;</span><br><span class="line">      <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125;;</span><br><span class="line">    <span class="keyword">return</span> n * factorial(n - <span class="number">1</span>);</span><br><span class="line">  &#125;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>之前的查找算法也可以写成递归风格</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 线性查找的递归风格</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">recursiveLinearSearch</span>(<span class="params">array, i, x</span>) </span>&#123;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> (i &lt; array.length) &#123;</span><br><span class="line">    <span class="keyword">if</span> (array[i] === x) &#123;</span><br><span class="line">      <span class="built_in">console</span>.log(i);</span><br><span class="line">      <span class="keyword">return</span>;</span><br><span class="line">    &#125;<span class="keyword">else</span> &#123;</span><br><span class="line">      <span class="keyword">return</span> recursiveLinearSearch(array, i+<span class="number">1</span>, x);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">'NOT-FOUND'</span>);</span><br><span class="line">  <span class="keyword">return</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E7%AE%97%E6%B3%95/" rel="tag"># 算法</a>
+              <a href="/tags/%E9%98%85%E8%AF%BB/" rel="tag"># 阅读</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2016/11/20/Git-%E7%9A%84%E7%AE%80%E5%8D%95%E4%BD%BF%E7%94%A8/" rel="prev" title="Git 的简单使用">
+      <i class="fa fa-chevron-left"></i> Git 的简单使用
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2017/04/16/%E3%80%8AAlgorithms-Unlocked%E3%80%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B02%E2%80%94%E2%80%94%E4%BA%8C%E5%88%86%E6%9F%A5%E6%89%BE%E5%92%8C%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95/" rel="next" title="《Algorithms Unlocked》读书笔记2——二分查找和排序算法">
+      《Algorithms Unlocked》读书笔记2——二分查找和排序算法 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let activeClass = CONFIG.comments.activeClass;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#循环和查找"><span class="nav-number">1.</span> <span class="nav-text">循环和查找</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#递归"><span class="nav-number">2.</span> <span class="nav-text">递归</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">张小超</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">45</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">33</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">张小超</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">Theme – <a href="https://muse.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> v7.7.1
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="http://cdn.chaohang.top/js%2Fbusuanzi%2F2.3%2Fbusuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('http://cdn.chaohang.top/js%2Fvaline%2F1.3.10%2FValine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'L0Iqsf0FUlKjzj6KJCTnwSf0-9Nh9j0Va',
+      appKey     : 'KxXflLfIf2O0c32s49pBtVxE',
+      placeholder: "留下你的爪印🐾",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : 'zh-cn' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

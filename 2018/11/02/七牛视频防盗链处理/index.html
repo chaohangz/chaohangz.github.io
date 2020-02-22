@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"www.chaohang.top","root":"/","scheme":"Muse","version":"7.7.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="背景公司在做付费课程，视频教学为主，需要对视频链接作防盗链处理。 REFERERHTTP referer 是 header 上的一个属性。当浏览器向服务器发起请求时，一般会带上Referer，告诉服务器我是从哪个页面链接过来的。 七牛在融合 CDN -&gt; 域名管理 -&gt; 高级配置里有一个域名防盗链选项。  配置好之后就可以限制链接只能从配置好的白名单域名进行访问，简单的防御了盗链。但是">
+<meta property="og:type" content="article">
+<meta property="og:title" content="七牛视频防盗链处理">
+<meta property="og:url" content="https://www.chaohang.top/2018/11/02/%E4%B8%83%E7%89%9B%E8%A7%86%E9%A2%91%E9%98%B2%E7%9B%97%E9%93%BE%E5%A4%84%E7%90%86/index.html">
+<meta property="og:site_name" content="张小超的博客">
+<meta property="og:description" content="背景公司在做付费课程，视频教学为主，需要对视频链接作防盗链处理。 REFERERHTTP referer 是 header 上的一个属性。当浏览器向服务器发起请求时，一般会带上Referer，告诉服务器我是从哪个页面链接过来的。 七牛在融合 CDN -&gt; 域名管理 -&gt; 高级配置里有一个域名防盗链选项。  配置好之后就可以限制链接只能从配置好的白名单域名进行访问，简单的防御了盗链。但是">
+<meta property="og:image" content="http://cdn.chaohang.top/20200212113323.png">
+<meta property="og:image" content="http://cdn.chaohang.top/20200212113415.png">
+<meta property="article:published_time" content="2018-11-02T06:41:40.000Z">
+<meta property="article:modified_time" content="2018-11-02T06:41:40.000Z">
+<meta property="article:author" content="张小超">
+<meta property="article:tag" content="JavaScript">
+<meta property="article:tag" content="node.js">
+<meta property="article:tag" content="七牛">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://cdn.chaohang.top/20200212113323.png">
+
+<link rel="canonical" href="https://www.chaohang.top/2018/11/02/%E4%B8%83%E7%89%9B%E8%A7%86%E9%A2%91%E9%98%B2%E7%9B%97%E9%93%BE%E5%A4%84%E7%90%86/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true
+  };
+</script>
+
+  <title>七牛视频防盗链处理 | 张小超的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">张小超的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <h1 class="site-subtitle" itemprop="description">超超不会飞</h1>
+      
+  </div>
+
+  <div class="site-nav-right"></div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>About</a>
+
+  </li>
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.chaohang.top/2018/11/02/%E4%B8%83%E7%89%9B%E8%A7%86%E9%A2%91%E9%98%B2%E7%9B%97%E9%93%BE%E5%A4%84%E7%90%86/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="张小超">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="张小超的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          七牛视频防盗链处理
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2018-11-02 14:41:40" itemprop="dateCreated datePublished" datetime="2018-11-02T14:41:40+08:00">2018-11-02</time>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine: </span>
+    
+    <a title="valine" href="/2018/11/02/%E4%B8%83%E7%89%9B%E8%A7%86%E9%A2%91%E9%98%B2%E7%9B%97%E9%93%BE%E5%A4%84%E7%90%86/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2018/11/02/%E4%B8%83%E7%89%9B%E8%A7%86%E9%A2%91%E9%98%B2%E7%9B%97%E9%93%BE%E5%A4%84%E7%90%86/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>公司在做付费课程，视频教学为主，需要对视频链接作防盗链处理。</p>
+<h2 id="REFERER"><a href="#REFERER" class="headerlink" title="REFERER"></a>REFERER</h2><p>HTTP referer 是 header 上的一个属性。当浏览器向服务器发起请求时，一般会带上Referer，告诉服务器我是从哪个页面链接过来的。</p>
+<p>七牛在融合 CDN -&gt; 域名管理 -&gt; 高级配置里有一个域名防盗链选项。</p>
+<p><img src="http://cdn.chaohang.top/20200212113323.png" alt="域名防盗链"></p>
+<p>配置好之后就可以限制链接只能从配置好的白名单域名进行访问，简单的防御了盗链。但是HTTP header 是可以被伪造的，经测试，直接用 postman 加个 Referer 就可以绕过了。</p>
+<a id="more"></a>
+<h2 id="私有空间"><a href="#私有空间" class="headerlink" title="私有空间"></a>私有空间</h2><p>七牛云提供了私有空间，空间内的文件对象都要获得拥有者的授权才能进行访问，并且可以设置链接的有效时间，超过时长后自动失效（视频会有缓存，清空缓存之前视频仍然有效）。</p>
+<p>如何创建私有空间的访问链接，下面是 Node.js SDK 的一段示例代码，其他语言可以去官网查看。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">var mac = new qiniu.auth.digest.Mac(accessKey, secretKey);</span><br><span class="line">var config = new qiniu.conf.Config();</span><br><span class="line">var bucketManager = new qiniu.rs.BucketManager(mac, config);</span><br><span class="line">var privateBucketDomain = &apos;http://if-pri.qiniudn.com&apos;;</span><br><span class="line">var deadline = parseInt(Date.now() / 1000) + 3600; // 1小时过期</span><br><span class="line">var privateDownloadUrl = bucketManager.privateDownloadUrl(privateBucketDomain, key, deadline);</span><br></pre></td></tr></table></figure>
+<h3 id="注意"><a href="#注意" class="headerlink" title="注意"></a>注意</h3><ol>
+<li>测试域名不能用于私有空间。</li>
+<li>自定义域名必须开启回源鉴权。</li>
+<li>播放 hls 文件需要使用 pm3u8 服务。</li>
+</ol>
+<p>详情可见这里：<a href="https://developer.qiniu.com/kodo/kb/4054/matters-needing-attention-of-private-space" target="_blank" rel="noopener">私有空间的注意事项</a>。</p>
+<h3 id="PM3U8"><a href="#PM3U8" class="headerlink" title="PM3U8"></a>PM3U8</h3><p>视频切片(<a href="https://www.jianshu.com/p/f2d4e3187ce5" target="_blank" rel="noopener">七牛视频切片</a>)后放在私有仓库时，获取单段视频的链接也需要带上token。七牛提供了 <a href="https://developer.qiniu.com/dora/manual/1292/private-m3u8-pm3u8" target="_blank" rel="noopener">pm3u8服务</a> ，对 m3u8文件中的 ts 资源进行批量下载授权。通过将 ts 资源的 url 改写成私有 url，以临时获取访问权限。</p>
+<p>有个需要注意的地方是，做签名处理时，要对整个链接做签名，比如 <code>https://test.com/12354.m3u8?pm3u8/0</code>。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">var privateBucketDomain = &apos;http://if-pri.qiniudn.com&apos;;</span><br><span class="line">var deadline = parseInt(Date.now() / 1000) + 3600; // 1小时过期</span><br><span class="line"></span><br><span class="line">var key = 12354.m3u8?pm3u8/0;  // pm3u8 参数和 url 一起做签名</span><br><span class="line"></span><br><span class="line">var privateDownloadUrl = bucketManager.privateDownloadUrl(privateBucketDomain, key, deadline);</span><br></pre></td></tr></table></figure>
+<p>还有个需要注意的地方是，虽然官方文档有一句这种提示，但和七牛沟通后的结果是，pm3u8 服务也是支持 <code>https</code> 的。</p>
+<p><img src="http://cdn.chaohang.top/20200212113415.png" alt></p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>使用 REFERER + 私有空间 已经可以解决盗链问题了，但是如果视频被下载仍然是个问题。需要对视频做加密处理，但是即使做了加密处理，也阻止不了录屏。完全杜绝视频泄露是很难的，或者我们可以采取其他方式加大盗用的成本，比如在视频里加上水印或者观看者ID，甚至让水印或者观看者ID在视频里四处游走（影响观看体验）。</p>
+<blockquote>
+<p>本文首发于我的个人博客 <a href="http://chaohang.top" target="_blank" rel="noopener">http://chaohang.top</a></p>
+<p>作者<a href="http://chaohang.top" target="_blank" rel="noopener">张小超</a></p>
+<p>转载请注明出处</p>
+</blockquote>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/JavaScript/" rel="tag"># JavaScript</a>
+              <a href="/tags/node-js/" rel="tag"># node.js</a>
+              <a href="/tags/%E4%B8%83%E7%89%9B/" rel="tag"># 七牛</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2018/10/31/%E7%99%BD%E5%A4%9C%E8%A1%8C/" rel="prev" title="白夜行">
+      <i class="fa fa-chevron-left"></i> 白夜行
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2018/11/07/%E4%BB%A3%E7%A0%81%E9%A1%BA%E5%BA%8F%E7%9A%84%E9%87%8D%E8%A6%81%E6%80%A7/" rel="next" title="代码顺序的重要性">
+      代码顺序的重要性 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let activeClass = CONFIG.comments.activeClass;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#背景"><span class="nav-number">1.</span> <span class="nav-text">背景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#REFERER"><span class="nav-number">2.</span> <span class="nav-text">REFERER</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#私有空间"><span class="nav-number">3.</span> <span class="nav-text">私有空间</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#注意"><span class="nav-number">3.1.</span> <span class="nav-text">注意</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#PM3U8"><span class="nav-number">3.2.</span> <span class="nav-text">PM3U8</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">4.</span> <span class="nav-text">总结</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">张小超</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">45</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">33</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">张小超</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">Theme – <a href="https://muse.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> v7.7.1
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="http://cdn.chaohang.top/js%2Fbusuanzi%2F2.3%2Fbusuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('http://cdn.chaohang.top/js%2Fvaline%2F1.3.10%2FValine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'L0Iqsf0FUlKjzj6KJCTnwSf0-9Nh9j0Va',
+      appKey     : 'KxXflLfIf2O0c32s49pBtVxE',
+      placeholder: "留下你的爪印🐾",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : 'zh-cn' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"www.chaohang.top","root":"/","scheme":"Muse","version":"7.7.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="什么是IoC和DI IoC(Inversion of Control 控制反转)：是一种面向对象编程中的一种设计原则，用来减低计算机代码之间的耦合度。其基本思想是：借助于“第三方”实现具有依赖关系的对象之间的解耦。 DI(Dependence Injection 依赖注入)：将实例变量传入到一个对象中去(Dependency injection means giving an object its">
+<meta property="og:type" content="article">
+<meta property="og:title" content="理解Spring中的IoC和DI">
+<meta property="og:url" content="https://www.chaohang.top/2019/12/15/%E7%90%86%E8%A7%A3Spring%E4%B8%AD%E7%9A%84IoC%E5%92%8CDI/index.html">
+<meta property="og:site_name" content="张小超的博客">
+<meta property="og:description" content="什么是IoC和DI IoC(Inversion of Control 控制反转)：是一种面向对象编程中的一种设计原则，用来减低计算机代码之间的耦合度。其基本思想是：借助于“第三方”实现具有依赖关系的对象之间的解耦。 DI(Dependence Injection 依赖注入)：将实例变量传入到一个对象中去(Dependency injection means giving an object its">
+<meta property="article:published_time" content="2019-12-15T04:44:36.000Z">
+<meta property="article:modified_time" content="2019-12-15T04:44:36.000Z">
+<meta property="article:author" content="张小超">
+<meta property="article:tag" content="Java">
+<meta property="article:tag" content="Spring">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://www.chaohang.top/2019/12/15/%E7%90%86%E8%A7%A3Spring%E4%B8%AD%E7%9A%84IoC%E5%92%8CDI/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true
+  };
+</script>
+
+  <title>理解Spring中的IoC和DI | 张小超的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">张小超的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <h1 class="site-subtitle" itemprop="description">超超不会飞</h1>
+      
+  </div>
+
+  <div class="site-nav-right"></div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>About</a>
+
+  </li>
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.chaohang.top/2019/12/15/%E7%90%86%E8%A7%A3Spring%E4%B8%AD%E7%9A%84IoC%E5%92%8CDI/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="张小超">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="张小超的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          理解Spring中的IoC和DI
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2019-12-15 12:44:36" itemprop="dateCreated datePublished" datetime="2019-12-15T12:44:36+08:00">2019-12-15</time>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine: </span>
+    
+    <a title="valine" href="/2019/12/15/%E7%90%86%E8%A7%A3Spring%E4%B8%AD%E7%9A%84IoC%E5%92%8CDI/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2019/12/15/%E7%90%86%E8%A7%A3Spring%E4%B8%AD%E7%9A%84IoC%E5%92%8CDI/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="什么是IoC和DI"><a href="#什么是IoC和DI" class="headerlink" title="什么是IoC和DI"></a>什么是IoC和DI</h1><blockquote>
+<p>IoC(Inversion of Control 控制反转)：是一种面向对象编程中的一种设计原则，用来减低计算机代码之间的耦合度。其基本思想是：借助于“第三方”实现具有依赖关系的对象之间的解耦。</p>
+<p>DI(Dependence Injection 依赖注入)：将实例变量传入到一个对象中去(Dependency injection means giving an object its instance variables)。</p>
+</blockquote>
+<a id="more"></a>
+<ul>
+<li>控制反转是一种思想</li>
+<li>依赖注入是一种设计模式</li>
+<li>IoC框架使用依赖注入作为实现控制反转的方式</li>
+</ul>
+<h1 id="为什么需要"><a href="#为什么需要" class="headerlink" title="为什么需要"></a>为什么需要</h1><p>在没有IoC之前，我们要在<code>A</code>类中使用<code>B</code>类，就要在<code>A</code>类中<code>new</code>出<code>B</code>类的实例，这样<code>A</code>类和<code>B</code>类之间就出现了耦合。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">A</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> B b = <span class="keyword">new</span> B();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>使用了IoC之后，我们就把实例化这样操作交给框架去帮我们做了。</p>
+<h1 id="Spring-中的IoC"><a href="#Spring-中的IoC" class="headerlink" title="Spring 中的IoC"></a>Spring 中的IoC</h1><p>容器是Spring的核心，Spring容器负责创建应用程序中的bean并通过DI来协调这些对象之间的关系。</p>
+<p>Spring容器并不是只有一个，Spring自带多个容器的实现，可以归纳为两种不同的类型：</p>
+<ol>
+<li>bean工厂(<code>BeanFactory</code>)，最简单的容器，提供基本的DI支持。</li>
+<li>应用上下文(<code>ApplicationContext</code>)，继承了<code>BeanFactory</code>，并提供应用框架级别的服务。</li>
+</ol>
+<p>作为开发人员，我们需要告诉Spring哪些对象要作为bean装配到容器中，bean和bean之间的依赖关系。Spring提供了三种主要的装配机制：</p>
+<ul>
+<li>隐式的bean发现机制和自动装配</li>
+<li>在Java中进行显示配置</li>
+<li>在XML中进行显示配置</li>
+</ul>
+<p>下面我们逐一介绍这三种机制。</p>
+<h2 id="自动装配bean"><a href="#自动装配bean" class="headerlink" title="自动装配bean"></a>自动装配bean</h2><h3 id="组件扫描：spring会自动发现应用上下文中所创建的bean"><a href="#组件扫描：spring会自动发现应用上下文中所创建的bean" class="headerlink" title="组件扫描：spring会自动发现应用上下文中所创建的bean"></a>组件扫描：spring会自动发现应用上下文中所创建的bean</h3><p><code>@Component</code> 注解表明该类会作为组件类，并告知Spring要为这个类创建bean。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Dog</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><code>@ComponentScan</code> 注解启用了组件扫描。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="meta">@ComponentScan</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">DemoApplication</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="自动装配：Spring自动满足bean之间的依赖"><a href="#自动装配：Spring自动满足bean之间的依赖" class="headerlink" title="自动装配：Spring自动满足bean之间的依赖"></a>自动装配：Spring自动满足bean之间的依赖</h3><p><code>@Autowired</code> 注解可以作用在构造器、方法、属性上。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Dog</span> </span>&#123;</span><br><span class="line">  	<span class="comment">// 属性</span></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> Cat cat;</span><br><span class="line"></span><br><span class="line">  	<span class="comment">// 构造器</span></span><br><span class="line">    <span class="comment">// 从Spring 4.3开始，具有单个构造函数的类可以省略@Autowired注释</span></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Dog</span><span class="params">(Cat cat)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.cat = cat;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">  	<span class="comment">// 方法</span></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setCat</span><span class="params">(Cat cat)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.cat = cat;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="在Java中装配bean"><a href="#在Java中装配bean" class="headerlink" title="在Java中装配bean"></a>在Java中装配bean</h2><h3 id="组价配置：声明一个配置类，并在配置类中配置bean"><a href="#组价配置：声明一个配置类，并在配置类中配置bean" class="headerlink" title="组价配置：声明一个配置类，并在配置类中配置bean"></a>组价配置：声明一个配置类，并在配置类中配置bean</h3><p><code>@Configuration</code> 注解表明这个类是配置类，我们可以在配置类下创建bean。</p>
+<p><code>@bean</code> 注解会告诉Spring这个方法将会返回一个对象，该对象要注册为Spring上下文中的bean。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 普通类</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">BaseBean</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">p</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"Hello bean"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 配置类</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">BeanConfig</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">  	<span class="comment">// 这个方法返回一个对象，Spring会把这个对象注册为bean</span></span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> BaseBean <span class="title">getBaseBean</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> BaseBean();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="组件注入：在配置类中把被依赖的组件注入另一个组件中"><a href="#组件注入：在配置类中把被依赖的组件注入另一个组件中" class="headerlink" title="组件注入：在配置类中把被依赖的组件注入另一个组件中"></a>组件注入：在配置类中把被依赖的组件注入另一个组件中</h3><p>两种方式注入bean：</p>
+<ol>
+<li>我们可以直接调用<code>get</code>方法，获取到对应的组件</li>
+<li>在<code>get</code>方法中把被依赖的组件作为参数传入，Spring在调用这个方法时，会自动为你注入。</li>
+</ol>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 普通类</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">BaseBean</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">p</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"Hello bean"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 普通类</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">UserBean</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> BaseBean baseBean;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">UserBean</span><span class="params">(BaseBean baseBean)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.baseBean = baseBean;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 配置类</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">BeanConfig</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 这个方法返回一个对象，Spring会把这个对象注册为bean</span></span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> BaseBean <span class="title">getBaseBean</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> BaseBean();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 以下为两种注入bean的方法</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">  	<span class="comment">// 方法一：直接调用get方法</span></span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> UseBean <span class="title">getUseBean</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> UseBean(getBaseBean());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">  	<span class="comment">// 方法二：当做参数传入，Spring将自动为你注入</span></span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> UseBean <span class="title">getUseBean</span><span class="params">(BaseBean baseBean)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> UseBean(baseBean);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>通常情况下我们都会使用方法二。</p>
+<h2 id="通过XML装配bean"><a href="#通过XML装配bean" class="headerlink" title="通过XML装配bean"></a>通过XML装配bean</h2><p>尽管现在我们已经不再怎么使用XML装配bean，但在Spring刚刚出现的时候，XML是描述配置的主要方式，我们还是有必要了解一下的。</p>
+<p>在使用JavaConfig的时候，我们创建了一个配置类来装配bean，而在XML配置中，我们需要创建一个XML文件，并且要以<code>&lt;beans&gt;</code>元素为根。</p>
+<p>最为简单的Spring XML配置如下所示：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">beans</span> <span class="attr">xmlns</span>=<span class="string">"http://www.springframework.org/schema/beans"</span></span></span><br><span class="line"><span class="tag">       <span class="attr">xmlns:xsi</span>=<span class="string">"http://www.w3.org/2001/XMLSchema-instance"</span></span></span><br><span class="line"><span class="tag">       <span class="attr">xsi:schemaLocation</span>=<span class="string">"http://www.springframework.org/schema/beans </span></span></span><br><span class="line"><span class="tag"><span class="string">       http://www.springframework.org/schema/beans/spring-beans.xsd"</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">&lt;!-- 在这里配置你的bean --&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;/<span class="name">beans</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<h3 id="组件配置"><a href="#组件配置" class="headerlink" title="组件配置"></a>组件配置</h3><p>以上文的<code>BaseBean</code>为例，我们在XML文件中把它声明为bean。</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">"baseBean"</span> <span class="attr">class</span>=<span class="string">"com.example.demo.BaseBean"</span> /&gt;</span></span><br></pre></td></tr></table></figure>
+<h3 id="组件注入"><a href="#组件注入" class="headerlink" title="组件注入"></a>组件注入</h3><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">"useBean"</span> <span class="attr">class</span>=<span class="string">"com.example.demo.UseBean"</span></span></span><br><span class="line"><span class="tag">      <span class="attr">c:_</span>=<span class="string">"baseBean"</span> /&gt;</span></span><br></pre></td></tr></table></figure>
+<p>XML的语法我就不再这里详述了，有兴趣的同学可以自行学习。</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>本文我们简单介绍了Spring中的IoC，介绍了Spring中装配bean的三种方式：自动化配置，基于Java的显式配置以及基于XML的显式配置。这些技术都是为了描述Spring应用中的组件以及组件之间的关系。</p>
+<p>一般来说我们都会使用自动化配置，尽量避免显式配置带来的维护成本。如果不得不使用显式配置的话，我们优先选择基于Java的配置，它比基于XML的配置更加强大、<strong>类型安全</strong>并且易于重构。</p>
+<h1 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h1><p><a href="https://www.jianshu.com/p/07af9dbbbc4b" target="_blank" rel="noopener">控制反转（IoC）与依赖注入（DI）</a></p>
+<p><a href="https://book.douban.com/subject/26767354/" target="_blank" rel="noopener">Spring 实战</a></p>
+<p><a href="https://book.douban.com/subject/3897837/" target="_blank" rel="noopener">Spring 揭秘</a></p>
+<blockquote>
+<p>本文首发于我的个人博客 <a href="http://chaohang.top" target="_blank" rel="noopener">http://chaohang.top</a></p>
+<p>作者<a href="http://chaohang.top" target="_blank" rel="noopener">张小超</a></p>
+<p>转载请注明出处</p>
+</blockquote>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Java/" rel="tag"># Java</a>
+              <a href="/tags/Spring/" rel="tag"># Spring</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/12/04/Java%E6%B3%A8%E8%A7%A3%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86/" rel="prev" title="Java注解基本原理">
+      <i class="fa fa-chevron-left"></i> Java注解基本原理
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/02/11/Java%E6%BA%90%E7%A0%81%E7%B3%BB%E5%88%971%E2%80%94%E2%80%94ArrayList/" rel="next" title="Java源码系列1——ArrayList">
+      Java源码系列1——ArrayList <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let activeClass = CONFIG.comments.activeClass;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#什么是IoC和DI"><span class="nav-number">1.</span> <span class="nav-text">什么是IoC和DI</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#为什么需要"><span class="nav-number">2.</span> <span class="nav-text">为什么需要</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Spring-中的IoC"><span class="nav-number">3.</span> <span class="nav-text">Spring 中的IoC</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#自动装配bean"><span class="nav-number">3.1.</span> <span class="nav-text">自动装配bean</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#组件扫描：spring会自动发现应用上下文中所创建的bean"><span class="nav-number">3.1.1.</span> <span class="nav-text">组件扫描：spring会自动发现应用上下文中所创建的bean</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#自动装配：Spring自动满足bean之间的依赖"><span class="nav-number">3.1.2.</span> <span class="nav-text">自动装配：Spring自动满足bean之间的依赖</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#在Java中装配bean"><span class="nav-number">3.2.</span> <span class="nav-text">在Java中装配bean</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#组价配置：声明一个配置类，并在配置类中配置bean"><span class="nav-number">3.2.1.</span> <span class="nav-text">组价配置：声明一个配置类，并在配置类中配置bean</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#组件注入：在配置类中把被依赖的组件注入另一个组件中"><span class="nav-number">3.2.2.</span> <span class="nav-text">组件注入：在配置类中把被依赖的组件注入另一个组件中</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#通过XML装配bean"><span class="nav-number">3.3.</span> <span class="nav-text">通过XML装配bean</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#组件配置"><span class="nav-number">3.3.1.</span> <span class="nav-text">组件配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#组件注入"><span class="nav-number">3.3.2.</span> <span class="nav-text">组件注入</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#总结"><span class="nav-number">4.</span> <span class="nav-text">总结</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考资料"><span class="nav-number">5.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">张小超</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">45</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">33</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">张小超</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">Theme – <a href="https://muse.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> v7.7.1
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="http://cdn.chaohang.top/js%2Fbusuanzi%2F2.3%2Fbusuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('http://cdn.chaohang.top/js%2Fvaline%2F1.3.10%2FValine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'L0Iqsf0FUlKjzj6KJCTnwSf0-9Nh9j0Va',
+      appKey     : 'KxXflLfIf2O0c32s49pBtVxE',
+      placeholder: "留下你的爪印🐾",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : 'zh-cn' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

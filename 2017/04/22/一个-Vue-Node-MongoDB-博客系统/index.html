@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"www.chaohang.top","root":"/","scheme":"Muse","version":"7.7.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="源码耗时半载（半个月）的大项目终于完成了。这是一个博客系统，使用 Vue 做前端框架，Node + express 做后端，数据库使用的是 MongoDB。实现了用户注册、用户登录、博客管理（文章的修改和删除）、文章编辑（Markdown）、标签分类等功能。 很早之前就想写一个个人博客。学了 Vue 之后，把前端部分写出来，然后 Node 一直拖拖拉拉的学了很久，中间又跑去实习了一段时间，所以直到">
+<meta property="og:type" content="article">
+<meta property="og:title" content="一个 Vue + Node + MongoDB 博客系统">
+<meta property="og:url" content="https://www.chaohang.top/2017/04/22/%E4%B8%80%E4%B8%AA-Vue-Node-MongoDB-%E5%8D%9A%E5%AE%A2%E7%B3%BB%E7%BB%9F/index.html">
+<meta property="og:site_name" content="张小超的博客">
+<meta property="og:description" content="源码耗时半载（半个月）的大项目终于完成了。这是一个博客系统，使用 Vue 做前端框架，Node + express 做后端，数据库使用的是 MongoDB。实现了用户注册、用户登录、博客管理（文章的修改和删除）、文章编辑（Markdown）、标签分类等功能。 很早之前就想写一个个人博客。学了 Vue 之后，把前端部分写出来，然后 Node 一直拖拖拉拉的学了很久，中间又跑去实习了一段时间，所以直到">
+<meta property="article:published_time" content="2017-04-22T11:45:10.000Z">
+<meta property="article:modified_time" content="2017-04-22T11:45:10.000Z">
+<meta property="article:author" content="张小超">
+<meta property="article:tag" content="node.js">
+<meta property="article:tag" content="mongodb">
+<meta property="article:tag" content="vue">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://www.chaohang.top/2017/04/22/%E4%B8%80%E4%B8%AA-Vue-Node-MongoDB-%E5%8D%9A%E5%AE%A2%E7%B3%BB%E7%BB%9F/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true
+  };
+</script>
+
+  <title>一个 Vue + Node + MongoDB 博客系统 | 张小超的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">张小超的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <h1 class="site-subtitle" itemprop="description">超超不会飞</h1>
+      
+  </div>
+
+  <div class="site-nav-right"></div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>About</a>
+
+  </li>
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.chaohang.top/2017/04/22/%E4%B8%80%E4%B8%AA-Vue-Node-MongoDB-%E5%8D%9A%E5%AE%A2%E7%B3%BB%E7%BB%9F/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="张小超">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="张小超的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          一个 Vue + Node + MongoDB 博客系统
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2017-04-22 19:45:10" itemprop="dateCreated datePublished" datetime="2017-04-22T19:45:10+08:00">2017-04-22</time>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine: </span>
+    
+    <a title="valine" href="/2017/04/22/%E4%B8%80%E4%B8%AA-Vue-Node-MongoDB-%E5%8D%9A%E5%AE%A2%E7%B3%BB%E7%BB%9F/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2017/04/22/%E4%B8%80%E4%B8%AA-Vue-Node-MongoDB-%E5%8D%9A%E5%AE%A2%E7%B3%BB%E7%BB%9F/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="源码"><a href="#源码" class="headerlink" title="源码"></a><a href="https://github.com/chaohangz/vueBlog" target="_blank" rel="noopener">源码</a></h1><p>耗时半载（半个月）的大项目终于完成了。这是一个博客系统，使用 Vue 做前端框架，Node + express 做后端，数据库使用的是 MongoDB。实现了用户注册、用户登录、博客管理（文章的修改和删除）、文章编辑（Markdown）、标签分类等功能。</p>
+<p>很早之前就想写一个个人博客。学了 Vue 之后，把前端部分写出来，然后 Node 一直拖拖拉拉的学了很久，中间又跑去实习了一段时间，所以直到回学校之后才列了个计划把这个项目实现了。</p>
+<p>翻出之前写的前端部分，好丑啊，干脆推掉重写吧。前端模仿的是 hexo 的经典主题 <a href="https://github.com/iissnan/hexo-theme-next" target="_blank" rel="noopener">NexT</a> ，本来是想把源码直接拿过来用的，后来发现还不如自己写来得快，就全部自己动手实现成 vue components。</p>
+<h2 id="实现的功能"><a href="#实现的功能" class="headerlink" title="实现的功能"></a>实现的功能</h2><ol>
+<li>文章的编辑，修改，删除</li>
+<li>支持使用 <code>Markdown</code> 编辑与实时预览</li>
+<li>支持代码高亮</li>
+<li>给文章添加标签</li>
+<li>支持用户注册登录</li>
+</ol>
+<h2 id="使用到的技术"><a href="#使用到的技术" class="headerlink" title="使用到的技术"></a>使用到的技术</h2><h3 id="前端"><a href="#前端" class="headerlink" title="前端"></a>前端</h3><ol>
+<li>Vue.js</li>
+<li>vue-cli</li>
+<li>vue-router</li>
+<li>vue-resource</li>
+<li>element-ui</li>
+<li>marked</li>
+<li>highlight.js</li>
+</ol>
+<h3 id="后端"><a href="#后端" class="headerlink" title="后端"></a>后端</h3><ol>
+<li>Node.js</li>
+<li>Express</li>
+<li>Mongoose</li>
+</ol>
+<h2 id="基本思路"><a href="#基本思路" class="headerlink" title="基本思路"></a>基本思路</h2><p>前端使用 <code>vue-router</code> 操作路由，实现单页应用的效果。使用 <code>vue-resource</code> 从后台获取数据，数据的处理全部都在前端，所以后端要做的事情很简单——把前端打包好的数据存进数据库中和从数据库中取出数据。前后端使用统一的路由命名规则。</p>
+<a id="more"></a>
+<h2 id="项目目录"><a href="#项目目录" class="headerlink" title="项目目录"></a>项目目录</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">| app.js              后端入口</span><br><span class="line">| index.html          入口页面</span><br><span class="line">| .babelrc            babel配置</span><br><span class="line">| .gitignore          git配置</span><br><span class="line">| package.json</span><br><span class="line">| webpack.config.js   webpack配置</span><br><span class="line">|</span><br><span class="line">|-dist                vue打包生成的文件</span><br><span class="line">|</span><br><span class="line">|-node_modules        模块</span><br><span class="line">|</span><br><span class="line">|-server              后端</span><br><span class="line">    | check.js</span><br><span class="line">    | db.js           数据库</span><br><span class="line"> __| router.js       路由</span><br><span class="line">|</span><br><span class="line">|-src                 前端</span><br><span class="line">    |-assets          静态资源</span><br><span class="line">    |-components      组件</span><br><span class="line">    | App.vue</span><br><span class="line">    | main.js</span><br></pre></td></tr></table></figure>
+<h2 id="webpack-配置"><a href="#webpack-配置" class="headerlink" title="webpack 配置"></a>webpack 配置</h2><p>webpack 大部分是 vue-cli 自动生成的，添加了让前后端http请求都转到node的3000端口，而不是前端的8080端口的配置。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">devServer: &#123;</span><br><span class="line">    historyApiFallback: <span class="literal">true</span>,</span><br><span class="line">    noInfo: <span class="literal">true</span>,</span><br><span class="line"></span><br><span class="line">    <span class="comment">//让前后端http请求都转到node的3000端口，而不是前端的8080端口</span></span><br><span class="line">    proxy: &#123;</span><br><span class="line">      <span class="string">'/'</span>: &#123;</span><br><span class="line">        target: <span class="string">'http://localhost:3000/'</span></span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+<p>这里涉及一个新手可能会不明白的问题（我之前就捣鼓了半天）。</p>
+<p>开发的时候要先打开数据库 MongoDB ,使用命令 <code>mongod</code>。</p>
+<p>然后打开后端服务器 <code>node app</code>，后端监听 3000 端口。</p>
+<p>最后打开前端开发模式 <code>npm run dev</code>，前端启动了一个 webpack 服务器，监听 8080 端口用于热刷新。通过配置把前端的http请求转到 3000 端口。</p>
+<h2 id="前端部分"><a href="#前端部分" class="headerlink" title="前端部分"></a>前端部分</h2><h3 id="命名视图"><a href="#命名视图" class="headerlink" title="命名视图"></a>命名视图</h3><p>所有页面都用到的元素可以写在 <code>App.vue</code> 上面，也可以写成公共组件。我在 App.vue 中使用了<a href="https://router.vuejs.org/zh-cn/essentials/named-views.html" target="_blank" rel="noopener">命名视图</a>，因为 sidebar 这个组件有的页面需要有的不需要，不需要的时候就不用加载。</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!--App.vue--&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">template</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"app"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"black_line"</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"main"</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">router-view</span> <span class="attr">name</span>=<span class="string">"sidebar"</span>&gt;</span><span class="tag">&lt;/<span class="name">router-view</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">router-view</span>&gt;</span><span class="tag">&lt;/<span class="name">router-view</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">template</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<h3 id="router"><a href="#router" class="headerlink" title="router"></a>router</h3><p>路由的配置写在 main.js 中，分为前台展示和后台管理。后台管理统一以 ‘/admin’ 开头。注册页和登录页写在一起了，上面有两个按钮“注册”和“登录”（我好懒-_-）。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// main.js</span></span><br><span class="line"><span class="keyword">const</span> router = <span class="keyword">new</span> VueRouter(&#123;</span><br><span class="line">  routes: [</span><br><span class="line">    &#123;<span class="attr">path</span>: <span class="string">'/'</span>, <span class="attr">components</span>: &#123;<span class="attr">default</span>: article, <span class="attr">sidebar</span>: sidebar&#125;&#125;,</span><br><span class="line">    &#123;<span class="attr">path</span>: <span class="string">'/article'</span>, <span class="attr">components</span>: &#123;<span class="attr">default</span>: article, <span class="attr">sidebar</span>: sidebar&#125;&#125;,</span><br><span class="line">    &#123;<span class="attr">path</span>: <span class="string">'/about'</span>, <span class="attr">components</span>: &#123;<span class="attr">default</span>: about, <span class="attr">sidebar</span>: sidebar&#125;&#125;,</span><br><span class="line">    &#123;<span class="attr">path</span>: <span class="string">'/articleDetail/:id'</span>, <span class="attr">components</span>: &#123;<span class="attr">default</span>: articleDetail, <span class="attr">sidebar</span>: sidebar&#125;&#125;,</span><br><span class="line">    &#123;<span class="attr">path</span>: <span class="string">'/admin/articleList'</span>, <span class="attr">components</span>: &#123;<span class="attr">default</span>: articleList, <span class="attr">sidebar</span>: sidebar&#125;&#125;,</span><br><span class="line">    &#123;<span class="attr">path</span>: <span class="string">'/admin/articleEdit'</span>, <span class="attr">component</span>: articleEdit&#125;,</span><br><span class="line">    &#123;<span class="attr">path</span>: <span class="string">'/admin/articleEdit/:id'</span>, <span class="attr">component</span>: articleEdit&#125;,</span><br><span class="line">    &#123;<span class="attr">path</span>: <span class="string">'/admin/signin'</span>, <span class="attr">component</span>: signin&#125;</span><br><span class="line">  ]</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<h3 id="element-UI"><a href="#element-UI" class="headerlink" title="element UI"></a>element UI</h3><p>使用了 element 用于消息提醒和标签分类。并不需要整个引入，而是使用按需引入。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// main.js</span></span><br><span class="line"><span class="comment">// 按需引用element</span></span><br><span class="line"><span class="keyword">import</span> &#123; Button, Message, MessageBox, Notification, Popover, Tag, Input &#125; <span class="keyword">from</span> <span class="string">'element-ui'</span></span><br><span class="line"><span class="keyword">import</span> <span class="string">'element-ui/lib/theme-default/index.css'</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> components = [Button, Message, MessageBox, Notification, Popover, Tag, Input]</span><br><span class="line"></span><br><span class="line">components.forEach(<span class="function">(<span class="params">item</span>) =&gt;</span> &#123;</span><br><span class="line">  Vue.component(item.name, item)</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> MsgBox = MessageBox</span><br><span class="line">Vue.prototype.$msgbox = MsgBox</span><br><span class="line">Vue.prototype.$alert = MsgBox.alert</span><br><span class="line">Vue.prototype.$confirm = MsgBox.confirm</span><br><span class="line">Vue.prototype.$prompt = MsgBox.prompt</span><br><span class="line">Vue.prototype.$message = Message</span><br><span class="line">Vue.prototype.$notify = Notification</span><br></pre></td></tr></table></figure>
+<h3 id="vue-resource"><a href="#vue-resource" class="headerlink" title="vue-resource"></a>vue-resource</h3><p>用于向后端发起请求。打通前后端的关键。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// GET /someUrl</span></span><br><span class="line">  <span class="keyword">this</span>.$http.get(<span class="string">'/someUrl'</span>).then(<span class="function"><span class="params">response</span> =&gt;</span> &#123;</span><br><span class="line">    <span class="comment">// success callback</span></span><br><span class="line">  &#125;, response =&gt; &#123;</span><br><span class="line">    <span class="comment">// error callback</span></span><br><span class="line">  &#125;);</span><br></pre></td></tr></table></figure>
+<h4 id="get-请求"><a href="#get-请求" class="headerlink" title="get 请求"></a>get 请求</h4><p>前端发起 get 请求，当请求成功被返回执行第一个回调函数，请求没有被成功返回则执行第二个回调函数。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">this</span>.$http.get(<span class="string">'/api/articleDetail/'</span> + id).then(</span><br><span class="line">  response =&gt; <span class="keyword">this</span>.article = response.body,</span><br><span class="line">  response =&gt; <span class="built_in">console</span>.log(response)</span><br><span class="line">)</span><br></pre></td></tr></table></figure></p>
+<p>后端响应请求并返回结果<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// router.js</span></span><br><span class="line">router.get(<span class="string">'/api/articleDetail/:id'</span>, <span class="function"><span class="keyword">function</span> (<span class="params">req, res</span>) </span>&#123;</span><br><span class="line">  db.Article.findOne(&#123; <span class="attr">_id</span>: req.params.id &#125;, <span class="function"><span class="keyword">function</span> (<span class="params">err, docs</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (err) &#123;</span><br><span class="line">      <span class="built_in">console</span>.error(err)</span><br><span class="line">      <span class="keyword">return</span></span><br><span class="line">    &#125;</span><br><span class="line">    res.send(docs)</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure></p>
+<h4 id="post-请求"><a href="#post-请求" class="headerlink" title="post 请求"></a>post 请求</h4><p>前端发起 post 请求，当请求成功被返回执行第一个回调函数，请求没有被成功返回则执行第二个回调函数。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 新建文章</span></span><br><span class="line"><span class="comment">// 即将被储存的数据 obj</span></span><br><span class="line"><span class="keyword">let</span> obj = &#123;</span><br><span class="line">  title: <span class="keyword">this</span>.title,</span><br><span class="line">  date: <span class="keyword">this</span>.date,</span><br><span class="line">  content: <span class="keyword">this</span>.content,</span><br><span class="line">  gist: <span class="keyword">this</span>.gist,</span><br><span class="line">  labels: <span class="keyword">this</span>.labels</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">this</span>.$http.post(<span class="string">'/api/admin/saveArticle'</span>, &#123;</span><br><span class="line">  articleInformation: obj</span><br><span class="line">&#125;).then(</span><br><span class="line">  response =&gt; &#123;</span><br><span class="line">    self.$message(&#123;</span><br><span class="line">      message: <span class="string">'发表文章成功'</span>,</span><br><span class="line">      type: <span class="string">'success'</span></span><br><span class="line">    &#125;)</span><br><span class="line">    <span class="comment">// 保存成功后跳转至文章列表页</span></span><br><span class="line">    self.refreshArticleList()</span><br><span class="line">  &#125;,</span><br><span class="line">  response =&gt; <span class="built_in">console</span>.log(response)</span><br><span class="line">)</span><br></pre></td></tr></table></figure></p>
+<p>后端存储数据并返回结果<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// router.js</span></span><br><span class="line"><span class="comment">// 文章保存</span></span><br><span class="line">router.post(<span class="string">'/api/admin/saveArticle'</span>, <span class="function"><span class="keyword">function</span> (<span class="params">req, res</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">new</span> db.Article(req.body.articleInformation).save(<span class="function"><span class="keyword">function</span> (<span class="params">err</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (err) &#123;</span><br><span class="line">      res.status(<span class="number">500</span>).send()</span><br><span class="line">      <span class="keyword">return</span></span><br><span class="line">    &#125;</span><br><span class="line">    res.send()</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure></p>
+<h2 id="后端部分"><a href="#后端部分" class="headerlink" title="后端部分"></a>后端部分</h2><p>后端使用 express 构建了一个简单的服务器，几乎只用于操作数据库。</p>
+<p>app.js 位于项目根目录，使用 <code>node app</code> 运行服务器。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> express = <span class="built_in">require</span>(<span class="string">'express'</span>)</span><br><span class="line"><span class="keyword">const</span> fs = <span class="built_in">require</span>(<span class="string">'fs'</span>)</span><br><span class="line"><span class="keyword">const</span> path = <span class="built_in">require</span>(<span class="string">'path'</span>)</span><br><span class="line"><span class="keyword">const</span> bodyParse = <span class="built_in">require</span>(<span class="string">'body-parser'</span>)</span><br><span class="line"><span class="keyword">const</span> session = <span class="built_in">require</span>(<span class="string">'express-session'</span>)</span><br><span class="line"><span class="keyword">const</span> MongoStore = <span class="built_in">require</span>(<span class="string">'connect-mongo'</span>)(session)</span><br><span class="line"><span class="keyword">const</span> router = <span class="built_in">require</span>(<span class="string">'./server/router'</span>)</span><br><span class="line"><span class="keyword">const</span> app = express()</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> resolve = <span class="function"><span class="params">file</span> =&gt;</span> path.resolve(__dirname, file)</span><br><span class="line"></span><br><span class="line">app.use(<span class="string">'/dist'</span>, express.static(resolve(<span class="string">'./dist'</span>)))</span><br><span class="line">app.use(bodyParse.json())</span><br><span class="line">app.use(bodyParse.urlencoded(&#123; <span class="attr">extended</span>: <span class="literal">true</span> &#125;))</span><br><span class="line">app.use(router)</span><br><span class="line"></span><br><span class="line"><span class="comment">// session</span></span><br><span class="line">app.set(<span class="string">'trust proxy'</span>, <span class="number">1</span>) <span class="comment">// trust first proxy</span></span><br><span class="line">app.use(session(&#123;</span><br><span class="line">  secret: <span class="string">'blog'</span>,</span><br><span class="line">  resave: <span class="literal">false</span>,</span><br><span class="line">  saveUninitialized: <span class="literal">true</span>,</span><br><span class="line">  cookie: &#123;</span><br><span class="line">    secure: <span class="literal">true</span>,</span><br><span class="line">    maxAge: <span class="number">2592000000</span></span><br><span class="line">  &#125;,</span><br><span class="line">  store: <span class="keyword">new</span> MongoStore(&#123;</span><br><span class="line">    url: <span class="string">'mongodb://localhost:27017/blog'</span></span><br><span class="line">  &#125;)</span><br><span class="line">&#125;))</span><br><span class="line"></span><br><span class="line">app.get(<span class="string">'*'</span>, <span class="function"><span class="keyword">function</span> (<span class="params">req, res</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">let</span> html = fs.readFileSync(resolve(<span class="string">'./'</span> + <span class="string">'index.html'</span>), <span class="string">'utf-8'</span>)</span><br><span class="line">  res.send(html)</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">app.listen(<span class="number">3000</span>, <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">'访问地址为 localhost:3000'</span>)</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<p>给自己挖了一个坑。因为登录之后需要保存用户状态，用来判断用户是否登录，如果登录则可以进入后台管理，如果没有登录则不能进入后台管理页面。之前写 node 的时候用的是 session 来保存，不过spa应用不同于前后端不分离的应用，我在前端对用户输入的账号密码进行了判断，如果成功则请求登录在后端保存 session。不过不知道出于什么原因，session 总是没办法赋值。因为我 node 学的也是半吊子，所以暂时放着，等我搞清楚了再来填坑。</p>
+<h2 id="收获"><a href="#收获" class="headerlink" title="收获"></a>收获</h2><ol>
+<li>学一个新模块，新框架第一步就是阅读官方文档。</li>
+<li>不要觉得读文档费时间，认真的读一遍官方文档比你瞎折腾来得有效率。</li>
+<li>阅读与你项目相关的优秀项目的源码，学习别人如何组织代码。</li>
+<li>自己的解决方案不一定是最优解，不过在找到最优解之前不妨自己先试试。</li>
+<li>框架模块的使用都不难，套API的活每个人都能干，只是快与慢的差别。</li>
+<li>尝试思考这个API是如何实现的。</li>
+<li>了解了完整的web应用是如何运作的，包括服务器，数据库，前端是如何联系在一起的。</li>
+</ol>
+<blockquote>
+<p>本文首发于我的个人博客 <a href="http://chaohang.top" target="_blank" rel="noopener">http://chaohang.top</a></p>
+<p>作者<a href="http://chaohang.top" target="_blank" rel="noopener">张小超</a></p>
+<p>转载请注明出处</p>
+</blockquote>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/node-js/" rel="tag"># node.js</a>
+              <a href="/tags/mongodb/" rel="tag"># mongodb</a>
+              <a href="/tags/vue/" rel="tag"># vue</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2017/04/17/mongoDB%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C/" rel="prev" title="mongoDB基本操作">
+      <i class="fa fa-chevron-left"></i> mongoDB基本操作
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2017/04/23/%E3%80%8A%E5%9B%BE%E8%A7%A3HTTP%E3%80%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/" rel="next" title="《图解HTTP》读书笔记">
+      《图解HTTP》读书笔记 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let activeClass = CONFIG.comments.activeClass;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#源码"><span class="nav-number">1.</span> <span class="nav-text">源码</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#实现的功能"><span class="nav-number">1.1.</span> <span class="nav-text">实现的功能</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用到的技术"><span class="nav-number">1.2.</span> <span class="nav-text">使用到的技术</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#前端"><span class="nav-number">1.2.1.</span> <span class="nav-text">前端</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#后端"><span class="nav-number">1.2.2.</span> <span class="nav-text">后端</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#基本思路"><span class="nav-number">1.3.</span> <span class="nav-text">基本思路</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#项目目录"><span class="nav-number">1.4.</span> <span class="nav-text">项目目录</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#webpack-配置"><span class="nav-number">1.5.</span> <span class="nav-text">webpack 配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#前端部分"><span class="nav-number">1.6.</span> <span class="nav-text">前端部分</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#命名视图"><span class="nav-number">1.6.1.</span> <span class="nav-text">命名视图</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#router"><span class="nav-number">1.6.2.</span> <span class="nav-text">router</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#element-UI"><span class="nav-number">1.6.3.</span> <span class="nav-text">element UI</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#vue-resource"><span class="nav-number">1.6.4.</span> <span class="nav-text">vue-resource</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#get-请求"><span class="nav-number">1.6.4.1.</span> <span class="nav-text">get 请求</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#post-请求"><span class="nav-number">1.6.4.2.</span> <span class="nav-text">post 请求</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#后端部分"><span class="nav-number">1.7.</span> <span class="nav-text">后端部分</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#收获"><span class="nav-number">1.8.</span> <span class="nav-text">收获</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">张小超</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">45</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">33</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">张小超</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">Theme – <a href="https://muse.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> v7.7.1
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="http://cdn.chaohang.top/js%2Fbusuanzi%2F2.3%2Fbusuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('http://cdn.chaohang.top/js%2Fvaline%2F1.3.10%2FValine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'L0Iqsf0FUlKjzj6KJCTnwSf0-9Nh9j0Va',
+      appKey     : 'KxXflLfIf2O0c32s49pBtVxE',
+      placeholder: "留下你的爪印🐾",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : 'zh-cn' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

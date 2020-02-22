@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"www.chaohang.top","root":"/","scheme":"Muse","version":"7.7.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="心血来潮花了9块9（学生价）买了个阿里云。因为后端只会一点 Node，所以上来第一件事就是按照官方教程把部署 Node 项目这个教程撸了一遍。 问题描述官方教程代码1234567891011const http &#x3D; require(&#39;http&#39;);const hostname &#x3D; &#39;ECS公网IP地址&#39;;  &#x2F;&#x2F; 这里把文字换成自己的公网IP地址const port &#x3D; 3000;const s">
+<meta property="og:type" content="article">
+<meta property="og:title" content="阿里云云服务器的端口配置问题">
+<meta property="og:url" content="https://www.chaohang.top/2017/05/23/%E9%98%BF%E9%87%8C%E4%BA%91%E4%BA%91%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%9A%84%E7%AB%AF%E5%8F%A3%E9%85%8D%E7%BD%AE%E9%97%AE%E9%A2%98/index.html">
+<meta property="og:site_name" content="张小超的博客">
+<meta property="og:description" content="心血来潮花了9块9（学生价）买了个阿里云。因为后端只会一点 Node，所以上来第一件事就是按照官方教程把部署 Node 项目这个教程撸了一遍。 问题描述官方教程代码1234567891011const http &#x3D; require(&#39;http&#39;);const hostname &#x3D; &#39;ECS公网IP地址&#39;;  &#x2F;&#x2F; 这里把文字换成自己的公网IP地址const port &#x3D; 3000;const s">
+<meta property="og:image" content="http://omwf3ob75.bkt.clouddn.com/%E6%8A%A5%E9%94%99.png">
+<meta property="og:image" content="http://omwf3ob75.bkt.clouddn.com/%E5%AE%89%E5%85%A8%E7%BB%841.png">
+<meta property="og:image" content="http://omwf3ob75.bkt.clouddn.com/%E5%AE%89%E5%85%A8%E7%BB%842.png">
+<meta property="og:image" content="http://omwf3ob75.bkt.clouddn.com/%E5%AE%89%E5%85%A8%E7%BB%843.png">
+<meta property="article:published_time" content="2017-05-23T06:26:28.000Z">
+<meta property="article:modified_time" content="2017-05-23T06:26:28.000Z">
+<meta property="article:author" content="张小超">
+<meta property="article:tag" content="踩坑">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://omwf3ob75.bkt.clouddn.com/%E6%8A%A5%E9%94%99.png">
+
+<link rel="canonical" href="https://www.chaohang.top/2017/05/23/%E9%98%BF%E9%87%8C%E4%BA%91%E4%BA%91%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%9A%84%E7%AB%AF%E5%8F%A3%E9%85%8D%E7%BD%AE%E9%97%AE%E9%A2%98/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true
+  };
+</script>
+
+  <title>阿里云云服务器的端口配置问题 | 张小超的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">张小超的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <h1 class="site-subtitle" itemprop="description">超超不会飞</h1>
+      
+  </div>
+
+  <div class="site-nav-right"></div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>About</a>
+
+  </li>
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.chaohang.top/2017/05/23/%E9%98%BF%E9%87%8C%E4%BA%91%E4%BA%91%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%9A%84%E7%AB%AF%E5%8F%A3%E9%85%8D%E7%BD%AE%E9%97%AE%E9%A2%98/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="张小超">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="张小超的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          阿里云云服务器的端口配置问题
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2017-05-23 14:26:28" itemprop="dateCreated datePublished" datetime="2017-05-23T14:26:28+08:00">2017-05-23</time>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine: </span>
+    
+    <a title="valine" href="/2017/05/23/%E9%98%BF%E9%87%8C%E4%BA%91%E4%BA%91%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%9A%84%E7%AB%AF%E5%8F%A3%E9%85%8D%E7%BD%AE%E9%97%AE%E9%A2%98/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2017/05/23/%E9%98%BF%E9%87%8C%E4%BA%91%E4%BA%91%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%9A%84%E7%AB%AF%E5%8F%A3%E9%85%8D%E7%BD%AE%E9%97%AE%E9%A2%98/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>心血来潮花了9块9（学生价）买了个阿里云。因为后端只会一点 Node，所以上来第一件事就是按照<a href="https://help.aliyun.com/document_detail/50775.html?spm=5176.doc52806.6.661.QHbNL5" target="_blank" rel="noopener">官方教程</a>把部署 Node 项目这个教程撸了一遍。</p>
+<h3 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h3><h4 id="官方教程代码"><a href="#官方教程代码" class="headerlink" title="官方教程代码"></a>官方教程代码</h4><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> http = <span class="built_in">require</span>(<span class="string">'http'</span>);</span><br><span class="line"><span class="keyword">const</span> hostname = <span class="string">'ECS公网IP地址'</span>;  <span class="comment">// 这里把文字换成自己的公网IP地址</span></span><br><span class="line"><span class="keyword">const</span> port = <span class="number">3000</span>;</span><br><span class="line"><span class="keyword">const</span> server = http.createServer(<span class="function">(<span class="params">req, res</span>) =&gt;</span> &#123;</span><br><span class="line">  res.statusCode = <span class="number">200</span>;</span><br><span class="line">  res.setHeader(<span class="string">'Content-Type'</span>, <span class="string">'text/plain'</span>);</span><br><span class="line">  res.end(<span class="string">'Hello World\n'</span>);</span><br><span class="line">&#125;);</span><br><span class="line">server.listen(port, hostname, () =&gt; &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">`Server running at http://<span class="subst">$&#123;hostname&#125;</span>:<span class="subst">$&#123;port&#125;</span>/`</span>);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<p>一段简单最简单的 Node http服务器，成功运行后可以在页面输出 Hello World。</p>
+<a id="more"></a>
+<h4 id="报错"><a href="#报错" class="headerlink" title="报错"></a>报错</h4><p><img src="http://omwf3ob75.bkt.clouddn.com/%E6%8A%A5%E9%94%99.png" alt="报错"></p>
+<p>报错了，因为之前写node只需要监听端口，没必要把IP地址也给写进去，所以我删了hostname，改成下面这样。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> http = <span class="built_in">require</span>(<span class="string">'http'</span>);</span><br><span class="line"><span class="keyword">const</span> hostname = <span class="string">'ECS公网IP地址'</span>;  <span class="comment">// 这里把文字换成自己的公网IP地址</span></span><br><span class="line"><span class="keyword">const</span> port = <span class="number">3000</span>;</span><br><span class="line"><span class="keyword">const</span> server = http.createServer(<span class="function">(<span class="params">req, res</span>) =&gt;</span> &#123;</span><br><span class="line">  res.statusCode = <span class="number">200</span>;</span><br><span class="line">  res.setHeader(<span class="string">'Content-Type'</span>, <span class="string">'text/plain'</span>);</span><br><span class="line">  res.end(<span class="string">'Hello World\n'</span>);</span><br><span class="line">&#125;);</span><br><span class="line">server.listen(port, () =&gt; &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">`Server running at http://<span class="subst">$&#123;hostname&#125;</span>:<span class="subst">$&#123;port&#125;</span>/`</span>);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<p>运行成功，但是在外网用浏览器输入IP地址之后无法访问。</p>
+<h4 id="问题分析"><a href="#问题分析" class="headerlink" title="问题分析"></a>问题分析</h4><p><code>curl ip.cn</code> </p>
+<p>查询当前外网IP，没有问题，与阿里云提供的一致。</p>
+<p><code>ping www.baidu.com</code></p>
+<p>服务器可以访问外网</p>
+<p><code>curl http://127.0.0.1:3000</code></p>
+<p>正确输出 “Hello World”，说明代码的编写没有问题。</p>
+<p>代码没问题，服务器网络没问题，ip地址没问题。我估计应该是防火墙把端口禁掉了。</p>
+<h4 id="关闭防火墙"><a href="#关闭防火墙" class="headerlink" title="关闭防火墙"></a>关闭防火墙</h4><p>身为小菜鸟，第一时间想到的就是把服务器的防火墙关掉。我的服务器是 CentOS7.0 ，与6.0不一样，CentOS7.0默认使用 <code>firewall</code> 作为防火墙。</p>
+<p><code>systemctl stop firewalld.service</code>       #停止firewall</p>
+<p><code>systemctl disable firewalld.service</code>    #禁止开机启动firewall</p>
+<p><code>firewall-cmd --state</code>                   #查看防火墙状态，已经处于关闭状态</p>
+<p>开Node服务器，浏览器访问还是失败。</p>
+<p>好像没招了，问小伙伴，他们说可能是没有备案的原因。但是没备案的小伙伴说他用得好好的，而且我就买了一个月的服务器，再等半个月备案我也不需要用了。正打算放弃问客服，小伙伴说你装个Nginx试试，只要正确运行Nginx而且服务器没问题直接访问IP地址就能出现Nginx首页了。</p>
+<h4 id="安装-Nginx"><a href="#安装-Nginx" class="headerlink" title="安装 Nginx"></a>安装 Nginx</h4><p>CentOS有两种方法安装Nginx，具体的自行谷歌吧。</p>
+<p>安装完成，运行成功。</p>
+<p>浏览器访问公网IP，无法访问。</p>
+<p>从吃完中午饭13:00一直折腾到下午6:30左右，一动不动坐凳子上5个多小时了，不行了，休息吃完饭去。</p>
+<h4 id="解决"><a href="#解决" class="headerlink" title="解决"></a>解决</h4><p>既然Nginx正确运行，那只剩两个问题了，一个是没有备案，不过这个问题的可能性很小很小。还有一点就是虽然我CentOS上把防火墙关了，但云服务器上阿里云应该会有一些安全措施，导致一部分端口被禁，或者压根就没有把端口打开。</p>
+<p>吃完饭，散完步，我就在云服务器控制台里一个一个的找，发现安全组里点击配置规则后有一个安全组规则，里面通过添加安全组规则可以开放需要用到的端口。默认只打开了两个端口。</p>
+<p><img src="http://omwf3ob75.bkt.clouddn.com/%E5%AE%89%E5%85%A8%E7%BB%841.png" alt="安全组"><br><img src="http://omwf3ob75.bkt.clouddn.com/%E5%AE%89%E5%85%A8%E7%BB%842.png" alt="安全组"><br><img src="http://omwf3ob75.bkt.clouddn.com/%E5%AE%89%E5%85%A8%E7%BB%843.png" alt="安全组"></p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>这是一个简单的问题，不过需要一步步排除掉可能的原因。</p>
+<p>如果身边有个后端或者运维的小伙伴在的话，应该可以很快意识到这个问题。独狼是走不远的，至少是走不快的。</p>
+<p>其实在购买时就可以选取要开放的端口，第一次嘛，没有经验，都是直接默认选项。怪不得小伙伴说他服务器的配置都没有动过，应该是购买的时候就已经设置好的。</p>
+<p>趁年轻，多踩坑。</p>
+<blockquote>
+<p>本文首发于我的个人博客 <a href="http://chaohang.top" target="_blank" rel="noopener">http://chaohang.top</a></p>
+<p>作者<a href="http://chaohang.top" target="_blank" rel="noopener">张小超</a></p>
+<p>转载请注明出处</p>
+</blockquote>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E8%B8%A9%E5%9D%91/" rel="tag"># 踩坑</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2017/04/23/%E3%80%8A%E5%9B%BE%E8%A7%A3HTTP%E3%80%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/" rel="prev" title="《图解HTTP》读书笔记">
+      <i class="fa fa-chevron-left"></i> 《图解HTTP》读书笔记
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2017/10/27/promise-%E5%92%8C-async-%E7%9A%84%E7%94%A8%E6%B3%95/" rel="next" title="promise 和 async 的用法">
+      promise 和 async 的用法 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let activeClass = CONFIG.comments.activeClass;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#问题描述"><span class="nav-number">1.</span> <span class="nav-text">问题描述</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#官方教程代码"><span class="nav-number">1.1.</span> <span class="nav-text">官方教程代码</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#报错"><span class="nav-number">1.2.</span> <span class="nav-text">报错</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#问题分析"><span class="nav-number">1.3.</span> <span class="nav-text">问题分析</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#关闭防火墙"><span class="nav-number">1.4.</span> <span class="nav-text">关闭防火墙</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#安装-Nginx"><span class="nav-number">1.5.</span> <span class="nav-text">安装 Nginx</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#解决"><span class="nav-number">1.6.</span> <span class="nav-text">解决</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#总结"><span class="nav-number">2.</span> <span class="nav-text">总结</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">张小超</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">45</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">33</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">张小超</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">Theme – <a href="https://muse.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> v7.7.1
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="http://cdn.chaohang.top/js%2Fbusuanzi%2F2.3%2Fbusuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('http://cdn.chaohang.top/js%2Fvaline%2F1.3.10%2FValine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'L0Iqsf0FUlKjzj6KJCTnwSf0-9Nh9j0Va',
+      appKey     : 'KxXflLfIf2O0c32s49pBtVxE',
+      placeholder: "留下你的爪印🐾",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : 'zh-cn' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>
