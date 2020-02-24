@@ -10,7 +10,9 @@
 <li>升级hexo版本和NexT版本</li>
 <li>配置SEO</li>
 <li>静态文件cdn加速</li>
+<li>是用gulp压缩文件</li>
 <li>添加lazyload</li>
+<li>添加站内搜索</li>
 </ol>
 <a id="more"></a>
 <h2 id="阅读统计和访客统计"><a href="#阅读统计和访客统计" class="headerlink" title="阅读统计和访客统计"></a>阅读统计和访客统计</h2><p>阅读统计和访客统计使用的都是不蒜子，因为使用的是NexT主题，只需要添加一下配置就可以了。</p>
