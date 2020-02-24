@@ -13,7 +13,7 @@
 <link rel="stylesheet" href="/css/main.css">
 
 
-<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/font-awesome@4/css/font-awesome.min.css">
 
 <script id="hexo-configurations">
     var NexT = window.NexT || {};
@@ -31,7 +31,7 @@
 <meta property="og:image" content="http://cdn.chaohang.top/20200223175103.png">
 <meta property="og:image" content="http://cdn.chaohang.top/20200223210745.jpg">
 <meta property="article:published_time" content="2020-02-23T09:51:38.000Z">
-<meta property="article:modified_time" content="2020-02-24T08:31:05.209Z">
+<meta property="article:modified_time" content="2020-02-24T08:49:42.137Z">
 <meta property="article:author" content="张小超">
 <meta property="article:tag" content="记录">
 <meta property="article:tag" content="博客">
@@ -218,7 +218,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2020-02-24 16:31:05" itemprop="dateModified" datetime="2020-02-24T16:31:05+08:00">2020-02-24</time>
+                <time title="Modified: 2020-02-24 16:49:42" itemprop="dateModified" datetime="2020-02-24T16:49:42+08:00">2020-02-24</time>
               </span>
 
           
@@ -283,11 +283,17 @@
 <p>把 /cdn 目录下的请求全部转发到 cdn.chaohang.top 这个子域名下，比如：</p>
 <p><a href="https://chaohang.top/cdn/min.js" target="_blank" rel="noopener">https://chaohang.top/cdn/min.js</a> 会被转发至 <a href="http://cdn.chaohang.top/cdn/min.js" target="_blank" rel="noopener">http://cdn.chaohang.top/cdn/min.js</a></p>
 <p>这样子就可以成功绕过浏览器的限制了，因为实际的请求是通过服务器代理的。</p>
+<p>Next 官方也提供了一些cdn加速，我们可以在配置文件里配置：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"># vendors底下全部都是可使用的cdn</span><br><span class="line">vendors:</span><br><span class="line">  # Internal path prefix.</span><br><span class="line">  _internal: lib</span><br><span class="line"></span><br><span class="line">  # FancyBox</span><br><span class="line">  # jquery: &#x2F;&#x2F;cdn.jsdelivr.net&#x2F;npm&#x2F;jquery@3&#x2F;dist&#x2F;jquery.min.js</span><br><span class="line">  # fancybox: &#x2F;&#x2F;cdn.jsdelivr.net&#x2F;gh&#x2F;fancyapps&#x2F;fancybox@3&#x2F;dist&#x2F;jquery.fancybox.min.js</span><br><span class="line">  # fancybox_css: &#x2F;&#x2F;cdn.jsdelivr.net&#x2F;gh&#x2F;fancyapps&#x2F;fancybox@3&#x2F;dist&#x2F;jquery.fancybox.min.css</span><br><span class="line">  jquery: &#x2F;&#x2F;cdn.jsdelivr.net&#x2F;npm&#x2F;jquery@3&#x2F;dist&#x2F;jquery.min.js</span><br><span class="line">  fancybox: &#x2F;&#x2F;cdn.jsdelivr.net&#x2F;gh&#x2F;fancyapps&#x2F;fancybox@3&#x2F;dist&#x2F;jquery.fancybox.min.js</span><br><span class="line">  fancybox_css: &#x2F;&#x2F;cdn.jsdelivr.net&#x2F;gh&#x2F;fancyapps&#x2F;fancybox@3&#x2F;dist&#x2F;jquery.fancybox.min.css</span><br></pre></td></tr></table></figure>
 <h2 id="添加lazyload"><a href="#添加lazyload" class="headerlink" title="添加lazyload"></a>添加lazyload</h2><p><a href="https://github.com/theme-next/theme-next-jquery-lazyload" target="_blank" rel="noopener">lazylod</a>可以在用户不查看的时候，不加载相关部分，从而提升网站加载速度。</p>
 <p>先是在next目录里clone仓库：</p>
 <p><code>git clone https://github.com/theme-next/theme-next-jquery-lazyload source/lib/jquery_lazyload</code></p>
 <p>再把配置里的开关打开：</p>
 <p><code>lazyload: true</code></p>
+<h2 id="添加站内搜索"><a href="#添加站内搜索" class="headerlink" title="添加站内搜索"></a>添加站内搜索</h2><p>Next集成了站内搜索功能，可以先安装依赖</p>
+<p><code>npm install hexo-generator-searchdb --save</code></p>
+<p>然后设置主题配置文件：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">local_search:</span><br><span class="line">  enable: true</span><br><span class="line">  # If auto, trigger search by changing input.</span><br><span class="line">  # If manual, trigger search by pressing enter key or search button.</span><br><span class="line">  trigger: auto</span><br><span class="line">  # Show top n results per article, show all results by setting to -1</span><br><span class="line">  top_n_per_article: 3</span><br><span class="line">  # Unescape html strings to the readable one.</span><br><span class="line">  unescape: false</span><br><span class="line">  # Preload the search data when the page loads.</span><br><span class="line">  preload: false</span><br></pre></td></tr></table></figure>
 <p>以上就是全部优化过程了，即使没人访问的站，也要好好的优化，这就是一个工(搬)程(砖)师(工)的坚持。</p>
 <p><img data-src="http://cdn.chaohang.top/20200223175103.png" alt=""></p>
 <blockquote>
@@ -380,7 +386,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#阅读统计和访客统计"><span class="nav-number">1.</span> <span class="nav-text">阅读统计和访客统计</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#添加评论"><span class="nav-number">2.</span> <span class="nav-text">添加评论</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#升级hexo版本和NexT版本"><span class="nav-number">3.</span> <span class="nav-text">升级hexo版本和NexT版本</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置SEO"><span class="nav-number">4.</span> <span class="nav-text">配置SEO</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#静态文件cdn加速"><span class="nav-number">5.</span> <span class="nav-text">静态文件cdn加速</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#添加lazyload"><span class="nav-number">6.</span> <span class="nav-text">添加lazyload</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#阅读统计和访客统计"><span class="nav-number">1.</span> <span class="nav-text">阅读统计和访客统计</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#添加评论"><span class="nav-number">2.</span> <span class="nav-text">添加评论</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#升级hexo版本和NexT版本"><span class="nav-number">3.</span> <span class="nav-text">升级hexo版本和NexT版本</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置SEO"><span class="nav-number">4.</span> <span class="nav-text">配置SEO</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#静态文件cdn加速"><span class="nav-number">5.</span> <span class="nav-text">静态文件cdn加速</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#添加lazyload"><span class="nav-number">6.</span> <span class="nav-text">添加lazyload</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#添加站内搜索"><span class="nav-number">7.</span> <span class="nav-text">添加站内搜索</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -472,10 +478,10 @@
   </div>
 
   
-  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/animejs@3.1.0/lib/anime.min.js"></script>
   <script src="//cdn.jsdelivr.net/npm/lozad@1/dist/lozad.min.js"></script>
-  <script src="/lib/velocity/velocity.min.js"></script>
-  <script src="/lib/velocity/velocity.ui.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/velocity-animate@1/velocity.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/velocity-animate@1/velocity.ui.min.js"></script>
 
 <script src="/js/utils.js"></script>
 
@@ -517,7 +523,7 @@
 
 <script>
 NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
-  NexT.utils.getScript('https://chaohang.top/cdn/js%2Fvaline%2F1.3.10%2FValine.min.js', () => {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/valine@1/dist/Valine.min.js', () => {
     var GUEST = ['nick', 'mail', 'link'];
     var guest = 'nick,mail,link';
     guest = guest.split(',').filter(item => {
