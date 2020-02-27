@@ -1,14 +1,201 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>深入理解Java虚拟机3——垃圾回收</title>
+    <url>/2020/02/28/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA3%E2%80%94%E2%80%94%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/</url>
+    <content><![CDATA[<blockquote>
+<p>《深入理解Java虚拟机》第3章读书笔记</p>
+</blockquote>
+<p>本文介绍了如何判断对象是否存活，三种垃圾回收算法，分析比较了几种垃圾收集器的特点。本文并非原创，是《深入理解Java虚拟机》第3章的整理、总结和补充。</p>
+<a id="more"></a>
+<h2 id="对象已死？"><a href="#对象已死？" class="headerlink" title="对象已死？"></a>对象已死？</h2><p>垃圾收集器在对堆进行回收前，要先判断哪些对象“存活”，哪些已经“死去”。</p>
+<h3 id="引用计数算法"><a href="#引用计数算法" class="headerlink" title="引用计数算法"></a>引用计数算法</h3><p>给对象中添加一个引用计数器，每当有一个地方引用它时，计数器就加1；当引用失效时，计数器就减1；任何时刻计数器为0的对象就是不可能再被使用的。</p>
+<p>主流的Java虚拟机里面没有选用引用计数算法来管理内存。</p>
+<p>优点：实现简单，效率高。</p>
+<p>缺点：很难解决对象之间相互循环引用的问题。</p>
+<p>循环引用问题，如下代码所示，</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 源代码出自《深入理解Java虚拟机》P62-63</span></span><br><span class="line"><span class="comment"> * 循环引用</span></span><br><span class="line"><span class="comment"> **/</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ReferenceCountingGC</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> Object instance = <span class="keyword">null</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> _1MB = <span class="number">1024</span> * <span class="number">1024</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 这个成员属性的唯一意义就是占点内存，以便能在GC日志中看清楚是否被回收过</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">byte</span>[] bigSize = <span class="keyword">new</span> <span class="keyword">byte</span>[<span class="number">2</span> * _1MB];</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 运行参数</span></span><br><span class="line"><span class="comment">     * -XX:+PrintGCDetails -Xms20M -Xmx20M -Xmn10M</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        ReferenceCountingGC objA = <span class="keyword">new</span> ReferenceCountingGC();</span><br><span class="line">        ReferenceCountingGC objB = <span class="keyword">new</span> ReferenceCountingGC();</span><br><span class="line">        objA.instance = objB;</span><br><span class="line">        objB.instance = objA;</span><br><span class="line"></span><br><span class="line">        objA = <span class="keyword">null</span>;</span><br><span class="line">        objB = <span class="keyword">null</span>;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 假设在这行发生GC，objA和objB是否能被回收？</span></span><br><span class="line">        System.gc();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>JVM参数设置了新生代为10MB，运行结果显示，在第一次触发GC时，“5120K-&gt;576K(9216K)”回收了约4MB内存。意味着虚拟机并没有因为两个对象相互引用就不回收它们，这也侧面说明了虚拟机并不是通过引用计数算法来判断对象是否存活</p>
+<p><img data-src="http://cdn.chaohang.top/20200227072300.png" alt=""></p>
+<h3 id="可达性分析算法"><a href="#可达性分析算法" class="headerlink" title="可达性分析算法"></a>可达性分析算法</h3><p>通过一系列的称为“GC Roots”的对象作为起始点，从这些节点开始向下搜索，搜索走过的路径称为引用链(Reference Chain)，当一个对象到GC Roots没有任何引用链相连（用图论的话来说，就是从GC Roots到这个对象不可达）时，则证明此对象是不可用的。</p>
+<p>如图，object5、object6、object7 为可回收对象</p>
+<p><img data-src="http://cdn.chaohang.top/20200227073303.png" alt=""></p>
+<p>主流的Java虚拟机使用可达性分析算法</p>
+<p>在Java语言中，GC Roots包括以下几种：</p>
+<ul>
+<li>虚拟机栈（栈帧中的本地变量表）中引用的对象</li>
+<li>方法区中类静态属性引用的对象</li>
+<li>方法区中常量引用的对象</li>
+<li>本地方法栈中Native方法引用的对象</li>
+</ul>
+<h3 id="四种引用"><a href="#四种引用" class="headerlink" title="四种引用"></a>四种引用</h3><ol>
+<li>强引用：代码中普遍存在，垃圾收集器不会回收强引用的对象。</li>
+<li>软引用：有用但非必需，在系统将要发生内存溢出异常之前，会把这些对象列入回收范围。</li>
+<li>弱引用：非必需，无论当前内存是否足够，下次垃圾回收都会回收掉这些对象。</li>
+<li>虚引用：最弱的引用关系，是否有虚引用不对其生存时间构成影响。</li>
+</ol>
+<h2 id="垃圾收集算法"><a href="#垃圾收集算法" class="headerlink" title="垃圾收集算法"></a>垃圾收集算法</h2><h3 id="标记-清除算法"><a href="#标记-清除算法" class="headerlink" title="标记-清除算法"></a>标记-清除算法</h3><p>最基础的收集算法——“标记-清除”(Mark-Sweep)算法。一般用于老年代。</p>
+<p>算法分为“标记”和“清除”两个阶段：</p>
+<ol>
+<li>标记出需要回收的对象</li>
+<li>清除被标记的对象</li>
+</ol>
+<p>缺点：效率低，空间碎片化。</p>
+<p><img data-src="http://cdn.chaohang.top/20200227074938.png" alt=""></p>
+<h3 id="复制算法"><a href="#复制算法" class="headerlink" title="复制算法"></a>复制算法</h3><p>为了解决效率问题，出现了“复制”算法(Copying)。它将内存分为两块，每次只使用其中一块，当这一块内存用完了，就将还存活的对象复制到另一块上面，然后再把已使用过的内存空间一次清理掉。</p>
+<p>缺点：内存缩小为原来的一半。</p>
+<p><img data-src="http://cdn.chaohang.top/20200227075507.png" alt=""></p>
+<p>JVM虚拟机在新生代使用这种收集算法，并不是按照 1:1 的比例来划分内存空间。而是根据新生代中的对象98%是“朝生夕死”这一特点，将内存分为一块较大的 Eden(80%) 空间和两块较小的 Survivor(10%) 空间。每次只使用 Eden 和其中一块 Survivor，当回收时，将 Eden 和 Survivor 中还存活的对象，一次性地复制到另外一块 Survivor 空间上，最后清理掉 Eden 和刚才用过的 Survivor 空间。</p>
+<p>HotSpot默认Eden和Survivor的大小比例为8:1，这样就只有10%的内存被“浪费”。当出现超过10%的对象存活时，就会使用老年代做分配担保，把Survivor空间放不下的对象，直接放入老年代。</p>
+<h3 id="标记-整理算法"><a href="#标记-整理算法" class="headerlink" title="标记-整理算法"></a>标记-整理算法</h3><p>在Mark-Sweep算法的基础上做了改良，用于解决空间碎片化问题。标记-整理(Mark-Compact)算法在标记后不是简单做清除，而是让所有存活的对象都向一端移动，然后清理掉端边界以外的内存。一般用于老年代。</p>
+<p><img data-src="http://cdn.chaohang.top/20200227080944.png" alt=""></p>
+<h2 id="安全点和安全区域"><a href="#安全点和安全区域" class="headerlink" title="安全点和安全区域"></a>安全点和安全区域</h2><h3 id="安全点"><a href="#安全点" class="headerlink" title="安全点"></a>安全点</h3><p>在做可达性分析时，需要保持分析期间整个系统不会发生变化，这就导致GC进行时必须停顿所有Java执行线程(Stop The World)，即使是在号称（几乎）不会发生停顿的CMS收集器中，枚举根节点时也必须要停顿。</p>
+<p>程序执行时并非在所有地方都能停下来开始GC，只有在到达<strong>安全点(Safepoint)</strong>时才能暂停。Safepoint 的选定既不能太少以致于让GC等待时间太长，也不能过于频繁以致于过分增大运行时的负荷。所以，安全点的选定基本上是以程序“是否具有让程序长时间执行的特征”为标准进行选定的，例如方法调用，循环跳转，异常跳转等。</p>
+<p>如何在GC发生时让线程都跑到最近的安全点再停顿下来？</p>
+<ul>
+<li>抢先试中断：先把所有线程中断，发现不在安全点的线程恢复线程，让它跑到安全点。</li>
+<li>主动式中断：设置一个不可读的内存位置作为中断标志，标志与安全点重合，当线程执行到这个标志时自己中断挂起。</li>
+</ul>
+<h3 id="安全区域"><a href="#安全区域" class="headerlink" title="安全区域"></a>安全区域</h3><p>安全区域(Safe Region)是指在一段代码片段中，引用关系不会发生变化。在这个区域的任何地方开始GC都是安全的。典型的安全区域比如线程处于Sleep状态或者Blocked状态。</p>
+<p>在线程执行到Safe Region中的代码时，首先标识自己已经进入了Safe Region。当要发起GC时，就不用管标识为Safe Region状态的线程了。当线程要离开Safe Region时，要检查是否处于GC状态，如果是，就要继续等待，直到收到可以安全离开Safe Region的信号为止。</p>
+<h2 id="垃圾收集器"><a href="#垃圾收集器" class="headerlink" title="垃圾收集器"></a>垃圾收集器</h2><h3 id="并行与并发"><a href="#并行与并发" class="headerlink" title="并行与并发"></a>并行与并发</h3><ul>
+<li>并行(Parallel)：指多条垃圾收集线程并行工作，但此时用户线程仍然处于等待状态。</li>
+<li>并发(Concurrent)：指用户线程与垃圾收集线程同时执行（但不一定是并行的，可能会交替执行），用户程序在继续运行，而垃圾收集程序运行于另一个CPU上。</li>
+</ul>
+<h3 id="吞吐量"><a href="#吞吐量" class="headerlink" title="吞吐量"></a>吞吐量</h3><p>吞吐量就是CPU用于运行用户代码的时间与CPU总消耗时间的比值，即</p>
+<p>吞吐量 = 运行用户代码时间 / (运行用户代码时间 + 垃圾收集时间)。</p>
+<p>假设虚拟机总共运行了100分钟，其中垃圾收集花掉1分钟，那吞吐量就是99%。</p>
+<h3 id="Minor-GC-和-Full-GC"><a href="#Minor-GC-和-Full-GC" class="headerlink" title="Minor GC 和 Full GC"></a>Minor GC 和 Full GC</h3><ul>
+<li>新生代GC（Minor GC）：指发生在新生代的垃圾收集动作，因为Java对象大多都具备朝生夕灭的特性，所以Minor GC 非常频繁，一般回收速度也比较快。</li>
+<li>老年代GC（Major GC / Full GC）：指发生在老年代的GC，出现了Major GC，经常会伴随至少一次的Minor GC（但非绝对的，在Parallel Scavenge收集器的收集策略里就有直接进行Major GC的策略选择过程）。Major GC的速度一般会比Minor GC慢10倍以上。</li>
+</ul>
+<h3 id="HotSpot虚拟机的垃圾收集器对比"><a href="#HotSpot虚拟机的垃圾收集器对比" class="headerlink" title="HotSpot虚拟机的垃圾收集器对比"></a>HotSpot虚拟机的垃圾收集器对比</h3><p><img data-src="http://cdn.chaohang.top/20200115143022.png" alt=""></p>
+<table>
+<thead>
+<tr>
+<th>收集器</th>
+<th>串行、并行、并发</th>
+<th>新生代、老生代</th>
+<th>算法</th>
+<th>目标</th>
+<th>使用场景</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Serial</td>
+<td>单线程，串行</td>
+<td>新生代</td>
+<td>复制算法</td>
+<td>响应速度优先</td>
+<td>单CPU环境下的Client模式</td>
+</tr>
+<tr>
+<td>Serial Old</td>
+<td>单线程，串行</td>
+<td>老年代</td>
+<td>标记-整理</td>
+<td>响应速度优先</td>
+<td>单CPU环境下的Client模式、CMS的后</td>
+</tr>
+<tr>
+<td>ParNew</td>
+<td>多线程，并行</td>
+<td>新生代</td>
+<td>复制算法</td>
+<td>响应速度优先</td>
+<td>多CPU环境时在Server模式下与CMS配合</td>
+</tr>
+<tr>
+<td>Parallel Scanvenge</td>
+<td>多线程，并行</td>
+<td>新生代</td>
+<td>复制算法</td>
+<td>吞吐量优先</td>
+<td>在后台运算而不需要太多交互的任务</td>
+</tr>
+<tr>
+<td>Parallel Old</td>
+<td>多线程，并行</td>
+<td>老年代</td>
+<td>标记-整理</td>
+<td>吞吐量优先</td>
+<td>在后台运算而不需要太多交互的任务</td>
+</tr>
+<tr>
+<td>CMS</td>
+<td>并发</td>
+<td>老年代</td>
+<td>标记-清除</td>
+<td>响应速度优先</td>
+<td>集中在互联网站或B/S系统服务端上的Java应用</td>
+</tr>
+<tr>
+<td>G1</td>
+<td>并发</td>
+<td>both</td>
+<td>复制算法+标记-整理</td>
+<td>响应速度优先</td>
+<td>面向服务端应用，将来替换CMS</td>
+</tr>
+</tbody>
+</table>
+<h3 id="ParNew-收集器"><a href="#ParNew-收集器" class="headerlink" title="ParNew 收集器"></a>ParNew 收集器</h3><p>Serial收集器的多线程版本，Service模式下的首选新生代收集器，除了Serial收集器外，目前只有它能与CMS收集器配合工作。</p>
+<p>ParNew 收集器是使用 <code>-XX:+UseConcMarkSweepGC</code> 选项后的默认新生代收集器，也可以使用 <code>-XX:+UseParNewGC</code> 选项来强制指定它。</p>
+<p>运行示意图如下：</p>
+<p><img data-src="http://cdn.chaohang.top/20200228063445.png" alt=""></p>
+<h3 id="CMS-收集器"><a href="#CMS-收集器" class="headerlink" title="CMS 收集器"></a>CMS 收集器</h3><p>CMS(Concurrent Mark Sweep)收集器是一种以获取<strong>最短回收停顿时间</strong>为目标的收集器。基于Mark-Sweep算法。运行过程分为四个部分：</p>
+<ul>
+<li>初始标记</li>
+<li>并发标记</li>
+<li>重新标记</li>
+<li>并发清除</li>
+</ul>
+<p>其中，初始标记和重新标记仍然需要 Stop The World。初始标记只是标记一下 GC Roots 能直接关联到的对象，速度很快。并发标记就是进行 GC Roots Tracing 的过程，而重新标记阶段则是为了修正并发标记期间用户程序继续运作而导致标记产生变动的那一部分对象的标记记录，这个阶段的停顿时间比初始标记稍长一些，但远比并发标记的时间短。</p>
+<p>由于整个过程中耗时最长的并发标记和并发清楚过程收集器线程都可以与用户线程一起工作，所以，从总体上来说，CMS收集器的内存回收过程是与用户线程一起并发执行的。</p>
+<p>运行示意图如下：</p>
+<p><img data-src="http://cdn.chaohang.top/20200228064903.png" alt=""></p>
+<p>CMS 收集器有如下3个缺点：</p>
+<ol>
+<li><p>对CPU资源非常敏感</p>
+<p>因为并发阶段需要占用一个用户线程，如果CPU小于4个，则会导致用户程序的执行速度下降大于25%，如果只有2个CPU，用户程序执行速度则会下降50%，这是让人无法接收的。一般来说使用CMS收集器的服务器配置至少需要4个CPU。</p>
+</li>
+<li><p>无法处理浮动垃圾</p>
+<p>在并发清理过程中产生的垃圾称为“浮动垃圾”。这些垃圾只能等待下次垃圾回收。因此，CMS 收集器不能像其他收集器那样等到老年代几乎被完全填满了再进行收集，需要预留一部分空间提供并发收集时的程序运作使用。</p>
+</li>
+<li><p>内存空间碎片化</p>
+<p>CMS 收集器是基于Mark-Sweep算法，这个算法会产生内存空间碎片。CMS 收集器提供了一个 <code>-XX:+UseCMSCompactAtFullCollection</code> 开关参数（默认为开启），用于在CMS收集器顶不住要进行Full GC时开启内存碎片的合并整理过程。内存整理的过程是无法并发执行的，空间碎片问题没有了，但停顿时间不得不变长。</p>
+</li>
+</ol>
+<h3 id="使用多个收集器配置，JVM会怎么处理？"><a href="#使用多个收集器配置，JVM会怎么处理？" class="headerlink" title="使用多个收集器配置，JVM会怎么处理？"></a>使用多个收集器配置，JVM会怎么处理？</h3><p>如过同时使用了四个组合配置，这是时候就会报错</p>
+<p><img data-src="http://cdn.chaohang.top/20200115143855.png" alt=""></p>
+<p><img data-src="http://cdn.chaohang.top/20200115143950.png" alt=""></p>
+<p>但是比如 <code>-XX:+UseConcMarkSweepGC -XX:+UseParNewGC</code> 这两个配置同时存在就不会报错。</p>
+<p>翻看源码可知</p>
+<p><img data-src="http://cdn.chaohang.top/20200115154156.png" alt=""></p>
+<p>有些配置项是可以并存的。</p>
+<p>其实，在使用 <code>UseConcMarkSweepGC</code> 配置的时候，虚拟机默认开启了 <code>UseParNewGC</code></p>
+<p><img data-src="http://cdn.chaohang.top/20200115154535.png" alt=""></p>
+<p>所以在配置JVM时，我们尽量显式配置。比如要启用 ParNew + CMS 组合可以配置为</p>
+<figure class="highlight"><table><tr><td class="code"><pre><span class="line">-XX:+UseParNewGC</span><br><span class="line">-XX:+UseConcMarkSweepGC</span><br></pre></td></tr></table></figure>
+<h2 id="理解GC日志"><a href="#理解GC日志" class="headerlink" title="理解GC日志"></a>理解GC日志</h2><p><img data-src="http://cdn.chaohang.top/20200228071137.png" alt=""></p>
+]]></content>
+      <tags>
+        <tag>Java</tag>
+        <tag>阅读</tag>
+        <tag>JVM</tag>
+        <tag>深入理解Java虚拟机</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>深入理解Java虚拟机2——对象探秘</title>
     <url>/2020/02/25/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA2%E2%80%94%E2%80%94%E5%AF%B9%E8%B1%A1%E6%8E%A2%E7%A7%98/</url>
     <content><![CDATA[<blockquote>
 <p>《深入理解Java虚拟机》第2章读书笔记</p>
 </blockquote>
-<p>本文介绍对象的创建过程，包括如何对内存进行分配和对象中内存的布局，还介绍了如何访问对象。</p>
-<h2 id="对象的创建"><a href="#对象的创建" class="headerlink" title="对象的创建"></a>对象的创建</h2><a id="more"></a>
-<p><img data-src="http://cdn.chaohang.top/20200224075442.png" alt=""></p>
+<p>本文介绍对象的创建过程，包括如何对内存进行分配和对象中内存的布局，还介绍了如何访问对象。本文并非原创，是《深入理解Java虚拟机》第2章的整理、总结和补充。</p>
+<a id="more"></a>
+<h2 id="对象的创建"><a href="#对象的创建" class="headerlink" title="对象的创建"></a>对象的创建</h2><p><img data-src="http://cdn.chaohang.top/20200224075442.png" alt=""></p>
 <p><strong>堆内存的分配取决于内存是否规整：</strong></p>
 <ul>
 <li><p>如果使用 Serial, ParNew 等带 Compact 过程的收集器时，系统采用的分配算法是<strong>指针碰撞(Bump the Pointer)</strong>——假设内存绝对规整，所有用过的内存都在一边，空闲的内存放在另一边，中间放着一个指针作为分界点的指示器，那所分配内存就仅仅把那个指针向空闲空间挪动一段与对象大小相等的距离；</p>
@@ -141,8 +328,9 @@
     <content><![CDATA[<blockquote>
 <p>《深入理解Java虚拟机》第2章读书笔记</p>
 </blockquote>
-<h2 id="运行时内存区域"><a href="#运行时内存区域" class="headerlink" title="运行时内存区域"></a>运行时内存区域</h2><p>Java虚拟机在执行Java程序的过程中会把它所管理的内存划分为若干个不同的区域。这些区域都有各自的用途，以及创建和销毁的时间，有的区域随着虚拟机进程的启动而存在，有些区域则依赖用户线程的启动和结束而建立和销毁。</p>
+<p>本文介绍了JVM内存的各个区域和他们的用途。本文并非原创，是《深入理解Java虚拟机》第2章的整理、总结和补充。</p>
 <a id="more"></a>
+<h2 id="运行时内存区域"><a href="#运行时内存区域" class="headerlink" title="运行时内存区域"></a>运行时内存区域</h2><p>Java虚拟机在执行Java程序的过程中会把它所管理的内存划分为若干个不同的区域。这些区域都有各自的用途，以及创建和销毁的时间，有的区域随着虚拟机进程的启动而存在，有些区域则依赖用户线程的启动和结束而建立和销毁。</p>
 <p>下图为《Java虚拟机规范》规定的几个区域，不同虚拟机实现起来略有区别：</p>
 <p><img data-src="http://cdn.chaohang.top/20200220081746.jpg" alt="内存区域"></p>
 <h3 id="程序计数器"><a href="#程序计数器" class="headerlink" title="程序计数器"></a>程序计数器</h3><blockquote>
@@ -359,7 +547,69 @@
   <entry>
     <title>理解Spring中的IoC和DI</title>
     <url>/2019/12/15/%E7%90%86%E8%A7%A3Spring%E4%B8%AD%E7%9A%84IoC%E5%92%8CDI/</url>
-    <content><![CDATA[<!-- build time:Mon Feb 24 2020 16:00:19 GMT+0800 (GMT+08:00) --><h1 id="什么是IoC和DI"><a href="#什么是IoC和DI" class="headerlink" title="什么是IoC和DI"></a>什么是IoC和DI</h1><blockquote><p>IoC(Inversion of Control 控制反转)：是一种面向对象编程中的一种设计原则，用来减低计算机代码之间的耦合度。其基本思想是：借助于“第三方”实现具有依赖关系的对象之间的解耦。</p><p>DI(Dependence Injection 依赖注入)：将实例变量传入到一个对象中去(Dependency injection means giving an object its instance variables)。</p></blockquote><a id="more"></a><ul><li>控制反转是一种思想</li><li>依赖注入是一种设计模式</li><li>IoC框架使用依赖注入作为实现控制反转的方式</li></ul><h1 id="为什么需要"><a href="#为什么需要" class="headerlink" title="为什么需要"></a>为什么需要</h1><p>在没有IoC之前，我们要在<code>A</code>类中使用<code>B</code>类，就要在<code>A</code>类中<code>new</code>出<code>B</code>类的实例，这样<code>A</code>类和<code>B</code>类之间就出现了耦合。</p><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">A</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> B b = <span class="keyword">new</span> B();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p>使用了IoC之后，我们就把实例化这样操作交给框架去帮我们做了。</p><h1 id="Spring-中的IoC"><a href="#Spring-中的IoC" class="headerlink" title="Spring 中的IoC"></a>Spring 中的IoC</h1><p>容器是Spring的核心，Spring容器负责创建应用程序中的bean并通过DI来协调这些对象之间的关系。</p><p>Spring容器并不是只有一个，Spring自带多个容器的实现，可以归纳为两种不同的类型：</p><ol><li>bean工厂(<code>BeanFactory</code>)，最简单的容器，提供基本的DI支持。</li><li>应用上下文(<code>ApplicationContext</code>)，继承了<code>BeanFactory</code>，并提供应用框架级别的服务。</li></ol><p>作为开发人员，我们需要告诉Spring哪些对象要作为bean装配到容器中，bean和bean之间的依赖关系。Spring提供了三种主要的装配机制：</p><ul><li>隐式的bean发现机制和自动装配</li><li>在Java中进行显示配置</li><li>在XML中进行显示配置</li></ul><p>下面我们逐一介绍这三种机制。</p><h2 id="自动装配bean"><a href="#自动装配bean" class="headerlink" title="自动装配bean"></a>自动装配bean</h2><h3 id="组件扫描：spring会自动发现应用上下文中所创建的bean"><a href="#组件扫描：spring会自动发现应用上下文中所创建的bean" class="headerlink" title="组件扫描：spring会自动发现应用上下文中所创建的bean"></a>组件扫描：spring会自动发现应用上下文中所创建的bean</h3><p><code>@Component</code> 注解表明该类会作为组件类，并告知Spring要为这个类创建bean。</p><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Dog</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p><code>@ComponentScan</code> 注解启用了组件扫描。</p><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="meta">@ComponentScan</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">DemoApplication</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><h3 id="自动装配：Spring自动满足bean之间的依赖"><a href="#自动装配：Spring自动满足bean之间的依赖" class="headerlink" title="自动装配：Spring自动满足bean之间的依赖"></a>自动装配：Spring自动满足bean之间的依赖</h3><p><code>@Autowired</code> 注解可以作用在构造器、方法、属性上。</p><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Dog</span> </span>&#123;</span><br><span class="line">  	<span class="comment">// 属性</span></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> Cat cat;</span><br><span class="line"></span><br><span class="line">  	<span class="comment">// 构造器</span></span><br><span class="line">    <span class="comment">// 从Spring 4.3开始，具有单个构造函数的类可以省略@Autowired注释</span></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Dog</span><span class="params">(Cat cat)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.cat = cat;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">  	<span class="comment">// 方法</span></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setCat</span><span class="params">(Cat cat)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.cat = cat;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><h2 id="在Java中装配bean"><a href="#在Java中装配bean" class="headerlink" title="在Java中装配bean"></a>在Java中装配bean</h2><h3 id="组价配置：声明一个配置类，并在配置类中配置bean"><a href="#组价配置：声明一个配置类，并在配置类中配置bean" class="headerlink" title="组价配置：声明一个配置类，并在配置类中配置bean"></a>组价配置：声明一个配置类，并在配置类中配置bean</h3><p><code>@Configuration</code> 注解表明这个类是配置类，我们可以在配置类下创建bean。</p><p><code>@bean</code> 注解会告诉Spring这个方法将会返回一个对象，该对象要注册为Spring上下文中的bean。</p><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 普通类</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">BaseBean</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">p</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"Hello bean"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 配置类</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">BeanConfig</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">  	<span class="comment">// 这个方法返回一个对象，Spring会把这个对象注册为bean</span></span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> BaseBean <span class="title">getBaseBean</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> BaseBean();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><h3 id="组件注入：在配置类中把被依赖的组件注入另一个组件中"><a href="#组件注入：在配置类中把被依赖的组件注入另一个组件中" class="headerlink" title="组件注入：在配置类中把被依赖的组件注入另一个组件中"></a>组件注入：在配置类中把被依赖的组件注入另一个组件中</h3><p>两种方式注入bean：</p><ol><li>我们可以直接调用<code>get</code>方法，获取到对应的组件</li><li>在<code>get</code>方法中把被依赖的组件作为参数传入，Spring在调用这个方法时，会自动为你注入。</li></ol><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 普通类</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">BaseBean</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">p</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"Hello bean"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 普通类</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">UserBean</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> BaseBean baseBean;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">UserBean</span><span class="params">(BaseBean baseBean)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.baseBean = baseBean;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 配置类</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">BeanConfig</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 这个方法返回一个对象，Spring会把这个对象注册为bean</span></span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> BaseBean <span class="title">getBaseBean</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> BaseBean();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 以下为两种注入bean的方法</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">  	<span class="comment">// 方法一：直接调用get方法</span></span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> UseBean <span class="title">getUseBean</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> UseBean(getBaseBean());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">  	<span class="comment">// 方法二：当做参数传入，Spring将自动为你注入</span></span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> UseBean <span class="title">getUseBean</span><span class="params">(BaseBean baseBean)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> UseBean(baseBean);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p>通常情况下我们都会使用方法二。</p><h2 id="通过XML装配bean"><a href="#通过XML装配bean" class="headerlink" title="通过XML装配bean"></a>通过XML装配bean</h2><p>尽管现在我们已经不再怎么使用XML装配bean，但在Spring刚刚出现的时候，XML是描述配置的主要方式，我们还是有必要了解一下的。</p><p>在使用JavaConfig的时候，我们创建了一个配置类来装配bean，而在XML配置中，我们需要创建一个XML文件，并且要以<code>&lt;beans&gt;</code>元素为根。</p><p>最为简单的Spring XML配置如下所示：</p><figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">beans</span> <span class="attr">xmlns</span>=<span class="string">"http://www.springframework.org/schema/beans"</span></span></span><br><span class="line"><span class="tag">       <span class="attr">xmlns:xsi</span>=<span class="string">"http://www.w3.org/2001/XMLSchema-instance"</span></span></span><br><span class="line"><span class="tag">       <span class="attr">xsi:schemaLocation</span>=<span class="string">"http://www.springframework.org/schema/beans </span></span></span><br><span class="line"><span class="tag"><span class="string">       http://www.springframework.org/schema/beans/spring-beans.xsd"</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">&lt;!-- 在这里配置你的bean --&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;/<span class="name">beans</span>&gt;</span></span><br></pre></td></tr></table></figure><h3 id="组件配置"><a href="#组件配置" class="headerlink" title="组件配置"></a>组件配置</h3><p>以上文的<code>BaseBean</code>为例，我们在XML文件中把它声明为bean。</p><figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">"baseBean"</span> <span class="attr">class</span>=<span class="string">"com.example.demo.BaseBean"</span> /&gt;</span></span><br></pre></td></tr></table></figure><h3 id="组件注入"><a href="#组件注入" class="headerlink" title="组件注入"></a>组件注入</h3><figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">"useBean"</span> <span class="attr">class</span>=<span class="string">"com.example.demo.UseBean"</span></span></span><br><span class="line"><span class="tag">      <span class="attr">c:_</span>=<span class="string">"baseBean"</span> /&gt;</span></span><br></pre></td></tr></table></figure><p>XML的语法我就不再这里详述了，有兴趣的同学可以自行学习。</p><h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>本文我们简单介绍了Spring中的IoC，介绍了Spring中装配bean的三种方式：自动化配置，基于Java的显式配置以及基于XML的显式配置。这些技术都是为了描述Spring应用中的组件以及组件之间的关系。</p><p>一般来说我们都会使用自动化配置，尽量避免显式配置带来的维护成本。如果不得不使用显式配置的话，我们优先选择基于Java的配置，它比基于XML的配置更加强大、<strong>类型安全</strong>并且易于重构。</p><h1 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h1><p><a href="https://www.jianshu.com/p/07af9dbbbc4b" target="_blank" rel="noopener">控制反转（IoC）与依赖注入（DI）</a></p><p><a href="https://book.douban.com/subject/26767354/" target="_blank" rel="noopener">Spring 实战</a></p><p><a href="https://book.douban.com/subject/3897837/" target="_blank" rel="noopener">Spring 揭秘</a></p><blockquote><p>本文首发于我的个人博客 <a href="http://chaohang.top" target="_blank" rel="noopener">http://chaohang.top</a></p><p>作者<a href="http://chaohang.top" target="_blank" rel="noopener">张小超</a></p><p>转载请注明出处</p></blockquote><p>欢迎关注我的微信公众号 【超超不会飞】，获取第一时间的更新。</p><p><img src="http://cdn.chaohang.top/20200223210745.jpg" alt=""></p><!-- rebuild by neat -->]]></content>
+    <content><![CDATA[<h1 id="什么是IoC和DI"><a href="#什么是IoC和DI" class="headerlink" title="什么是IoC和DI"></a>什么是IoC和DI</h1><blockquote>
+<p>IoC(Inversion of Control 控制反转)：是一种面向对象编程中的一种设计原则，用来降低计算机代码之间的耦合度。其基本思想是：借助于“第三方”实现具有依赖关系的对象之间的解耦。</p>
+<p>DI(Dependence Injection 依赖注入)：将实例变量传入到一个对象中去(Dependency injection means giving an object its instance variables)。</p>
+</blockquote>
+<a id="more"></a>
+<ul>
+<li>控制反转是一种思想</li>
+<li>依赖注入是一种设计模式</li>
+<li>IoC框架使用依赖注入作为实现控制反转的方式</li>
+</ul>
+<h1 id="为什么需要"><a href="#为什么需要" class="headerlink" title="为什么需要"></a>为什么需要</h1><p>在没有IoC之前，我们要在<code>A</code>类中使用<code>B</code>类，就要在<code>A</code>类中<code>new</code>出<code>B</code>类的实例，这样<code>A</code>类和<code>B</code>类之间就出现了耦合。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">A</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> B b = <span class="keyword">new</span> B();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>使用了IoC之后，我们就把实例化这样操作交给框架去帮我们做了。</p>
+<h1 id="Spring-中的IoC"><a href="#Spring-中的IoC" class="headerlink" title="Spring 中的IoC"></a>Spring 中的IoC</h1><p>容器是Spring的核心，Spring容器负责创建应用程序中的bean并通过DI来协调这些对象之间的关系。</p>
+<p>Spring容器并不是只有一个，Spring自带多个容器的实现，可以归纳为两种不同的类型：</p>
+<ol>
+<li>bean工厂(<code>BeanFactory</code>)，最简单的容器，提供基本的DI支持。</li>
+<li>应用上下文(<code>ApplicationContext</code>)，继承了<code>BeanFactory</code>，并提供应用框架级别的服务。</li>
+</ol>
+<p>作为开发人员，我们需要告诉Spring哪些对象要作为bean装配到容器中，bean和bean之间的依赖关系。Spring提供了三种主要的装配机制：</p>
+<ul>
+<li>隐式的bean发现机制和自动装配</li>
+<li>在Java中进行显示配置</li>
+<li>在XML中进行显示配置</li>
+</ul>
+<p>下面我们逐一介绍这三种机制。</p>
+<h2 id="自动装配bean"><a href="#自动装配bean" class="headerlink" title="自动装配bean"></a>自动装配bean</h2><h3 id="组件扫描：Spring会自动发现应用上下文中所创建的bean"><a href="#组件扫描：Spring会自动发现应用上下文中所创建的bean" class="headerlink" title="组件扫描：Spring会自动发现应用上下文中所创建的bean"></a>组件扫描：Spring会自动发现应用上下文中所创建的bean</h3><p><code>@Component</code> 注解表明该类会作为组件类，并告知Spring要为这个类创建bean。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Dog</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><code>@ComponentScan</code> 注解启用了组件扫描。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="meta">@ComponentScan</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">DemoApplication</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="自动装配：Spring自动满足bean之间的依赖"><a href="#自动装配：Spring自动满足bean之间的依赖" class="headerlink" title="自动装配：Spring自动满足bean之间的依赖"></a>自动装配：Spring自动满足bean之间的依赖</h3><p><code>@Autowired</code> 注解可以作用在构造器、方法、属性上。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Dog</span> </span>&#123;</span><br><span class="line">  	<span class="comment">// 属性</span></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> Cat cat;</span><br><span class="line"></span><br><span class="line">  	<span class="comment">// 构造器</span></span><br><span class="line">    <span class="comment">// 从Spring 4.3开始，具有单个构造函数的类可以省略@Autowired注释</span></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Dog</span><span class="params">(Cat cat)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.cat = cat;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">  	<span class="comment">// 方法</span></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setCat</span><span class="params">(Cat cat)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.cat = cat;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="在Java中装配bean"><a href="#在Java中装配bean" class="headerlink" title="在Java中装配bean"></a>在Java中装配bean</h2><h3 id="组价配置：声明一个配置类，并在配置类中配置bean"><a href="#组价配置：声明一个配置类，并在配置类中配置bean" class="headerlink" title="组价配置：声明一个配置类，并在配置类中配置bean"></a>组价配置：声明一个配置类，并在配置类中配置bean</h3><p><code>@Configuration</code> 注解表明这个类是配置类，我们可以在配置类下创建bean。</p>
+<p><code>@bean</code> 注解会告诉Spring这个方法将会返回一个对象，该对象要注册为Spring上下文中的bean。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 普通类</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">BaseBean</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">p</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"Hello bean"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 配置类</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">BeanConfig</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">  	<span class="comment">// 这个方法返回一个对象，Spring会把这个对象注册为bean</span></span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> BaseBean <span class="title">getBaseBean</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> BaseBean();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="组件注入：在配置类中把被依赖的组件注入另一个组件中"><a href="#组件注入：在配置类中把被依赖的组件注入另一个组件中" class="headerlink" title="组件注入：在配置类中把被依赖的组件注入另一个组件中"></a>组件注入：在配置类中把被依赖的组件注入另一个组件中</h3><p>两种方式注入bean：</p>
+<ol>
+<li>我们可以直接调用<code>get</code>方法，获取到对应的组件</li>
+<li>在<code>get</code>方法中把被依赖的组件作为参数传入，Spring在调用这个方法时，会自动为你注入。</li>
+</ol>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 普通类</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">BaseBean</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">p</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"Hello bean"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 普通类</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">UserBean</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> BaseBean baseBean;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">UserBean</span><span class="params">(BaseBean baseBean)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.baseBean = baseBean;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 配置类</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">BeanConfig</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 这个方法返回一个对象，Spring会把这个对象注册为bean</span></span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> BaseBean <span class="title">getBaseBean</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> BaseBean();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 以下为两种注入bean的方法</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">  	<span class="comment">// 方法一：直接调用get方法</span></span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> UseBean <span class="title">getUseBean</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> UseBean(getBaseBean());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">  	<span class="comment">// 方法二：当做参数传入，Spring将自动为你注入</span></span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> UseBean <span class="title">getUseBean</span><span class="params">(BaseBean baseBean)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> UseBean(baseBean);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>通常情况下我们都会使用方法二。</p>
+<h2 id="通过XML装配bean"><a href="#通过XML装配bean" class="headerlink" title="通过XML装配bean"></a>通过XML装配bean</h2><p>尽管现在我们已经不怎么再使用XML装配bean，但在Spring刚刚出现的时候，XML是描述配置的主要方式，我们还是有必要了解一下的。</p>
+<p>在使用JavaConfig的时候，我们创建了一个配置类来装配bean，而在XML配置中，我们需要创建一个XML文件，并且要以<code>&lt;beans&gt;</code>元素为根。</p>
+<p>最为简单的Spring XML配置如下所示：</p>
+<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">beans</span> <span class="attr">xmlns</span>=<span class="string">"http://www.springframework.org/schema/beans"</span></span></span><br><span class="line"><span class="tag">       <span class="attr">xmlns:xsi</span>=<span class="string">"http://www.w3.org/2001/XMLSchema-instance"</span></span></span><br><span class="line"><span class="tag">       <span class="attr">xsi:schemaLocation</span>=<span class="string">"http://www.springframework.org/schema/beans </span></span></span><br><span class="line"><span class="tag"><span class="string">       http://www.springframework.org/schema/beans/spring-beans.xsd"</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">&lt;!-- 在这里配置你的bean --&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;/<span class="name">beans</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<h3 id="组件配置"><a href="#组件配置" class="headerlink" title="组件配置"></a>组件配置</h3><p>以上文的<code>BaseBean</code>为例，我们在XML文件中把它声明为bean。</p>
+<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">"baseBean"</span> <span class="attr">class</span>=<span class="string">"com.example.demo.BaseBean"</span> /&gt;</span></span><br></pre></td></tr></table></figure>
+<h3 id="组件注入"><a href="#组件注入" class="headerlink" title="组件注入"></a>组件注入</h3><figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">"useBean"</span> <span class="attr">class</span>=<span class="string">"com.example.demo.UseBean"</span></span></span><br><span class="line"><span class="tag">      <span class="attr">c:_</span>=<span class="string">"baseBean"</span> /&gt;</span></span><br></pre></td></tr></table></figure>
+<p>XML的语法我就不再这里详述了，有兴趣的同学可以自行学习。</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>本文我们简单介绍了Spring中的IoC，介绍了Spring中装配bean的三种方式：自动化配置，基于Java的显式配置以及基于XML的显式配置。这些技术都是为了描述Spring应用中的组件以及组件之间的关系。</p>
+<p>一般来说我们都会使用自动化配置，尽量避免显式配置带来的维护成本。如果不得不使用显式配置的话，我们优先选择基于Java的配置，它比基于XML的配置更加强大、<strong>类型安全</strong>并且易于重构。</p>
+<h1 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h1><p><a href="https://www.jianshu.com/p/07af9dbbbc4b" target="_blank" rel="noopener">控制反转（IoC）与依赖注入（DI）</a></p>
+<p><a href="https://book.douban.com/subject/26767354/" target="_blank" rel="noopener">Spring 实战</a></p>
+<p><a href="https://book.douban.com/subject/3897837/" target="_blank" rel="noopener">Spring 揭秘</a></p>
+<blockquote>
+<p>本文首发于我的个人博客 <a href="http://chaohang.top" target="_blank" rel="noopener">http://chaohang.top</a></p>
+<p>作者<a href="http://chaohang.top" target="_blank" rel="noopener">张小超</a></p>
+<p>转载请注明出处</p>
+</blockquote>
+<p>欢迎关注我的微信公众号 【超超不会飞】，获取第一时间的更新。</p>
+<p><img data-src="http://cdn.chaohang.top/20200223210745.jpg" alt=""></p>
+]]></content>
       <tags>
         <tag>Java</tag>
         <tag>Spring</tag>
@@ -368,7 +618,62 @@
   <entry>
     <title>Java注解基本原理</title>
     <url>/2019/12/04/Java%E6%B3%A8%E8%A7%A3%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86/</url>
-    <content><![CDATA[<!-- build time:Mon Feb 24 2020 16:00:19 GMT+0800 (GMT+08:00) --><h1 id="注解的本质"><a href="#注解的本质" class="headerlink" title="注解的本质"></a>注解的本质</h1><p>「java.lang.annotation.Annotation」接口中有这么一句话，用来描述『注解』。</p><blockquote><p>The common interface extended by all annotation types<br>所有的注解类型都继承自这个普通的接口（Annotation）</p></blockquote><a id="more"></a><p>这句话有点抽象，但却说出了注解的本质。我们看一个 JDK 内置注解的定义：</p><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Target</span>(ElementType.METHOD)</span><br><span class="line"><span class="meta">@Retention</span>(RetentionPolicy.SOURCE)</span><br><span class="line"><span class="keyword">public</span> <span class="meta">@interface</span> Override &#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p>这是注解 @Override 的定义，其实它本质上就是：<br></p><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Override</span> <span class="keyword">extends</span> <span class="title">Annotation</span></span>&#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>没错，注解的本质就是一个继承了 Annotation 接口的接口。有关这一点，你可以去反编译任意一个注解类，你会得到结果的。<p></p><p><strong>一个注解准确意义上来说，只不过是一种特殊的注释而已，如果没有解析它的代码，它可能连注释都不如。</strong></p><p>解析一个类或者方法的注解往往有两种形式，一种是编译期直接的扫描，一种是运行期反射。</p><h1 id="元注解"><a href="#元注解" class="headerlink" title="元注解"></a>元注解</h1><p>『元注解』是用于修饰注解的注解，通常用在注解的定义上。</p><p>JAVA 中有以下几个『元注解』：</p><ul><li>@Target：注解的作用目标</li><li>@Retention：注解的生命周期</li><li>@Documented：注解是否应当被包含在 JavaDoc 文档中</li><li>@Inherited：是否允许子类继承该注解</li></ul><h2 id="Target"><a href="#Target" class="headerlink" title="@Target"></a>@Target</h2><p><code>@Target</code> 注解指明该注解可以作用哪些对象上。</p><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Documented</span></span><br><span class="line"><span class="meta">@Retention</span>(RetentionPolicy.RUNTIME)</span><br><span class="line"><span class="meta">@Target</span>(ElementType.ANNOTATION_TYPE)</span><br><span class="line"><span class="keyword">public</span> <span class="meta">@interface</span> Target &#123;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">        * Returns an array of the kinds of elements an annotation type</span></span><br><span class="line"><span class="comment">        * can be applied to.</span></span><br><span class="line"><span class="comment">        * <span class="doctag">@return</span> an array of the kinds of elements an annotation type</span></span><br><span class="line"><span class="comment">        * can be applied to</span></span><br><span class="line"><span class="comment">        */</span></span><br><span class="line">    ElementType[] value();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p>注解接收一个ElementType数组，ElementType是一个枚举，成员如下：</p><ul><li>ElementType.TYPE：允许被修饰的注解作用在类、接口和枚举上</li><li>ElementType.FIELD：允许作用在属性字段上</li><li>ElementType.METHOD：允许作用在方法上</li><li>ElementType.PARAMETER：允许作用在方法参数上</li><li>ElementType.CONSTRUCTOR：允许作用在构造器上</li><li>ElementType.LOCAL_VARIABLE：允许作用在本地局部变量上</li><li>ElementType.ANNOTATION_TYPE：允许作用在注解上</li><li>ElementType.PACKAGE：允许作用在包上</li><li>ElementType.TYPE_PARAMETER：允许作用在类型参数上</li><li>ElementType.TYPE_USE：允许作用在类型上</li></ul><h2 id="Retention"><a href="#Retention" class="headerlink" title="@Retention"></a>@Retention</h2><p>@Retention 用于指明当前注解的生命周期<br></p><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Documented</span></span><br><span class="line"><span class="meta">@Retention</span>(RetentionPolicy.RUNTIME)</span><br><span class="line"><span class="meta">@Target</span>(ElementType.ANNOTATION_TYPE)</span><br><span class="line"><span class="keyword">public</span> <span class="meta">@interface</span> Retention &#123;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">        * Returns the retention policy.</span></span><br><span class="line"><span class="comment">        * <span class="doctag">@return</span> the retention policy</span></span><br><span class="line"><span class="comment">        */</span></span><br><span class="line">    <span class="function">RetentionPolicy <span class="title">value</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>注解接收一个RetentionPolicy数据，RetentionPolicy是个枚举，成员如下：<p></p><ul><li>RetentionPolicy.SOURCE：当前注解编译期可见，不会写入 class 文件</li><li>RetentionPolicy.CLASS：类加载阶段丢弃，会写入 class 文件</li><li>RetentionPolicy.RUNTIME：永久保存，可以反射获取</li></ul><h1 id="JAVA-的内置三大注解"><a href="#JAVA-的内置三大注解" class="headerlink" title="JAVA 的内置三大注解"></a>JAVA 的内置三大注解</h1><ul><li>@Override</li><li>@Deprecated 标识类或方法不再推荐使用</li><li>@SuppressWarnings 主要用来压制 java 的警告</li></ul><h1 id="实现一个自己的注解"><a href="#实现一个自己的注解" class="headerlink" title="实现一个自己的注解"></a>实现一个自己的注解</h1><p>定义一个注解：<br></p><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Target</span>(ElementType.METHOD)</span><br><span class="line"><span class="meta">@Retention</span>(RetentionPolicy.RUNTIME)</span><br><span class="line"><span class="keyword">public</span> <span class="meta">@interface</span> HelloAnnotation &#123;</span><br><span class="line">    <span class="function">String <span class="title">value</span><span class="params">()</span> <span class="keyword">default</span> "Hello annotation!"</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>使用这个注解：<br><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">UseAnnotation</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@HelloAnnotation</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">hello</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"hello"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@HelloAnnotation</span>(<span class="string">"Hello world!"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">helloWorld</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"Hello world!"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>注解最重要的部分在于对注解的处理。注解处理器就是通过反射机制获取被检查方法上的注解信息，然后根据注解元素的值进行特定的处理。如果没有注解处理器，注解就是个注释，或者连注释都不如。<p></p><p>处理这个注解：<br></p><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Test</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        testAnnotation(UseAnnotation<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">testAnnotation</span><span class="params">(Class&lt;?&gt; cl)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">for</span> (Method m : cl.getDeclaredMethods()) &#123;</span><br><span class="line">            HelloAnnotation ha = m.getAnnotation(HelloAnnotation<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line">            <span class="keyword">if</span> (ha != <span class="keyword">null</span>) &#123;</span><br><span class="line">                System.out.println(<span class="string">"Found My Annotation: "</span> + ha.value());</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>输出结果：<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Found My Annotation: Hello annotation!</span><br><span class="line">Found My Annotation: Hello world!</span><br></pre></td></tr></table></figure><p></p><h1 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h1><p><a href="https://www.cnblogs.com/yangming1996/p/9295168.html" target="_blank" rel="noopener">JAVA 注解的基本原理</a></p><p><a href="https://www.jianshu.com/p/f5b564693c43" target="_blank" rel="noopener">Java注解基本原理</a></p><blockquote><p>本文首发于我的个人博客 <a href="http://chaohang.top" target="_blank" rel="noopener">http://chaohang.top</a></p><p>作者<a href="http://chaohang.top" target="_blank" rel="noopener">张小超</a></p><p>转载请注明出处</p></blockquote><p>欢迎关注我的微信公众号 【超超不会飞】，获取第一时间的更新。</p><p><img src="http://cdn.chaohang.top/20200223210745.jpg" alt=""></p><!-- rebuild by neat -->]]></content>
+    <content><![CDATA[<h1 id="注解的本质"><a href="#注解的本质" class="headerlink" title="注解的本质"></a>注解的本质</h1><p>「java.lang.annotation.Annotation」接口中有这么一句话，用来描述『注解』。</p>
+<blockquote>
+<p>The common interface extended by all annotation types<br>所有的注解类型都继承自这个普通的接口（Annotation）</p>
+</blockquote>
+<a id="more"></a>
+<p>这句话有点抽象，但却说出了注解的本质。我们看一个 JDK 内置注解的定义：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Target</span>(ElementType.METHOD)</span><br><span class="line"><span class="meta">@Retention</span>(RetentionPolicy.SOURCE)</span><br><span class="line"><span class="keyword">public</span> <span class="meta">@interface</span> Override &#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这是注解 @Override 的定义，其实它本质上就是：<br><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Override</span> <span class="keyword">extends</span> <span class="title">Annotation</span></span>&#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>没错，注解的本质就是一个继承了 Annotation 接口的接口。有关这一点，你可以去反编译任意一个注解类，你会得到结果的。</p>
+<p><strong>一个注解准确意义上来说，只不过是一种特殊的注释而已，如果没有解析它的代码，它可能连注释都不如。</strong></p>
+<p>解析一个类或者方法的注解往往有两种形式，一种是编译期直接扫描，一种是运行期反射。</p>
+<h1 id="元注解"><a href="#元注解" class="headerlink" title="元注解"></a>元注解</h1><p>『元注解』是用于修饰注解的注解，通常用在注解的定义上。</p>
+<p>JAVA 中有以下几个『元注解』：</p>
+<ul>
+<li>@Target：注解的作用目标</li>
+<li>@Retention：注解的生命周期</li>
+<li>@Documented：注解是否应当被包含在 JavaDoc 文档中</li>
+<li>@Inherited：是否允许子类继承该注解</li>
+</ul>
+<h2 id="Target"><a href="#Target" class="headerlink" title="@Target"></a>@Target</h2><p><code>@Target</code> 注解指明该注解可以作用哪些对象上。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Documented</span></span><br><span class="line"><span class="meta">@Retention</span>(RetentionPolicy.RUNTIME)</span><br><span class="line"><span class="meta">@Target</span>(ElementType.ANNOTATION_TYPE)</span><br><span class="line"><span class="keyword">public</span> <span class="meta">@interface</span> Target &#123;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">        * Returns an array of the kinds of elements an annotation type</span></span><br><span class="line"><span class="comment">        * can be applied to.</span></span><br><span class="line"><span class="comment">        * <span class="doctag">@return</span> an array of the kinds of elements an annotation type</span></span><br><span class="line"><span class="comment">        * can be applied to</span></span><br><span class="line"><span class="comment">        */</span></span><br><span class="line">    ElementType[] value();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>注解接收一个ElementType数组，ElementType是一个枚举，成员如下：</p>
+<ul>
+<li>ElementType.TYPE：允许被修饰的注解作用在类、接口和枚举上</li>
+<li>ElementType.FIELD：允许作用在属性字段上</li>
+<li>ElementType.METHOD：允许作用在方法上</li>
+<li>ElementType.PARAMETER：允许作用在方法参数上</li>
+<li>ElementType.CONSTRUCTOR：允许作用在构造器上</li>
+<li>ElementType.LOCAL_VARIABLE：允许作用在本地局部变量上</li>
+<li>ElementType.ANNOTATION_TYPE：允许作用在注解上</li>
+<li>ElementType.PACKAGE：允许作用在包上</li>
+<li>ElementType.TYPE_PARAMETER：允许作用在类型参数上</li>
+<li>ElementType.TYPE_USE：允许作用在类型上</li>
+</ul>
+<h2 id="Retention"><a href="#Retention" class="headerlink" title="@Retention"></a>@Retention</h2><p>@Retention 用于指明当前注解的生命周期<br><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Documented</span></span><br><span class="line"><span class="meta">@Retention</span>(RetentionPolicy.RUNTIME)</span><br><span class="line"><span class="meta">@Target</span>(ElementType.ANNOTATION_TYPE)</span><br><span class="line"><span class="keyword">public</span> <span class="meta">@interface</span> Retention &#123;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">        * Returns the retention policy.</span></span><br><span class="line"><span class="comment">        * <span class="doctag">@return</span> the retention policy</span></span><br><span class="line"><span class="comment">        */</span></span><br><span class="line">    <span class="function">RetentionPolicy <span class="title">value</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>注解接收一个RetentionPolicy数据，RetentionPolicy是个枚举，成员如下：</p>
+<ul>
+<li>RetentionPolicy.SOURCE：当前注解编译期可见，不会写入 class 文件</li>
+<li>RetentionPolicy.CLASS：类加载阶段丢弃，会写入 class 文件</li>
+<li>RetentionPolicy.RUNTIME：永久保存，可以反射获取</li>
+</ul>
+<h1 id="JAVA-的内置三大注解"><a href="#JAVA-的内置三大注解" class="headerlink" title="JAVA 的内置三大注解"></a>JAVA 的内置三大注解</h1><ul>
+<li>@Override</li>
+<li>@Deprecated  标识类或方法不再推荐使用</li>
+<li>@SuppressWarnings 主要用来压制 java 的警告</li>
+</ul>
+<h1 id="实现一个自己的注解"><a href="#实现一个自己的注解" class="headerlink" title="实现一个自己的注解"></a>实现一个自己的注解</h1><p>定义一个注解：<br><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Target</span>(ElementType.METHOD)</span><br><span class="line"><span class="meta">@Retention</span>(RetentionPolicy.RUNTIME)</span><br><span class="line"><span class="keyword">public</span> <span class="meta">@interface</span> HelloAnnotation &#123;</span><br><span class="line">    <span class="function">String <span class="title">value</span><span class="params">()</span> <span class="keyword">default</span> "Hello annotation!"</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>使用这个注解：<br><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">UseAnnotation</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@HelloAnnotation</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">hello</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"hello"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@HelloAnnotation</span>(<span class="string">"Hello world!"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">helloWorld</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"Hello world!"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>注解最重要的部分在于对注解的处理。注解处理器就是通过反射机制获取被检查方法上的注解信息，然后根据注解元素的值进行特定的处理。如果没有注解处理器，注解就是个注释，或者连注释都不如。</p>
+<p>处理这个注解：<br><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Test</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        testAnnotation(UseAnnotation<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">testAnnotation</span><span class="params">(Class&lt;?&gt; cl)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">for</span> (Method m : cl.getDeclaredMethods()) &#123;</span><br><span class="line">            HelloAnnotation ha = m.getAnnotation(HelloAnnotation<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line">            <span class="keyword">if</span> (ha != <span class="keyword">null</span>) &#123;</span><br><span class="line">                System.out.println(<span class="string">"Found My Annotation: "</span> + ha.value());</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>输出结果：<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Found My Annotation: Hello annotation!</span><br><span class="line">Found My Annotation: Hello world!</span><br></pre></td></tr></table></figure></p>
+<h1 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h1><p><a href="https://www.cnblogs.com/yangming1996/p/9295168.html" target="_blank" rel="noopener">JAVA 注解的基本原理</a></p>
+<p><a href="https://www.jianshu.com/p/f5b564693c43" target="_blank" rel="noopener">Java注解基本原理</a></p>
+<blockquote>
+<p>本文首发于我的个人博客 <a href="http://chaohang.top" target="_blank" rel="noopener">http://chaohang.top</a></p>
+<p>作者<a href="http://chaohang.top" target="_blank" rel="noopener">张小超</a></p>
+<p>转载请注明出处</p>
+</blockquote>
+<p>欢迎关注我的微信公众号 【超超不会飞】，获取第一时间的更新。</p>
+<p><img data-src="http://cdn.chaohang.top/20200223210745.jpg" alt=""></p>
+]]></content>
       <tags>
         <tag>Java</tag>
       </tags>
