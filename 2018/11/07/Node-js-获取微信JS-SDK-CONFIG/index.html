@@ -1,4 +1,304 @@
-<!DOCTYPE html><html lang="zh-Hans"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=2"><meta name="theme-color" content="#222"><meta name="generator" content="Hexo 4.2.0"><link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png"><link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png"><link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png"><link rel="mask-icon" href="/images/logo.svg" color="#222"><link rel="stylesheet" href="/css/main.css"><link rel="stylesheet" href="//cdn.jsdelivr.net/npm/font-awesome@4/css/font-awesome.min.css"><script id="hexo-configurations">var NexT=window.NexT||{},CONFIG={hostname:"www.chaohang.top",root:"/",scheme:"Muse",version:"7.7.1",exturl:!1,sidebar:{position:"left",display:"post",padding:18,offset:12,onmobile:!1},copycode:{enable:!1,show_result:!1,style:null},back2top:{enable:!0,sidebar:!1,scrollpercent:!1},bookmark:{enable:!1,color:"#222",save:"auto"},fancybox:!1,mediumzoom:!1,lazyload:!0,pangu:!1,comments:{style:"tabs",active:null,storage:!0,lazyload:!1,nav:null},algolia:{hits:{per_page:10},labels:{input_placeholder:"Search for Posts",hits_empty:"We didn't find any results for the search: ${query}",hits_stats:"${hits} results found in ${time} ms"}},localsearch:{enable:!0,trigger:"auto",top_n_per_article:3,unescape:!1,preload:!1},motion:{enable:!0,async:!1,transition:{post_block:"fadeIn",post_header:"slideDownIn",post_body:"slideDownIn",coll_header:"slideLeftIn",sidebar:"slideUpIn"}},path:"search.xml"}</script><meta name="description" content="背景前端在调用微信提供的分享、拍照、扫一扫等功能时需要到后台获取配置，主要是签名(signature)。Node 开发可以用朴灵大佬的SDK——co-wechat-api。 配置到微信公众平台进入“公众号设置”的“功能设置”里填写“JS接口安全域名”。前提是该域名的项目目录下有微信提供的校验文件。如果需要本地调试或者测试环境调试，可以把IP白名单也顺便配置一下。"><meta property="og:type" content="article"><meta property="og:title" content="Node.js 获取微信JS-SDK CONFIG"><meta property="og:url" content="https://www.chaohang.top/2018/11/07/Node-js-%E8%8E%B7%E5%8F%96%E5%BE%AE%E4%BF%A1JS-SDK-CONFIG/index.html"><meta property="og:site_name" content="张小超的博客"><meta property="og:description" content="背景前端在调用微信提供的分享、拍照、扫一扫等功能时需要到后台获取配置，主要是签名(signature)。Node 开发可以用朴灵大佬的SDK——co-wechat-api。 配置到微信公众平台进入“公众号设置”的“功能设置”里填写“JS接口安全域名”。前提是该域名的项目目录下有微信提供的校验文件。如果需要本地调试或者测试环境调试，可以把IP白名单也顺便配置一下。"><meta property="article:published_time" content="2018-11-07T10:44:57.000Z"><meta property="article:modified_time" content="2018-11-07T10:44:57.000Z"><meta property="article:author" content="张小超"><meta property="article:tag" content="node.js"><meta property="article:tag" content="wechat"><meta property="article:tag" content="Javascript"><meta name="twitter:card" content="summary"><link rel="canonical" href="https://www.chaohang.top/2018/11/07/Node-js-%E8%8E%B7%E5%8F%96%E5%BE%AE%E4%BF%A1JS-SDK-CONFIG/"><script id="page-configurations">CONFIG.page={sidebar:"",isHome:!1,isPost:!0}</script><title>Node.js 获取微信JS-SDK CONFIG | 张小超的博客</title><noscript><style>.sidebar-inner,.use-motion .brand,.use-motion .collection-header,.use-motion .comments,.use-motion .menu-item,.use-motion .pagination,.use-motion .post-block,.use-motion .post-body,.use-motion .post-header{opacity:initial}.use-motion .site-subtitle,.use-motion .site-title{opacity:initial;top:initial}.use-motion .logo-line-before i{left:initial}.use-motion .logo-line-after i{right:initial}</style></noscript></head><body itemscope itemtype="http://schema.org/WebPage"><div class="container use-motion"><div class="headband"></div><header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="header-inner"><div class="site-brand-container"><div class="site-nav-toggle"><div class="toggle" aria-label="Toggle navigation bar"><span class="toggle-line toggle-line-first"></span><span class="toggle-line toggle-line-middle"></span><span class="toggle-line toggle-line-last"></span></div></div><div class="site-meta"><div><a href="/" class="brand" rel="start"><span class="logo-line-before"><i></i></span> <span class="site-title">张小超的博客</span><span class="logo-line-after"><i></i></span></a></div><h1 class="site-subtitle" itemprop="description">超超不会飞</h1></div><div class="site-nav-right"></div></div><nav class="site-nav"><ul id="menu" class="menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-fw fa-home"></i> Home</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i> Archives</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i> Tags</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i> About</a></li><li class="menu-item menu-item-search"><a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i> Search</a></li></ul></nav><div class="site-search"><div class="popup search-popup"><div class="search-header"><span class="search-icon"><i class="fa fa-search"></i></span><div class="search-input-container"> <input autocomplete="off" autocorrect="off" autocapitalize="off" placeholder="Searching..." spellcheck="false" type="search" class="search-input"></div><span class="popup-btn-close"><i class="fa fa-times-circle"></i></span></div><div id="search-result"></div></div><div class="search-pop-overlay"></div></div></div></header><div class="back-to-top"><i class="fa fa-arrow-up"></i> <span>0%</span></div><main class="main"><div class="main-inner"><div class="content-wrap"><div class="content"><div class="posts-expand"><article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans"><link itemprop="mainEntityOfPage" href="https://www.chaohang.top/2018/11/07/Node-js-%E8%8E%B7%E5%8F%96%E5%BE%AE%E4%BF%A1JS-SDK-CONFIG/"><span hidden itemprop="author" itemscope itemtype="http://schema.org/Person"><meta itemprop="image" content="/images/avatar.gif"><meta itemprop="name" content="张小超"><meta itemprop="description" content=""></span><span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization"><meta itemprop="name" content="张小超的博客"></span><header class="post-header"><h2 class="post-title" itemprop="name headline"> Node.js 获取微信JS-SDK CONFIG</h2><div class="post-meta"><span class="post-meta-item"><span class="post-meta-item-icon"><i class="fa fa-calendar-o"></i></span> <span class="post-meta-item-text">Posted on</span> <time title="Created: 2018-11-07 18:44:57" itemprop="dateCreated datePublished" datetime="2018-11-07T18:44:57+08:00">2018-11-07</time></span><span id="/2018/11/07/Node-js-%E8%8E%B7%E5%8F%96%E5%BE%AE%E4%BF%A1JS-SDK-CONFIG/" class="post-meta-item leancloud_visitors" data-flag-title="Node.js 获取微信JS-SDK CONFIG" title="Views"><span class="post-meta-item-icon"><i class="fa fa-eye"></i></span> <span class="post-meta-item-text">Views:</span><span class="leancloud-visitors-count"></span></span><span class="post-meta-item"><span class="post-meta-item-icon"><i class="fa fa-comment-o"></i></span> <span class="post-meta-item-text">Valine:</span><a title="valine" href="/2018/11/07/Node-js-%E8%8E%B7%E5%8F%96%E5%BE%AE%E4%BF%A1JS-SDK-CONFIG/#valine-comments" itemprop="discussionUrl"><span class="post-comments-count valine-comment-count" data-xid="/2018/11/07/Node-js-%E8%8E%B7%E5%8F%96%E5%BE%AE%E4%BF%A1JS-SDK-CONFIG/" itemprop="commentCount"></span></a></span></div></header><div class="post-body" itemprop="articleBody"><h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>前端在调用微信提供的分享、拍照、扫一扫等功能时需要到后台获取配置，主要是签名(signature)。Node 开发可以用朴灵大佬的SDK——<a href="https://github.com/node-webot/co-wechat-api" target="_blank" rel="noopener">co-wechat-api</a>。</p><h2 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h2><p>到微信公众平台进入“公众号设置”的“功能设置”里填写“JS接口安全域名”。前提是该域名的项目目录下有微信提供的校验文件。如果需要本地调试或者测试环境调试，可以把IP白名单也顺便配置一下。</p><a id="more"></a><h2 id="开发"><a href="#开发" class="headerlink" title="开发"></a>开发</h2><p>实例化 <code>WechatAPI</code> 对象</p><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> WECHAT_API = <span class="keyword">new</span> WechatAPI(</span><br><span class="line">  appid,</span><br><span class="line">  secret,</span><br><span class="line">  get_access_token,  <span class="comment">// function</span></span><br><span class="line">  save_access_token,  <span class="comment">// function 缓存 access_token</span></span><br><span class="line">);</span><br><span class="line"></span><br><span class="line">WECHAT_API.registerTicketHandle(</span><br><span class="line">  get_js_api_ticket,  <span class="comment">// function</span></span><br><span class="line">  save_js_api_ticket,  <span class="comment">// function 缓存 jsapi_ticket</span></span><br><span class="line">);</span><br></pre></td></tr></table></figure><p><strong>注意</strong>：<code>jsapi_ticket</code> 是公众号用于调用微信JS接口的临时票据。正常情况下，<code>jsapi_ticket</code> 的有效期为7200秒，通过 <code>access_token</code> 来获取。由于获取 <code>jsapi_ticket</code> 的api调用次数非常有限，频繁刷新 <code>jsapi_ticket</code> 会导致api调用受限，影响自身业务，开发者必须在自己的服务全局缓存 <code>jsapi_ticket</code>。同样的，<code>access_token</code> 有效期也是7200秒，同样需要全局缓存。</p><p>缓存的函数就是简单的 <code>JSON.stringify</code> 后存入 redis 或其他数据库。</p><h2 id="调用"><a href="#调用" class="headerlink" title="调用"></a>调用</h2><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> params = &#123;</span><br><span class="line">      debug: <span class="literal">false</span>,</span><br><span class="line">      jsApiList: [],  <span class="comment">// 需要获取的能力，由前端传入</span></span><br><span class="line">      url: <span class="string">''</span>,        <span class="comment">// 申请能力并且在后台配置过的域名</span></span><br><span class="line">&#125;;</span><br><span class="line">ctx.body = <span class="keyword">await</span> WECHAT_API.getJsConfig(params);</span><br></pre></td></tr></table></figure><h2 id="接入多个微信公众号"><a href="#接入多个微信公众号" class="headerlink" title="接入多个微信公众号"></a>接入多个微信公众号</h2><p>待我重构归来。。。。。。</p><blockquote><p>本文首发于我的个人博客 <a href="http://chaohang.top" target="_blank" rel="noopener">http://chaohang.top</a></p><p>作者<a href="http://chaohang.top" target="_blank" rel="noopener">张小超</a></p><p>转载请注明出处</p></blockquote></div><footer class="post-footer"><div class="post-tags"> <a href="/tags/node-js/" rel="tag"># node.js</a> <a href="/tags/wechat/" rel="tag"># wechat</a> <a href="/tags/Javascript/" rel="tag"># Javascript</a></div><div class="post-nav"><div class="post-nav-item"><a href="/2018/11/07/%E4%BB%A3%E7%A0%81%E9%A1%BA%E5%BA%8F%E7%9A%84%E9%87%8D%E8%A6%81%E6%80%A7/" rel="prev" title="代码顺序的重要性"><i class="fa fa-chevron-left"></i> 代码顺序的重要性</a></div><div class="post-nav-item"> <a href="/2018/11/16/%E5%B0%8F%E7%A8%8B%E5%BA%8F%E7%99%BB%E5%BD%95%E5%8F%8A%E7%94%A8%E6%88%B7%E4%BF%A1%E6%81%AF%E5%92%8C%E6%89%8B%E6%9C%BA%E5%8F%B7%E7%9A%84%E8%8E%B7%E5%8F%96/" rel="next" title="小程序登录及用户信息和手机号的获取">小程序登录及用户信息和手机号的获取<i class="fa fa-chevron-right"></i></a></div></div></footer></article></div></div><div class="comments" id="valine-comments"></div><script>
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/font-awesome@4/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"www.chaohang.top","root":"/","scheme":"Muse","version":"7.7.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":3,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="背景前端在调用微信提供的分享、拍照、扫一扫等功能时需要到后台获取配置，主要是签名(signature)。Node 开发可以用朴灵大佬的SDK——co-wechat-api。 配置到微信公众平台进入“公众号设置”的“功能设置”里填写“JS接口安全域名”。前提是该域名的项目目录下有微信提供的校验文件。如果需要本地调试或者测试环境调试，可以把IP白名单也顺便配置一下。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Node.js 获取微信JS-SDK CONFIG">
+<meta property="og:url" content="https://www.chaohang.top/2018/11/07/Node-js-%E8%8E%B7%E5%8F%96%E5%BE%AE%E4%BF%A1JS-SDK-CONFIG/index.html">
+<meta property="og:site_name" content="张小超的博客">
+<meta property="og:description" content="背景前端在调用微信提供的分享、拍照、扫一扫等功能时需要到后台获取配置，主要是签名(signature)。Node 开发可以用朴灵大佬的SDK——co-wechat-api。 配置到微信公众平台进入“公众号设置”的“功能设置”里填写“JS接口安全域名”。前提是该域名的项目目录下有微信提供的校验文件。如果需要本地调试或者测试环境调试，可以把IP白名单也顺便配置一下。">
+<meta property="article:published_time" content="2018-11-07T10:44:57.000Z">
+<meta property="article:modified_time" content="2018-11-07T10:44:57.000Z">
+<meta property="article:author" content="张小超">
+<meta property="article:tag" content="wechat">
+<meta property="article:tag" content="node.js">
+<meta property="article:tag" content="Javascript">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://www.chaohang.top/2018/11/07/Node-js-%E8%8E%B7%E5%8F%96%E5%BE%AE%E4%BF%A1JS-SDK-CONFIG/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true
+  };
+</script>
+
+  <title>Node.js 获取微信JS-SDK CONFIG | 张小超的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">张小超的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <h1 class="site-subtitle" itemprop="description">超超不会飞</h1>
+      
+  </div>
+
+  <div class="site-nav-right"></div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>About</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.chaohang.top/2018/11/07/Node-js-%E8%8E%B7%E5%8F%96%E5%BE%AE%E4%BF%A1JS-SDK-CONFIG/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="张小超">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="张小超的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          Node.js 获取微信JS-SDK CONFIG
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2018-11-07 18:44:57" itemprop="dateCreated datePublished" datetime="2018-11-07T18:44:57+08:00">2018-11-07</time>
+            </span>
+
+          
+            <span id="/2018/11/07/Node-js-%E8%8E%B7%E5%8F%96%E5%BE%AE%E4%BF%A1JS-SDK-CONFIG/" class="post-meta-item leancloud_visitors" data-flag-title="Node.js 获取微信JS-SDK CONFIG" title="Views">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine: </span>
+    
+    <a title="valine" href="/2018/11/07/Node-js-%E8%8E%B7%E5%8F%96%E5%BE%AE%E4%BF%A1JS-SDK-CONFIG/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2018/11/07/Node-js-%E8%8E%B7%E5%8F%96%E5%BE%AE%E4%BF%A1JS-SDK-CONFIG/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>前端在调用微信提供的分享、拍照、扫一扫等功能时需要到后台获取配置，主要是签名(signature)。Node 开发可以用朴灵大佬的SDK——<a href="https://github.com/node-webot/co-wechat-api" target="_blank" rel="noopener">co-wechat-api</a>。</p>
+<h2 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h2><p>到微信公众平台进入“公众号设置”的“功能设置”里填写“JS接口安全域名”。前提是该域名的项目目录下有微信提供的校验文件。如果需要本地调试或者测试环境调试，可以把IP白名单也顺便配置一下。</p>
+<a id="more"></a>
+<h2 id="开发"><a href="#开发" class="headerlink" title="开发"></a>开发</h2><p>实例化 <code>WechatAPI</code> 对象</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> WECHAT_API = <span class="keyword">new</span> WechatAPI(</span><br><span class="line">  appid,</span><br><span class="line">  secret,</span><br><span class="line">  get_access_token,  <span class="comment">// function</span></span><br><span class="line">  save_access_token,  <span class="comment">// function 缓存 access_token</span></span><br><span class="line">);</span><br><span class="line"></span><br><span class="line">WECHAT_API.registerTicketHandle(</span><br><span class="line">  get_js_api_ticket,  <span class="comment">// function</span></span><br><span class="line">  save_js_api_ticket,  <span class="comment">// function 缓存 jsapi_ticket</span></span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+<p><strong>注意</strong>：<code>jsapi_ticket</code> 是公众号用于调用微信JS接口的临时票据。正常情况下，<code>jsapi_ticket</code> 的有效期为7200秒，通过 <code>access_token</code> 来获取。由于获取 <code>jsapi_ticket</code> 的api调用次数非常有限，频繁刷新 <code>jsapi_ticket</code> 会导致api调用受限，影响自身业务，开发者必须在自己的服务全局缓存 <code>jsapi_ticket</code>。同样的，<code>access_token</code> 有效期也是7200秒，同样需要全局缓存。</p>
+<p>缓存的函数就是简单的 <code>JSON.stringify</code> 后存入 redis 或其他数据库。</p>
+<h2 id="调用"><a href="#调用" class="headerlink" title="调用"></a>调用</h2><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> params = &#123;</span><br><span class="line">      debug: <span class="literal">false</span>,</span><br><span class="line">      jsApiList: [],  <span class="comment">// 需要获取的能力，由前端传入</span></span><br><span class="line">      url: <span class="string">''</span>,        <span class="comment">// 申请能力并且在后台配置过的域名</span></span><br><span class="line">&#125;;</span><br><span class="line">ctx.body = <span class="keyword">await</span> WECHAT_API.getJsConfig(params);</span><br></pre></td></tr></table></figure>
+<h2 id="接入多个微信公众号"><a href="#接入多个微信公众号" class="headerlink" title="接入多个微信公众号"></a>接入多个微信公众号</h2><p>待我重构归来。。。。。。</p>
+<blockquote>
+<p>本文首发于我的个人博客 <a href="http://chaohang.top" target="_blank" rel="noopener">http://chaohang.top</a></p>
+<p>作者<a href="http://chaohang.top" target="_blank" rel="noopener">张小超</a></p>
+<p>转载请注明出处</p>
+</blockquote>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/wechat/" rel="tag"># wechat</a>
+              <a href="/tags/node-js/" rel="tag"># node.js</a>
+              <a href="/tags/Javascript/" rel="tag"># Javascript</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2018/11/07/%E4%BB%A3%E7%A0%81%E9%A1%BA%E5%BA%8F%E7%9A%84%E9%87%8D%E8%A6%81%E6%80%A7/" rel="prev" title="代码顺序的重要性">
+      <i class="fa fa-chevron-left"></i> 代码顺序的重要性
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2018/11/16/%E5%B0%8F%E7%A8%8B%E5%BA%8F%E7%99%BB%E5%BD%95%E5%8F%8A%E7%94%A8%E6%88%B7%E4%BF%A1%E6%81%AF%E5%92%8C%E6%89%8B%E6%9C%BA%E5%8F%B7%E7%9A%84%E8%8E%B7%E5%8F%96/" rel="next" title="小程序登录及用户信息和手机号的获取">
+      小程序登录及用户信息和手机号的获取 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
   window.addEventListener('tabs:register', () => {
     let activeClass = CONFIG.comments.activeClass;
     if (CONFIG.comments.storage) {
@@ -18,7 +318,169 @@
       localStorage.setItem('comments_active', commentClass);
     });
   }
-</script></div><div class="toggle sidebar-toggle"><span class="toggle-line toggle-line-first"></span><span class="toggle-line toggle-line-middle"></span><span class="toggle-line toggle-line-last"></span></div><aside class="sidebar"><div class="sidebar-inner"><ul class="sidebar-nav motion-element"><li class="sidebar-nav-toc"> Table of Contents</li><li class="sidebar-nav-overview"> Overview</li></ul><div class="post-toc-wrap sidebar-panel"><div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#背景"><span class="nav-number">1.</span> <span class="nav-text">背景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置"><span class="nav-number">2.</span> <span class="nav-text">配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#开发"><span class="nav-number">3.</span> <span class="nav-text">开发</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#调用"><span class="nav-number">4.</span> <span class="nav-text">调用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#接入多个微信公众号"><span class="nav-number">5.</span> <span class="nav-text">接入多个微信公众号</span></a></li></ol></div></div><div class="site-overview-wrap sidebar-panel"><div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person"><p class="site-author-name" itemprop="name">张小超</p><div class="site-description" itemprop="description"></div></div><div class="site-state-wrap motion-element"><nav class="site-state"><div class="site-state-item site-state-posts"> <a href="/archives/"><span class="site-state-item-count">49</span> <span class="site-state-item-name">posts</span></a></div><div class="site-state-item site-state-tags"> <a href="/tags/"><span class="site-state-item-count">35</span> <span class="site-state-item-name">tags</span></a></div></nav></div></div></div></aside><div id="sidebar-dimmer"></div></div></main><footer class="footer"><div class="footer-inner"><div class="beian"><a href="http://www.beian.miit.gov.cn" rel="noopener" target="_blank">闽ICP备19023472号</a></div><div class="copyright"> &copy; 2016 – <span itemprop="copyrightYear">2020</span><span class="with-love"><i class="fa fa-user"></i></span> <span class="author" itemprop="copyrightHolder">张小超</span></div><div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v4.2.0</div> <span class="post-meta-divider">|</span><div class="theme-info">Theme – <a href="https://muse.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> v7.7.1</div><div class="busuanzi-count"><script async src="https://chaohang.top/cdn/js%2Fbusuanzi%2F2.3%2Fbusuanzi.pure.mini.js"></script><span class="post-meta-item" id="busuanzi_container_site_uv" style="display:none"><span class="post-meta-item-icon"><i class="fa fa-user"></i></span><span class="site-uv" title="Total Visitors"><span id="busuanzi_value_site_uv"></span></span></span> <span class="post-meta-divider">|</span><span class="post-meta-item" id="busuanzi_container_site_pv" style="display:none"><span class="post-meta-item-icon"><i class="fa fa-eye"></i></span><span class="site-pv" title="Total Views"><span id="busuanzi_value_site_pv"></span></span></span></div></div></footer></div><script src="//cdn.jsdelivr.net/npm/animejs@3.1.0/lib/anime.min.js"></script><script src="//cdn.jsdelivr.net/npm/lozad@1/dist/lozad.min.js"></script><script src="//cdn.jsdelivr.net/npm/velocity-animate@1/velocity.min.js"></script><script src="//cdn.jsdelivr.net/npm/velocity-animate@1/velocity.ui.min.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script><script src="/js/local-search.js"></script><script>
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#背景"><span class="nav-number">1.</span> <span class="nav-text">背景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置"><span class="nav-number">2.</span> <span class="nav-text">配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#开发"><span class="nav-number">3.</span> <span class="nav-text">开发</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#调用"><span class="nav-number">4.</span> <span class="nav-text">调用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#接入多个微信公众号"><span class="nav-number">5.</span> <span class="nav-text">接入多个微信公众号</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">张小超</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">49</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">35</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+  <div class="beian"><a href="http://www.beian.miit.gov.cn" rel="noopener" target="_blank">闽ICP备19023472号 </a>
+  </div>
+
+<div class="copyright">
+  
+  &copy; 2016 – 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">张小超</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">Theme – <a href="https://muse.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> v7.7.1
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://chaohang.top/cdn/js%2Fbusuanzi%2F2.3%2Fbusuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="//cdn.jsdelivr.net/npm/animejs@3.1.0/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/lozad@1/dist/lozad.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/velocity-animate@1/velocity.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/velocity-animate@1/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
 NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
   NexT.utils.getScript('//cdn.jsdelivr.net/npm/valine@1/dist/Valine.min.js', () => {
     var GUEST = ['nick', 'mail', 'link'];
@@ -44,4 +506,7 @@ NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
     });
   }, window.Valine);
 });
-</script></body></html>
+</script>
+
+</body>
+</html>

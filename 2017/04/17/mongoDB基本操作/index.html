@@ -1,4 +1,360 @@
-<!DOCTYPE html><html lang="zh-Hans"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=2"><meta name="theme-color" content="#222"><meta name="generator" content="Hexo 4.2.0"><link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png"><link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png"><link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png"><link rel="mask-icon" href="/images/logo.svg" color="#222"><link rel="stylesheet" href="/css/main.css"><link rel="stylesheet" href="//cdn.jsdelivr.net/npm/font-awesome@4/css/font-awesome.min.css"><script id="hexo-configurations">var NexT=window.NexT||{},CONFIG={hostname:"www.chaohang.top",root:"/",scheme:"Muse",version:"7.7.1",exturl:!1,sidebar:{position:"left",display:"post",padding:18,offset:12,onmobile:!1},copycode:{enable:!1,show_result:!1,style:null},back2top:{enable:!0,sidebar:!1,scrollpercent:!1},bookmark:{enable:!1,color:"#222",save:"auto"},fancybox:!1,mediumzoom:!1,lazyload:!0,pangu:!1,comments:{style:"tabs",active:null,storage:!0,lazyload:!1,nav:null},algolia:{hits:{per_page:10},labels:{input_placeholder:"Search for Posts",hits_empty:"We didn't find any results for the search: ${query}",hits_stats:"${hits} results found in ${time} ms"}},localsearch:{enable:!0,trigger:"auto",top_n_per_article:3,unescape:!1,preload:!1},motion:{enable:!0,async:!1,transition:{post_block:"fadeIn",post_header:"slideDownIn",post_body:"slideDownIn",coll_header:"slideLeftIn",sidebar:"slideUpIn"}},path:"search.xml"}</script><meta name="description" content="创建数据库use DATABASE_NAME 如果数据库不存在则创建，否则切换到指定数据库 db查看当前数据库名 show dbs 查看所有数据库 show tables 查看集合 删除数据库db.dropDatabase() 删除当前数据库 db.collection.drop()  删除集合，collection为集合名，例db.student.drop() 插入文档db.COLLECTION"><meta property="og:type" content="article"><meta property="og:title" content="mongoDB基本操作"><meta property="og:url" content="https://www.chaohang.top/2017/04/17/mongoDB%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C/index.html"><meta property="og:site_name" content="张小超的博客"><meta property="og:description" content="创建数据库use DATABASE_NAME 如果数据库不存在则创建，否则切换到指定数据库 db查看当前数据库名 show dbs 查看所有数据库 show tables 查看集合 删除数据库db.dropDatabase() 删除当前数据库 db.collection.drop()  删除集合，collection为集合名，例db.student.drop() 插入文档db.COLLECTION"><meta property="article:published_time" content="2017-04-17T03:28:54.000Z"><meta property="article:modified_time" content="2017-04-17T03:28:54.000Z"><meta property="article:author" content="张小超"><meta property="article:tag" content="mongodb"><meta name="twitter:card" content="summary"><link rel="canonical" href="https://www.chaohang.top/2017/04/17/mongoDB%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C/"><script id="page-configurations">CONFIG.page={sidebar:"",isHome:!1,isPost:!0}</script><title>mongoDB基本操作 | 张小超的博客</title><noscript><style>.sidebar-inner,.use-motion .brand,.use-motion .collection-header,.use-motion .comments,.use-motion .menu-item,.use-motion .pagination,.use-motion .post-block,.use-motion .post-body,.use-motion .post-header{opacity:initial}.use-motion .site-subtitle,.use-motion .site-title{opacity:initial;top:initial}.use-motion .logo-line-before i{left:initial}.use-motion .logo-line-after i{right:initial}</style></noscript></head><body itemscope itemtype="http://schema.org/WebPage"><div class="container use-motion"><div class="headband"></div><header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="header-inner"><div class="site-brand-container"><div class="site-nav-toggle"><div class="toggle" aria-label="Toggle navigation bar"><span class="toggle-line toggle-line-first"></span><span class="toggle-line toggle-line-middle"></span><span class="toggle-line toggle-line-last"></span></div></div><div class="site-meta"><div><a href="/" class="brand" rel="start"><span class="logo-line-before"><i></i></span> <span class="site-title">张小超的博客</span><span class="logo-line-after"><i></i></span></a></div><h1 class="site-subtitle" itemprop="description">超超不会飞</h1></div><div class="site-nav-right"></div></div><nav class="site-nav"><ul id="menu" class="menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-fw fa-home"></i> Home</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i> Archives</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i> Tags</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i> About</a></li><li class="menu-item menu-item-search"><a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i> Search</a></li></ul></nav><div class="site-search"><div class="popup search-popup"><div class="search-header"><span class="search-icon"><i class="fa fa-search"></i></span><div class="search-input-container"> <input autocomplete="off" autocorrect="off" autocapitalize="off" placeholder="Searching..." spellcheck="false" type="search" class="search-input"></div><span class="popup-btn-close"><i class="fa fa-times-circle"></i></span></div><div id="search-result"></div></div><div class="search-pop-overlay"></div></div></div></header><div class="back-to-top"><i class="fa fa-arrow-up"></i> <span>0%</span></div><main class="main"><div class="main-inner"><div class="content-wrap"><div class="content"><div class="posts-expand"><article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans"><link itemprop="mainEntityOfPage" href="https://www.chaohang.top/2017/04/17/mongoDB%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C/"><span hidden itemprop="author" itemscope itemtype="http://schema.org/Person"><meta itemprop="image" content="/images/avatar.gif"><meta itemprop="name" content="张小超"><meta itemprop="description" content=""></span><span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization"><meta itemprop="name" content="张小超的博客"></span><header class="post-header"><h2 class="post-title" itemprop="name headline"> mongoDB基本操作</h2><div class="post-meta"><span class="post-meta-item"><span class="post-meta-item-icon"><i class="fa fa-calendar-o"></i></span> <span class="post-meta-item-text">Posted on</span> <time title="Created: 2017-04-17 11:28:54" itemprop="dateCreated datePublished" datetime="2017-04-17T11:28:54+08:00">2017-04-17</time></span><span id="/2017/04/17/mongoDB%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C/" class="post-meta-item leancloud_visitors" data-flag-title="mongoDB基本操作" title="Views"><span class="post-meta-item-icon"><i class="fa fa-eye"></i></span> <span class="post-meta-item-text">Views:</span><span class="leancloud-visitors-count"></span></span><span class="post-meta-item"><span class="post-meta-item-icon"><i class="fa fa-comment-o"></i></span> <span class="post-meta-item-text">Valine:</span><a title="valine" href="/2017/04/17/mongoDB%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C/#valine-comments" itemprop="discussionUrl"><span class="post-comments-count valine-comment-count" data-xid="/2017/04/17/mongoDB%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C/" itemprop="commentCount"></span></a></span></div></header><div class="post-body" itemprop="articleBody"><h2 id="创建数据库"><a href="#创建数据库" class="headerlink" title="创建数据库"></a>创建数据库</h2><p><code>use DATABASE_NAME</code> 如果数据库不存在则创建，否则切换到指定数据库</p><p><code>db</code>查看当前数据库名</p><p><code>show dbs</code> 查看所有数据库</p><p><code>show tables</code> 查看集合</p><h2 id="删除数据库"><a href="#删除数据库" class="headerlink" title="删除数据库"></a>删除数据库</h2><p><code>db.dropDatabase()</code> 删除当前数据库</p><p><code>db.collection.drop()</code> 删除集合，collection为集合名，例<code>db.student.drop()</code></p><h2 id="插入文档"><a href="#插入文档" class="headerlink" title="插入文档"></a>插入文档</h2><p><code>db.COLLECTION_NAME.insert(document)</code><br>实例<br></p><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">db.col.insert(&#123;</span><br><span class="line">	title: <span class="string">'MongoDB教程'</span>,</span><br><span class="line">	tags: [<span class="string">'mongodb'</span>, <span class="string">'database'</span>, <span class="string">'nosql'</span>],</span><br><span class="line">	url: <span class="string">'www.runoob.com'</span></span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure><p></p><a id="more"></a><p>我们也可以把数据定义为变量</p><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">document</span> = (&#123;  <span class="comment">// 记得这边有个括号</span></span><br><span class="line">	title: <span class="string">'MongoDB教程'</span>,</span><br><span class="line">	tags: [<span class="string">'mongodb'</span>, <span class="string">'database'</span>, <span class="string">'nosql'</span>],</span><br><span class="line">	url: <span class="string">'www.runoob.com'</span></span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">db.col.insert(<span class="built_in">document</span>)</span><br></pre></td></tr></table></figure><p>插入文档也可以使用 <code>db.col.save(document)</code> 命令，如果不指定 <code>_id</code> 字段save()方法类似<br>于 insert()。如果指定 <code>_id</code> 字段，则会更新该 <code>_id</code> 的数据。</p><h2 id="更新文档"><a href="#更新文档" class="headerlink" title="更新文档"></a>更新文档</h2><h3 id="update-方法"><a href="#update-方法" class="headerlink" title="update()方法"></a>update()方法</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">db.collection.update(</span><br><span class="line">	&lt;query&gt;,  // 查询条件</span><br><span class="line">	&lt;update&gt;,  //update的对象和一些更新的操作符</span><br><span class="line">	&#123;</span><br><span class="line">		upsert: &lt;boolean&gt;,  // 可选</span><br><span class="line">		multi: &lt;boolean&gt;,   // 可选</span><br><span class="line">		writeConcern: &lt;document&gt;  // 可选，抛出异常的级别</span><br><span class="line">	&#125;</span><br><span class="line">)</span><br></pre></td></tr></table></figure><p>例子<br><code>db.col.update({&#39;title&#39;:&#39;MongoDB 教程&#39;},{$set:{&#39;title&#39;:&#39;MongoDB&#39;}})</code></p><p>以上语句只会修改第一条发现的文档，如果你要修改多条相同的文档，则需要设置multi参数为true</p><h3 id="save-方法"><a href="#save-方法" class="headerlink" title="save()方法"></a>save()方法</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">db.collection.save(</span><br><span class="line">	&lt;document&gt;, // 传入文档用来替换之前的文档</span><br><span class="line">	&#123;</span><br><span class="line">		writeConcern: &lt;document&gt;</span><br><span class="line">	&#125;</span><br><span class="line">)</span><br></pre></td></tr></table></figure><p>例子<br></p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">db.col.save(&#123;</span><br><span class="line">	&quot;_id&quot; : ObjectId(&quot;56064f89ade2f21f36b03136&quot;),  // id唯一</span><br><span class="line">    &quot;title&quot; : &quot;MongoDB&quot;,</span><br><span class="line">    &quot;description&quot; : &quot;MongoDB 是一个 Nosql 数据库&quot;,</span><br><span class="line">    &quot;by&quot; : &quot;Runoob&quot;,</span><br><span class="line">    &quot;url&quot; : &quot;http://www.runoob.com&quot;,</span><br><span class="line">    &quot;tags&quot; : [</span><br><span class="line">            &quot;mongodb&quot;,</span><br><span class="line">            &quot;NoSQL&quot;</span><br><span class="line">    ],</span><br><span class="line">    &quot;likes&quot; : 110</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure><p></p><h2 id="删除文档"><a href="#删除文档" class="headerlink" title="删除文档"></a>删除文档</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">db.collection.remove(</span><br><span class="line">	&lt;query&gt;,       // 可选，删除的文档的条件</span><br><span class="line">	&#123;</span><br><span class="line">		justOne:&lt;boolean&gt;,   // 可选，如果为true或1，则只删除一个文档</span><br><span class="line">		writeConcern: &lt;document&gt;  // 可选，抛出异常级别</span><br><span class="line">	&#125;</span><br><span class="line">)</span><br></pre></td></tr></table></figure><p>例子<br><code>db.col.remove({&#39;title&#39;:&#39;mongodb&#39;})</code></p><p><code>db.col.remove({})</code> 删除所有数据</p><h2 id="查询文档"><a href="#查询文档" class="headerlink" title="查询文档"></a>查询文档</h2><p><code>db.col.find()</code> 查看已插入的文档<br><code>db.col.find().pretty()</code> 输出好看的格式<br><code>db.col.findOne()</code> 只返回一个文档</p><h2 id="条件操作符"><a href="#条件操作符" class="headerlink" title="条件操作符"></a>条件操作符</h2><p>(&gt;) 大于 - $gt<br>(&lt;) 小于 - $lt<br>(&gt;=) 大于等于 - $gte<br>(&lt;= ) 小于等于 - $lte<br><code>db.col.find({&quot;likes&quot; : {$gt : 100}})</code> 查找likes大于100的数据</p><h3 id="AND条件"><a href="#AND条件" class="headerlink" title="AND条件"></a>AND条件</h3><p>传入多个键值然后逗号隔开<br><code>db.col.find({key1: value1, key2: value2}).pretty()</code></p><h3 id="OR条件"><a href="#OR条件" class="headerlink" title="OR条件"></a>OR条件</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">	[</span><br><span class="line">		&#123;key1: value1&#125;, &#123;key2: value2&#125;</span><br><span class="line">	]</span><br><span class="line">&#125;).pretty()</span><br></pre></td></tr></table></figure><h2 id="type操作符"><a href="#type操作符" class="headerlink" title="$type操作符"></a>$type操作符</h2><table><thead><tr><th>类型</th><th>数字</th></tr></thead><tbody><tr><td>Double</td><td>1</td></tr><tr><td>String</td><td>2</td></tr><tr><td>Object</td><td>3</td></tr><tr><td>Array</td><td>4</td></tr><tr><td>Binary data</td><td>5</td></tr><tr><td>Object id</td><td>7</td></tr><tr><td>Boolean</td><td>8</td></tr><tr><td>Date</td><td>9</td></tr><tr><td>Null</td><td>10</td></tr></tbody></table><p>不全，<a href="http://www.runoob.com/mongodb/mongodb-operators-type.html" target="_blank" rel="noopener">完整表格访问这里</a></p><p><code>db.col.find({&#39;title&#39; :{$type: 2}})</code> 如果title为String则输出</p><h3 id="limit-and-skip"><a href="#limit-and-skip" class="headerlink" title="limit and skip"></a>limit and skip</h3><p><code>db.col.find().limit(2)</code> 只读取两条<br><code>db.col.find().limit(1).skip(1)</code> 跳过第一条，只显示第二条<br>skip默认为0</p><h3 id="sort-方法"><a href="#sort-方法" class="headerlink" title="sort()方法"></a>sort()方法</h3><p>1升序，-1降序</p><p><code>db.col.find().sort({key: 1})</code></p><p>例子<br><code>db.col.find({}, {&#39;title&#39;: 1, _id: 0}).sort({&#39;likes&#39;: -1})</code></p></div><footer class="post-footer"><div class="post-tags"> <a href="/tags/mongodb/" rel="tag"># mongodb</a></div><div class="post-nav"><div class="post-nav-item"><a href="/2017/04/16/%E4%BA%8C%E5%8F%89%E6%A0%91%E7%9A%84%E9%80%92%E5%BD%92%E7%AE%97%E6%B3%95/" rel="prev" title="二叉树的递归算法"><i class="fa fa-chevron-left"></i> 二叉树的递归算法</a></div><div class="post-nav-item"> <a href="/2017/04/22/%E4%B8%80%E4%B8%AA-Vue-Node-MongoDB-%E5%8D%9A%E5%AE%A2%E7%B3%BB%E7%BB%9F/" rel="next" title="一个 Vue + Node + MongoDB 博客系统">一个 Vue + Node + MongoDB 博客系统<i class="fa fa-chevron-right"></i></a></div></div></footer></article></div></div><div class="comments" id="valine-comments"></div><script>
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/font-awesome@4/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"www.chaohang.top","root":"/","scheme":"Muse","version":"7.7.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":3,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="创建数据库use DATABASE_NAME 如果数据库不存在则创建，否则切换到指定数据库 db查看当前数据库名 show dbs 查看所有数据库 show tables 查看集合 删除数据库db.dropDatabase() 删除当前数据库 db.collection.drop()  删除集合，collection为集合名，例db.student.drop() 插入文档db.COLLECTION">
+<meta property="og:type" content="article">
+<meta property="og:title" content="mongoDB基本操作">
+<meta property="og:url" content="https://www.chaohang.top/2017/04/17/mongoDB%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C/index.html">
+<meta property="og:site_name" content="张小超的博客">
+<meta property="og:description" content="创建数据库use DATABASE_NAME 如果数据库不存在则创建，否则切换到指定数据库 db查看当前数据库名 show dbs 查看所有数据库 show tables 查看集合 删除数据库db.dropDatabase() 删除当前数据库 db.collection.drop()  删除集合，collection为集合名，例db.student.drop() 插入文档db.COLLECTION">
+<meta property="article:published_time" content="2017-04-17T03:28:54.000Z">
+<meta property="article:modified_time" content="2017-04-17T03:28:54.000Z">
+<meta property="article:author" content="张小超">
+<meta property="article:tag" content="mongodb">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://www.chaohang.top/2017/04/17/mongoDB%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true
+  };
+</script>
+
+  <title>mongoDB基本操作 | 张小超的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">张小超的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <h1 class="site-subtitle" itemprop="description">超超不会飞</h1>
+      
+  </div>
+
+  <div class="site-nav-right"></div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>About</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.chaohang.top/2017/04/17/mongoDB%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="张小超">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="张小超的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          mongoDB基本操作
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2017-04-17 11:28:54" itemprop="dateCreated datePublished" datetime="2017-04-17T11:28:54+08:00">2017-04-17</time>
+            </span>
+
+          
+            <span id="/2017/04/17/mongoDB%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C/" class="post-meta-item leancloud_visitors" data-flag-title="mongoDB基本操作" title="Views">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine: </span>
+    
+    <a title="valine" href="/2017/04/17/mongoDB%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2017/04/17/mongoDB%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="创建数据库"><a href="#创建数据库" class="headerlink" title="创建数据库"></a>创建数据库</h2><p><code>use DATABASE_NAME</code> 如果数据库不存在则创建，否则切换到指定数据库</p>
+<p><code>db</code>查看当前数据库名</p>
+<p><code>show dbs</code> 查看所有数据库</p>
+<p><code>show tables</code> 查看集合</p>
+<h2 id="删除数据库"><a href="#删除数据库" class="headerlink" title="删除数据库"></a>删除数据库</h2><p><code>db.dropDatabase()</code> 删除当前数据库</p>
+<p><code>db.collection.drop()</code>  删除集合，collection为集合名，例<code>db.student.drop()</code></p>
+<h2 id="插入文档"><a href="#插入文档" class="headerlink" title="插入文档"></a>插入文档</h2><p><code>db.COLLECTION_NAME.insert(document)</code><br>实例<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">db.col.insert(&#123;</span><br><span class="line">	title: <span class="string">'MongoDB教程'</span>,</span><br><span class="line">	tags: [<span class="string">'mongodb'</span>, <span class="string">'database'</span>, <span class="string">'nosql'</span>],</span><br><span class="line">	url: <span class="string">'www.runoob.com'</span></span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure><br><a id="more"></a></p>
+<p>我们也可以把数据定义为变量</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">document</span> = (&#123;  <span class="comment">// 记得这边有个括号</span></span><br><span class="line">	title: <span class="string">'MongoDB教程'</span>,</span><br><span class="line">	tags: [<span class="string">'mongodb'</span>, <span class="string">'database'</span>, <span class="string">'nosql'</span>],</span><br><span class="line">	url: <span class="string">'www.runoob.com'</span></span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">db.col.insert(<span class="built_in">document</span>)</span><br></pre></td></tr></table></figure>
+<p>插入文档也可以使用    <code>db.col.save(document)</code> 命令，如果不指定 <code>_id</code> 字段save()方法类似<br>于 insert()。如果指定 <code>_id</code> 字段，则会更新该 <code>_id</code> 的数据。</p>
+<h2 id="更新文档"><a href="#更新文档" class="headerlink" title="更新文档"></a>更新文档</h2><h3 id="update-方法"><a href="#update-方法" class="headerlink" title="update()方法"></a>update()方法</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">db.collection.update(</span><br><span class="line">	&lt;query&gt;,  &#x2F;&#x2F; 查询条件</span><br><span class="line">	&lt;update&gt;,  &#x2F;&#x2F;update的对象和一些更新的操作符</span><br><span class="line">	&#123;</span><br><span class="line">		upsert: &lt;boolean&gt;,  &#x2F;&#x2F; 可选</span><br><span class="line">		multi: &lt;boolean&gt;,   &#x2F;&#x2F; 可选</span><br><span class="line">		writeConcern: &lt;document&gt;  &#x2F;&#x2F; 可选，抛出异常的级别</span><br><span class="line">	&#125;</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+<p>例子<br><code>db.col.update({&#39;title&#39;:&#39;MongoDB 教程&#39;},{$set:{&#39;title&#39;:&#39;MongoDB&#39;}})</code></p>
+<p>以上语句只会修改第一条发现的文档，如果你要修改多条相同的文档，则需要设置multi参数为true</p>
+<h3 id="save-方法"><a href="#save-方法" class="headerlink" title="save()方法"></a>save()方法</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">db.collection.save(</span><br><span class="line">	&lt;document&gt;, &#x2F;&#x2F; 传入文档用来替换之前的文档</span><br><span class="line">	&#123;</span><br><span class="line">		writeConcern: &lt;document&gt;</span><br><span class="line">	&#125;</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+<p>例子<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">db.col.save(&#123;</span><br><span class="line">	&quot;_id&quot; : ObjectId(&quot;56064f89ade2f21f36b03136&quot;),  &#x2F;&#x2F; id唯一</span><br><span class="line">    &quot;title&quot; : &quot;MongoDB&quot;,</span><br><span class="line">    &quot;description&quot; : &quot;MongoDB 是一个 Nosql 数据库&quot;,</span><br><span class="line">    &quot;by&quot; : &quot;Runoob&quot;,</span><br><span class="line">    &quot;url&quot; : &quot;http:&#x2F;&#x2F;www.runoob.com&quot;,</span><br><span class="line">    &quot;tags&quot; : [</span><br><span class="line">            &quot;mongodb&quot;,</span><br><span class="line">            &quot;NoSQL&quot;</span><br><span class="line">    ],</span><br><span class="line">    &quot;likes&quot; : 110</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure></p>
+<h2 id="删除文档"><a href="#删除文档" class="headerlink" title="删除文档"></a>删除文档</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">db.collection.remove(</span><br><span class="line">	&lt;query&gt;,       &#x2F;&#x2F; 可选，删除的文档的条件</span><br><span class="line">	&#123;</span><br><span class="line">		justOne:&lt;boolean&gt;,   &#x2F;&#x2F; 可选，如果为true或1，则只删除一个文档</span><br><span class="line">		writeConcern: &lt;document&gt;  &#x2F;&#x2F; 可选，抛出异常级别</span><br><span class="line">	&#125;</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+<p>例子<br><code>db.col.remove({&#39;title&#39;:&#39;mongodb&#39;})</code></p>
+<p><code>db.col.remove({})</code> 删除所有数据</p>
+<h2 id="查询文档"><a href="#查询文档" class="headerlink" title="查询文档"></a>查询文档</h2><p><code>db.col.find()</code> 查看已插入的文档<br><code>db.col.find().pretty()</code>  输出好看的格式<br><code>db.col.findOne()</code> 只返回一个文档</p>
+<h2 id="条件操作符"><a href="#条件操作符" class="headerlink" title="条件操作符"></a>条件操作符</h2><p>(&gt;) 大于 - $gt<br>(&lt;) 小于 - $lt<br>(&gt;=) 大于等于 - $gte<br>(&lt;= ) 小于等于 - $lte<br><code>db.col.find({&quot;likes&quot; : {$gt : 100}})</code> 查找likes大于100的数据</p>
+<h3 id="AND条件"><a href="#AND条件" class="headerlink" title="AND条件"></a>AND条件</h3><p>传入多个键值然后逗号隔开<br><code>db.col.find({key1: value1, key2: value2}).pretty()</code></p>
+<h3 id="OR条件"><a href="#OR条件" class="headerlink" title="OR条件"></a>OR条件</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">	[</span><br><span class="line">		&#123;key1: value1&#125;, &#123;key2: value2&#125;</span><br><span class="line">	]</span><br><span class="line">&#125;).pretty()</span><br></pre></td></tr></table></figure>
+<h2 id="type操作符"><a href="#type操作符" class="headerlink" title="$type操作符"></a>$type操作符</h2><table>
+<thead>
+<tr>
+<th>类型</th>
+<th>数字</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Double</td>
+<td>1</td>
+</tr>
+<tr>
+<td>String</td>
+<td>2</td>
+</tr>
+<tr>
+<td>Object</td>
+<td>3</td>
+</tr>
+<tr>
+<td>Array</td>
+<td>4</td>
+</tr>
+<tr>
+<td>Binary data</td>
+<td>5</td>
+</tr>
+<tr>
+<td>Object id</td>
+<td>7</td>
+</tr>
+<tr>
+<td>Boolean</td>
+<td>8</td>
+</tr>
+<tr>
+<td>Date</td>
+<td>9</td>
+</tr>
+<tr>
+<td>Null</td>
+<td>10</td>
+</tr>
+</tbody>
+</table>
+<p>不全，<a href="http://www.runoob.com/mongodb/mongodb-operators-type.html" target="_blank" rel="noopener">完整表格访问这里</a></p>
+<p><code>db.col.find({&#39;title&#39; :{$type: 2}})</code> 如果title为String则输出</p>
+<h3 id="limit-and-skip"><a href="#limit-and-skip" class="headerlink" title="limit and skip"></a>limit and skip</h3><p><code>db.col.find().limit(2)</code>  只读取两条<br><code>db.col.find().limit(1).skip(1)</code> 跳过第一条，只显示第二条<br>skip默认为0</p>
+<h3 id="sort-方法"><a href="#sort-方法" class="headerlink" title="sort()方法"></a>sort()方法</h3><p>1升序，-1降序</p>
+<p><code>db.col.find().sort({key: 1})</code></p>
+<p>例子<br><code>db.col.find({}, {&#39;title&#39;: 1, _id: 0}).sort({&#39;likes&#39;: -1})</code></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/mongodb/" rel="tag"># mongodb</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2017/04/16/%E4%BA%8C%E5%8F%89%E6%A0%91%E7%9A%84%E9%80%92%E5%BD%92%E7%AE%97%E6%B3%95/" rel="prev" title="二叉树的递归算法">
+      <i class="fa fa-chevron-left"></i> 二叉树的递归算法
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2017/04/22/%E4%B8%80%E4%B8%AA-Vue-Node-MongoDB-%E5%8D%9A%E5%AE%A2%E7%B3%BB%E7%BB%9F/" rel="next" title="一个 Vue + Node + MongoDB 博客系统">
+      一个 Vue + Node + MongoDB 博客系统 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
   window.addEventListener('tabs:register', () => {
     let activeClass = CONFIG.comments.activeClass;
     if (CONFIG.comments.storage) {
@@ -18,7 +374,169 @@
       localStorage.setItem('comments_active', commentClass);
     });
   }
-</script></div><div class="toggle sidebar-toggle"><span class="toggle-line toggle-line-first"></span><span class="toggle-line toggle-line-middle"></span><span class="toggle-line toggle-line-last"></span></div><aside class="sidebar"><div class="sidebar-inner"><ul class="sidebar-nav motion-element"><li class="sidebar-nav-toc"> Table of Contents</li><li class="sidebar-nav-overview"> Overview</li></ul><div class="post-toc-wrap sidebar-panel"><div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#创建数据库"><span class="nav-number">1.</span> <span class="nav-text">创建数据库</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#删除数据库"><span class="nav-number">2.</span> <span class="nav-text">删除数据库</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#插入文档"><span class="nav-number">3.</span> <span class="nav-text">插入文档</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#更新文档"><span class="nav-number">4.</span> <span class="nav-text">更新文档</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#update-方法"><span class="nav-number">4.1.</span> <span class="nav-text">update()方法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#save-方法"><span class="nav-number">4.2.</span> <span class="nav-text">save()方法</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#删除文档"><span class="nav-number">5.</span> <span class="nav-text">删除文档</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#查询文档"><span class="nav-number">6.</span> <span class="nav-text">查询文档</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#条件操作符"><span class="nav-number">7.</span> <span class="nav-text">条件操作符</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#AND条件"><span class="nav-number">7.1.</span> <span class="nav-text">AND条件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#OR条件"><span class="nav-number">7.2.</span> <span class="nav-text">OR条件</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#type操作符"><span class="nav-number">8.</span> <span class="nav-text">$type操作符</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#limit-and-skip"><span class="nav-number">8.1.</span> <span class="nav-text">limit and skip</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#sort-方法"><span class="nav-number">8.2.</span> <span class="nav-text">sort()方法</span></a></li></ol></li></ol></div></div><div class="site-overview-wrap sidebar-panel"><div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person"><p class="site-author-name" itemprop="name">张小超</p><div class="site-description" itemprop="description"></div></div><div class="site-state-wrap motion-element"><nav class="site-state"><div class="site-state-item site-state-posts"> <a href="/archives/"><span class="site-state-item-count">49</span> <span class="site-state-item-name">posts</span></a></div><div class="site-state-item site-state-tags"> <a href="/tags/"><span class="site-state-item-count">35</span> <span class="site-state-item-name">tags</span></a></div></nav></div></div></div></aside><div id="sidebar-dimmer"></div></div></main><footer class="footer"><div class="footer-inner"><div class="beian"><a href="http://www.beian.miit.gov.cn" rel="noopener" target="_blank">闽ICP备19023472号</a></div><div class="copyright"> &copy; 2016 – <span itemprop="copyrightYear">2020</span><span class="with-love"><i class="fa fa-user"></i></span> <span class="author" itemprop="copyrightHolder">张小超</span></div><div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v4.2.0</div> <span class="post-meta-divider">|</span><div class="theme-info">Theme – <a href="https://muse.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> v7.7.1</div><div class="busuanzi-count"><script async src="https://chaohang.top/cdn/js%2Fbusuanzi%2F2.3%2Fbusuanzi.pure.mini.js"></script><span class="post-meta-item" id="busuanzi_container_site_uv" style="display:none"><span class="post-meta-item-icon"><i class="fa fa-user"></i></span><span class="site-uv" title="Total Visitors"><span id="busuanzi_value_site_uv"></span></span></span> <span class="post-meta-divider">|</span><span class="post-meta-item" id="busuanzi_container_site_pv" style="display:none"><span class="post-meta-item-icon"><i class="fa fa-eye"></i></span><span class="site-pv" title="Total Views"><span id="busuanzi_value_site_pv"></span></span></span></div></div></footer></div><script src="//cdn.jsdelivr.net/npm/animejs@3.1.0/lib/anime.min.js"></script><script src="//cdn.jsdelivr.net/npm/lozad@1/dist/lozad.min.js"></script><script src="//cdn.jsdelivr.net/npm/velocity-animate@1/velocity.min.js"></script><script src="//cdn.jsdelivr.net/npm/velocity-animate@1/velocity.ui.min.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script><script src="/js/local-search.js"></script><script>
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#创建数据库"><span class="nav-number">1.</span> <span class="nav-text">创建数据库</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#删除数据库"><span class="nav-number">2.</span> <span class="nav-text">删除数据库</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#插入文档"><span class="nav-number">3.</span> <span class="nav-text">插入文档</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#更新文档"><span class="nav-number">4.</span> <span class="nav-text">更新文档</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#update-方法"><span class="nav-number">4.1.</span> <span class="nav-text">update()方法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#save-方法"><span class="nav-number">4.2.</span> <span class="nav-text">save()方法</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#删除文档"><span class="nav-number">5.</span> <span class="nav-text">删除文档</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#查询文档"><span class="nav-number">6.</span> <span class="nav-text">查询文档</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#条件操作符"><span class="nav-number">7.</span> <span class="nav-text">条件操作符</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#AND条件"><span class="nav-number">7.1.</span> <span class="nav-text">AND条件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#OR条件"><span class="nav-number">7.2.</span> <span class="nav-text">OR条件</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#type操作符"><span class="nav-number">8.</span> <span class="nav-text">$type操作符</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#limit-and-skip"><span class="nav-number">8.1.</span> <span class="nav-text">limit and skip</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#sort-方法"><span class="nav-number">8.2.</span> <span class="nav-text">sort()方法</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">张小超</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">49</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">35</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+  <div class="beian"><a href="http://www.beian.miit.gov.cn" rel="noopener" target="_blank">闽ICP备19023472号 </a>
+  </div>
+
+<div class="copyright">
+  
+  &copy; 2016 – 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">张小超</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">Theme – <a href="https://muse.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> v7.7.1
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://chaohang.top/cdn/js%2Fbusuanzi%2F2.3%2Fbusuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="//cdn.jsdelivr.net/npm/animejs@3.1.0/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/lozad@1/dist/lozad.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/velocity-animate@1/velocity.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/velocity-animate@1/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
 NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
   NexT.utils.getScript('//cdn.jsdelivr.net/npm/valine@1/dist/Valine.min.js', () => {
     var GUEST = ['nick', 'mail', 'link'];
@@ -44,4 +562,7 @@ NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
     });
   }, window.Valine);
 });
-</script></body></html>
+</script>
+
+</body>
+</html>

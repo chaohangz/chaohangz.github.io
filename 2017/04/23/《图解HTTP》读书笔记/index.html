@@ -1,4 +1,362 @@
-<!DOCTYPE html><html lang="zh-Hans"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=2"><meta name="theme-color" content="#222"><meta name="generator" content="Hexo 4.2.0"><link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png"><link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png"><link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png"><link rel="mask-icon" href="/images/logo.svg" color="#222"><link rel="stylesheet" href="/css/main.css"><link rel="stylesheet" href="//cdn.jsdelivr.net/npm/font-awesome@4/css/font-awesome.min.css"><script id="hexo-configurations">var NexT=window.NexT||{},CONFIG={hostname:"www.chaohang.top",root:"/",scheme:"Muse",version:"7.7.1",exturl:!1,sidebar:{position:"left",display:"post",padding:18,offset:12,onmobile:!1},copycode:{enable:!1,show_result:!1,style:null},back2top:{enable:!0,sidebar:!1,scrollpercent:!1},bookmark:{enable:!1,color:"#222",save:"auto"},fancybox:!1,mediumzoom:!1,lazyload:!0,pangu:!1,comments:{style:"tabs",active:null,storage:!0,lazyload:!1,nav:null},algolia:{hits:{per_page:10},labels:{input_placeholder:"Search for Posts",hits_empty:"We didn't find any results for the search: ${query}",hits_stats:"${hits} results found in ${time} ms"}},localsearch:{enable:!0,trigger:"auto",top_n_per_article:3,unescape:!1,preload:!1},motion:{enable:!0,async:!1,transition:{post_block:"fadeIn",post_header:"slideDownIn",post_body:"slideDownIn",coll_header:"slideLeftIn",sidebar:"slideUpIn"}},path:"search.xml"}</script><meta name="description" content="TCP&#x2F;IP 协议族TCP&#x2F;IP 协议族按层次分为以下4层：应用层、传输层、网络层和数据链路层。 应用层决定了向用户提供应用服务时通信的活动。DNS服务、HTTP协议处于该层。 传输层对上层应用层，提供处于网络连接中的两台计算机之间的数据传输。TCP协议处于该层。 网络层用来处理在网络上流动的数据包。数据包是网络传输的最小数据单位。该层规定了通过怎样的路径到达对方的计算机，并把数据包传给对方。IP"><meta property="og:type" content="article"><meta property="og:title" content="《图解HTTP》读书笔记"><meta property="og:url" content="https://www.chaohang.top/2017/04/23/%E3%80%8A%E5%9B%BE%E8%A7%A3HTTP%E3%80%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/index.html"><meta property="og:site_name" content="张小超的博客"><meta property="og:description" content="TCP&#x2F;IP 协议族TCP&#x2F;IP 协议族按层次分为以下4层：应用层、传输层、网络层和数据链路层。 应用层决定了向用户提供应用服务时通信的活动。DNS服务、HTTP协议处于该层。 传输层对上层应用层，提供处于网络连接中的两台计算机之间的数据传输。TCP协议处于该层。 网络层用来处理在网络上流动的数据包。数据包是网络传输的最小数据单位。该层规定了通过怎样的路径到达对方的计算机，并把数据包传给对方。IP"><meta property="article:published_time" content="2017-04-23T12:49:25.000Z"><meta property="article:modified_time" content="2017-04-23T12:49:25.000Z"><meta property="article:author" content="张小超"><meta property="article:tag" content="阅读"><meta property="article:tag" content="HTTP"><meta name="twitter:card" content="summary"><link rel="canonical" href="https://www.chaohang.top/2017/04/23/%E3%80%8A%E5%9B%BE%E8%A7%A3HTTP%E3%80%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/"><script id="page-configurations">CONFIG.page={sidebar:"",isHome:!1,isPost:!0}</script><title>《图解HTTP》读书笔记 | 张小超的博客</title><noscript><style>.sidebar-inner,.use-motion .brand,.use-motion .collection-header,.use-motion .comments,.use-motion .menu-item,.use-motion .pagination,.use-motion .post-block,.use-motion .post-body,.use-motion .post-header{opacity:initial}.use-motion .site-subtitle,.use-motion .site-title{opacity:initial;top:initial}.use-motion .logo-line-before i{left:initial}.use-motion .logo-line-after i{right:initial}</style></noscript></head><body itemscope itemtype="http://schema.org/WebPage"><div class="container use-motion"><div class="headband"></div><header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="header-inner"><div class="site-brand-container"><div class="site-nav-toggle"><div class="toggle" aria-label="Toggle navigation bar"><span class="toggle-line toggle-line-first"></span><span class="toggle-line toggle-line-middle"></span><span class="toggle-line toggle-line-last"></span></div></div><div class="site-meta"><div><a href="/" class="brand" rel="start"><span class="logo-line-before"><i></i></span> <span class="site-title">张小超的博客</span><span class="logo-line-after"><i></i></span></a></div><h1 class="site-subtitle" itemprop="description">超超不会飞</h1></div><div class="site-nav-right"></div></div><nav class="site-nav"><ul id="menu" class="menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-fw fa-home"></i> Home</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i> Archives</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i> Tags</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i> About</a></li><li class="menu-item menu-item-search"><a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i> Search</a></li></ul></nav><div class="site-search"><div class="popup search-popup"><div class="search-header"><span class="search-icon"><i class="fa fa-search"></i></span><div class="search-input-container"> <input autocomplete="off" autocorrect="off" autocapitalize="off" placeholder="Searching..." spellcheck="false" type="search" class="search-input"></div><span class="popup-btn-close"><i class="fa fa-times-circle"></i></span></div><div id="search-result"></div></div><div class="search-pop-overlay"></div></div></div></header><div class="back-to-top"><i class="fa fa-arrow-up"></i> <span>0%</span></div><main class="main"><div class="main-inner"><div class="content-wrap"><div class="content"><div class="posts-expand"><article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans"><link itemprop="mainEntityOfPage" href="https://www.chaohang.top/2017/04/23/%E3%80%8A%E5%9B%BE%E8%A7%A3HTTP%E3%80%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/"><span hidden itemprop="author" itemscope itemtype="http://schema.org/Person"><meta itemprop="image" content="/images/avatar.gif"><meta itemprop="name" content="张小超"><meta itemprop="description" content=""></span><span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization"><meta itemprop="name" content="张小超的博客"></span><header class="post-header"><h2 class="post-title" itemprop="name headline"> 《图解HTTP》读书笔记</h2><div class="post-meta"><span class="post-meta-item"><span class="post-meta-item-icon"><i class="fa fa-calendar-o"></i></span> <span class="post-meta-item-text">Posted on</span> <time title="Created: 2017-04-23 20:49:25" itemprop="dateCreated datePublished" datetime="2017-04-23T20:49:25+08:00">2017-04-23</time></span><span id="/2017/04/23/%E3%80%8A%E5%9B%BE%E8%A7%A3HTTP%E3%80%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/" class="post-meta-item leancloud_visitors" data-flag-title="《图解HTTP》读书笔记" title="Views"><span class="post-meta-item-icon"><i class="fa fa-eye"></i></span> <span class="post-meta-item-text">Views:</span><span class="leancloud-visitors-count"></span></span><span class="post-meta-item"><span class="post-meta-item-icon"><i class="fa fa-comment-o"></i></span> <span class="post-meta-item-text">Valine:</span><a title="valine" href="/2017/04/23/%E3%80%8A%E5%9B%BE%E8%A7%A3HTTP%E3%80%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/#valine-comments" itemprop="discussionUrl"><span class="post-comments-count valine-comment-count" data-xid="/2017/04/23/%E3%80%8A%E5%9B%BE%E8%A7%A3HTTP%E3%80%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/" itemprop="commentCount"></span></a></span></div></header><div class="post-body" itemprop="articleBody"><h1 id="TCP-IP-协议族"><a href="#TCP-IP-协议族" class="headerlink" title="TCP/IP 协议族"></a>TCP/IP 协议族</h1><p>TCP/IP 协议族按层次分为以下4层：应用层、传输层、网络层和数据链路层。</p><p>应用层决定了向用户提供应用服务时通信的活动。DNS服务、HTTP协议处于该层。</p><p>传输层对上层应用层，提供处于网络连接中的两台计算机之间的数据传输。TCP协议处于该层。</p><p>网络层用来处理在网络上流动的数据包。数据包是网络传输的最小数据单位。该层规定了通过怎样的路径到达对方的计算机，并把数据包传给对方。IP网际协议位于该层。</p><p>链路层用来处理链接网络的硬件部分。包括操作系统、硬件驱动等。</p><a id="more"></a><h2 id="IP协议"><a href="#IP协议" class="headerlink" title="IP协议"></a>IP协议</h2><p>IP网际协议位于网络层。IP协议的作用是把各种数据包传送给对方。而要保证确实传送到对方那里，则需要满足各类条件。其中两个重要的条件是IP地址和MAC地址。</p><p>IP地址指明了节点被分配到的地址，MAC地址是指网卡所属的固定地址。IP地址可以和MAC地址进行配对。IP地址可变换，但MAC地址基本上不会改变。</p><h2 id="TCP协议"><a href="#TCP协议" class="headerlink" title="TCP协议"></a>TCP协议</h2><p>TCP协议位于传输层，提供可靠的字节流服务。</p><p>所谓的字节流服务（Byte Stream Service）是指，为了方便传输，将大块数据分割成以报文段为单位的数据包进行管理。而可靠的传输服务是指，能够把数据准确可靠的传给对方。一言以蔽之，TCP协议为了更容易传送大数据才把数据分割，而且TCP协议能够确认数据最终是否送达到对方。</p><h3 id="三次握手（three-way-handshaking）"><a href="#三次握手（three-way-handshaking）" class="headerlink" title="三次握手（three-way handshaking）"></a>三次握手（three-way handshaking）</h3><p>为了准确无误地将数据送达目标处，TCP协议采用了三次握手策略。</p><p>发送端发送一个带SYN标志的数据包给对方 –&gt; 接受端收到后传回一个带SYN/ACK标志的数据包以示传达确认信息 –&gt; 发送端再传回一个带ACK标志的数据包表示握手结束</p><h2 id="DNS服务"><a href="#DNS服务" class="headerlink" title="DNS服务"></a>DNS服务</h2><p>DNS服务位于应用层。提供域名到IP地址之间的解析服务。</p><h2 id="整个服务的流程"><a href="#整个服务的流程" class="headerlink" title="整个服务的流程"></a>整个服务的流程</h2><p>客户端请求一个网址 –&gt; DNS把域名解析为IP地址 –&gt; HTTP生成针对目标Web服务器的HTTP请求报文 –&gt; TCP将HTTP请求报文分割成报文段按序号传输 –&gt; IP协议负责搜索对方的地址边中转边传送 –&gt; TCP从对方那里接受报文段并重组成报文 –&gt; HTTP对请求的内容进行处理 –&gt; 请求的处理结果也按照这个流程返回客户端</p><h1 id="HTTP-协议"><a href="#HTTP-协议" class="headerlink" title="HTTP 协议"></a>HTTP 协议</h1><h2 id="HTTP-方法"><a href="#HTTP-方法" class="headerlink" title="HTTP 方法"></a>HTTP 方法</h2><table><thead><tr><th>方法</th><th>作用</th><th>说明</th></tr></thead><tbody><tr><td>GET</td><td>获取资源</td></tr><tr><td>POST</td><td>传输实体主体</td><td>一般用于提交需要存储的信息</td></tr><tr><td>HEAD</td><td>获取报文首部</td><td>和GET一样，只是不返回报文主体部分</td></tr><tr><td>DELETE</td><td>删除文件</td></tr><tr><td>OPTIONS</td><td>询问支持的方法</td></tr></tbody></table><h2 id="持久连接"><a href="#持久连接" class="headerlink" title="持久连接"></a>持久连接</h2><p>在HTTP/1.1中，所有的连接默认都是持久连接</p><h2 id="HTTP-状态码"><a href="#HTTP-状态码" class="headerlink" title="HTTP 状态码"></a>HTTP 状态码</h2><table><thead><tr><th>状态码</th><th>类别</th></tr></thead><tbody><tr><td>2**</td><td>成功</td></tr><tr><td>3**</td><td>重定向</td></tr><tr><td>4**</td><td>客户端错误</td></tr><tr><td>5**</td><td>服务端错误</td></tr></tbody></table></div><footer class="post-footer"><div class="post-tags"> <a href="/tags/%E9%98%85%E8%AF%BB/" rel="tag"># 阅读</a> <a href="/tags/HTTP/" rel="tag"># HTTP</a></div><div class="post-nav"><div class="post-nav-item"><a href="/2017/04/22/%E4%B8%80%E4%B8%AA-Vue-Node-MongoDB-%E5%8D%9A%E5%AE%A2%E7%B3%BB%E7%BB%9F/" rel="prev" title="一个 Vue + Node + MongoDB 博客系统"><i class="fa fa-chevron-left"></i> 一个 Vue + Node + MongoDB 博客系统</a></div><div class="post-nav-item"> <a href="/2017/05/23/%E9%98%BF%E9%87%8C%E4%BA%91%E4%BA%91%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%9A%84%E7%AB%AF%E5%8F%A3%E9%85%8D%E7%BD%AE%E9%97%AE%E9%A2%98/" rel="next" title="阿里云云服务器的端口配置问题">阿里云云服务器的端口配置问题<i class="fa fa-chevron-right"></i></a></div></div></footer></article></div></div><div class="comments" id="valine-comments"></div><script>
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/font-awesome@4/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"www.chaohang.top","root":"/","scheme":"Muse","version":"7.7.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":3,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="TCP&#x2F;IP 协议族TCP&#x2F;IP 协议族按层次分为以下4层：应用层、传输层、网络层和数据链路层。 应用层决定了向用户提供应用服务时通信的活动。DNS服务、HTTP协议处于该层。 传输层对上层应用层，提供处于网络连接中的两台计算机之间的数据传输。TCP协议处于该层。 网络层用来处理在网络上流动的数据包。数据包是网络传输的最小数据单位。该层规定了通过怎样的路径到达对方的计算机，并把数据包传给对方。IP">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《图解HTTP》读书笔记">
+<meta property="og:url" content="https://www.chaohang.top/2017/04/23/%E3%80%8A%E5%9B%BE%E8%A7%A3HTTP%E3%80%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/index.html">
+<meta property="og:site_name" content="张小超的博客">
+<meta property="og:description" content="TCP&#x2F;IP 协议族TCP&#x2F;IP 协议族按层次分为以下4层：应用层、传输层、网络层和数据链路层。 应用层决定了向用户提供应用服务时通信的活动。DNS服务、HTTP协议处于该层。 传输层对上层应用层，提供处于网络连接中的两台计算机之间的数据传输。TCP协议处于该层。 网络层用来处理在网络上流动的数据包。数据包是网络传输的最小数据单位。该层规定了通过怎样的路径到达对方的计算机，并把数据包传给对方。IP">
+<meta property="article:published_time" content="2017-04-23T12:49:25.000Z">
+<meta property="article:modified_time" content="2017-04-23T12:49:25.000Z">
+<meta property="article:author" content="张小超">
+<meta property="article:tag" content="阅读">
+<meta property="article:tag" content="HTTP">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://www.chaohang.top/2017/04/23/%E3%80%8A%E5%9B%BE%E8%A7%A3HTTP%E3%80%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true
+  };
+</script>
+
+  <title>《图解HTTP》读书笔记 | 张小超的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">张小超的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <h1 class="site-subtitle" itemprop="description">超超不会飞</h1>
+      
+  </div>
+
+  <div class="site-nav-right"></div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>About</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.chaohang.top/2017/04/23/%E3%80%8A%E5%9B%BE%E8%A7%A3HTTP%E3%80%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="张小超">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="张小超的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          《图解HTTP》读书笔记
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2017-04-23 20:49:25" itemprop="dateCreated datePublished" datetime="2017-04-23T20:49:25+08:00">2017-04-23</time>
+            </span>
+
+          
+            <span id="/2017/04/23/%E3%80%8A%E5%9B%BE%E8%A7%A3HTTP%E3%80%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/" class="post-meta-item leancloud_visitors" data-flag-title="《图解HTTP》读书笔记" title="Views">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine: </span>
+    
+    <a title="valine" href="/2017/04/23/%E3%80%8A%E5%9B%BE%E8%A7%A3HTTP%E3%80%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2017/04/23/%E3%80%8A%E5%9B%BE%E8%A7%A3HTTP%E3%80%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="TCP-IP-协议族"><a href="#TCP-IP-协议族" class="headerlink" title="TCP/IP 协议族"></a>TCP/IP 协议族</h1><p>TCP/IP 协议族按层次分为以下4层：应用层、传输层、网络层和数据链路层。</p>
+<p>应用层决定了向用户提供应用服务时通信的活动。DNS服务、HTTP协议处于该层。</p>
+<p>传输层对上层应用层，提供处于网络连接中的两台计算机之间的数据传输。TCP协议处于该层。</p>
+<p>网络层用来处理在网络上流动的数据包。数据包是网络传输的最小数据单位。该层规定了通过怎样的路径到达对方的计算机，并把数据包传给对方。IP网际协议位于该层。</p>
+<p>链路层用来处理链接网络的硬件部分。包括操作系统、硬件驱动等。</p>
+<a id="more"></a>
+<h2 id="IP协议"><a href="#IP协议" class="headerlink" title="IP协议"></a>IP协议</h2><p>IP网际协议位于网络层。IP协议的作用是把各种数据包传送给对方。而要保证确实传送到对方那里，则需要满足各类条件。其中两个重要的条件是IP地址和MAC地址。</p>
+<p>IP地址指明了节点被分配到的地址，MAC地址是指网卡所属的固定地址。IP地址可以和MAC地址进行配对。IP地址可变换，但MAC地址基本上不会改变。</p>
+<h2 id="TCP协议"><a href="#TCP协议" class="headerlink" title="TCP协议"></a>TCP协议</h2><p>TCP协议位于传输层，提供可靠的字节流服务。</p>
+<p>所谓的字节流服务（Byte Stream Service）是指，为了方便传输，将大块数据分割成以报文段为单位的数据包进行管理。而可靠的传输服务是指，能够把数据准确可靠的传给对方。一言以蔽之，TCP协议为了更容易传送大数据才把数据分割，而且TCP协议能够确认数据最终是否送达到对方。</p>
+<h3 id="三次握手（three-way-handshaking）"><a href="#三次握手（three-way-handshaking）" class="headerlink" title="三次握手（three-way handshaking）"></a>三次握手（three-way handshaking）</h3><p>为了准确无误地将数据送达目标处，TCP协议采用了三次握手策略。</p>
+<p>发送端发送一个带SYN标志的数据包给对方 –&gt; 接受端收到后传回一个带SYN/ACK标志的数据包以示传达确认信息 –&gt; 发送端再传回一个带ACK标志的数据包表示握手结束</p>
+<h2 id="DNS服务"><a href="#DNS服务" class="headerlink" title="DNS服务"></a>DNS服务</h2><p>DNS服务位于应用层。提供域名到IP地址之间的解析服务。</p>
+<h2 id="整个服务的流程"><a href="#整个服务的流程" class="headerlink" title="整个服务的流程"></a>整个服务的流程</h2><p>客户端请求一个网址 –&gt; DNS把域名解析为IP地址 –&gt; HTTP生成针对目标Web服务器的HTTP请求报文 –&gt; TCP将HTTP请求报文分割成报文段按序号传输 –&gt; IP协议负责搜索对方的地址边中转边传送 –&gt; TCP从对方那里接受报文段并重组成报文 –&gt; HTTP对请求的内容进行处理 –&gt; 请求的处理结果也按照这个流程返回客户端</p>
+<h1 id="HTTP-协议"><a href="#HTTP-协议" class="headerlink" title="HTTP 协议"></a>HTTP 协议</h1><h2 id="HTTP-方法"><a href="#HTTP-方法" class="headerlink" title="HTTP 方法"></a>HTTP 方法</h2><table>
+<thead>
+<tr>
+<th>方法</th>
+<th>作用</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td>获取资源</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>传输实体主体</td>
+<td>一般用于提交需要存储的信息</td>
+</tr>
+<tr>
+<td>HEAD</td>
+<td>获取报文首部</td>
+<td>和GET一样，只是不返回报文主体部分</td>
+</tr>
+<tr>
+<td>DELETE</td>
+<td>删除文件</td>
+</tr>
+<tr>
+<td>OPTIONS</td>
+<td>询问支持的方法</td>
+</tr>
+</tbody>
+</table>
+<h2 id="持久连接"><a href="#持久连接" class="headerlink" title="持久连接"></a>持久连接</h2><p>在HTTP/1.1中，所有的连接默认都是持久连接</p>
+<h2 id="HTTP-状态码"><a href="#HTTP-状态码" class="headerlink" title="HTTP 状态码"></a>HTTP 状态码</h2><table>
+<thead>
+<tr>
+<th>状态码</th>
+<th>类别</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2**</td>
+<td>成功</td>
+</tr>
+<tr>
+<td>3**</td>
+<td>重定向</td>
+</tr>
+<tr>
+<td>4**</td>
+<td>客户端错误</td>
+</tr>
+<tr>
+<td>5**</td>
+<td>服务端错误</td>
+</tr>
+</tbody>
+</table>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E9%98%85%E8%AF%BB/" rel="tag"># 阅读</a>
+              <a href="/tags/HTTP/" rel="tag"># HTTP</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2017/04/22/%E4%B8%80%E4%B8%AA-Vue-Node-MongoDB-%E5%8D%9A%E5%AE%A2%E7%B3%BB%E7%BB%9F/" rel="prev" title="一个 Vue + Node + MongoDB 博客系统">
+      <i class="fa fa-chevron-left"></i> 一个 Vue + Node + MongoDB 博客系统
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2017/05/23/%E9%98%BF%E9%87%8C%E4%BA%91%E4%BA%91%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%9A%84%E7%AB%AF%E5%8F%A3%E9%85%8D%E7%BD%AE%E9%97%AE%E9%A2%98/" rel="next" title="阿里云云服务器的端口配置问题">
+      阿里云云服务器的端口配置问题 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
   window.addEventListener('tabs:register', () => {
     let activeClass = CONFIG.comments.activeClass;
     if (CONFIG.comments.storage) {
@@ -18,7 +376,169 @@
       localStorage.setItem('comments_active', commentClass);
     });
   }
-</script></div><div class="toggle sidebar-toggle"><span class="toggle-line toggle-line-first"></span><span class="toggle-line toggle-line-middle"></span><span class="toggle-line toggle-line-last"></span></div><aside class="sidebar"><div class="sidebar-inner"><ul class="sidebar-nav motion-element"><li class="sidebar-nav-toc"> Table of Contents</li><li class="sidebar-nav-overview"> Overview</li></ul><div class="post-toc-wrap sidebar-panel"><div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#TCP-IP-协议族"><span class="nav-number">1.</span> <span class="nav-text">TCP&#x2F;IP 协议族</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#IP协议"><span class="nav-number">1.1.</span> <span class="nav-text">IP协议</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#TCP协议"><span class="nav-number">1.2.</span> <span class="nav-text">TCP协议</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#三次握手（three-way-handshaking）"><span class="nav-number">1.2.1.</span> <span class="nav-text">三次握手（three-way handshaking）</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#DNS服务"><span class="nav-number">1.3.</span> <span class="nav-text">DNS服务</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#整个服务的流程"><span class="nav-number">1.4.</span> <span class="nav-text">整个服务的流程</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#HTTP-协议"><span class="nav-number">2.</span> <span class="nav-text">HTTP 协议</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#HTTP-方法"><span class="nav-number">2.1.</span> <span class="nav-text">HTTP 方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#持久连接"><span class="nav-number">2.2.</span> <span class="nav-text">持久连接</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#HTTP-状态码"><span class="nav-number">2.3.</span> <span class="nav-text">HTTP 状态码</span></a></li></ol></li></ol></div></div><div class="site-overview-wrap sidebar-panel"><div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person"><p class="site-author-name" itemprop="name">张小超</p><div class="site-description" itemprop="description"></div></div><div class="site-state-wrap motion-element"><nav class="site-state"><div class="site-state-item site-state-posts"> <a href="/archives/"><span class="site-state-item-count">49</span> <span class="site-state-item-name">posts</span></a></div><div class="site-state-item site-state-tags"> <a href="/tags/"><span class="site-state-item-count">35</span> <span class="site-state-item-name">tags</span></a></div></nav></div></div></div></aside><div id="sidebar-dimmer"></div></div></main><footer class="footer"><div class="footer-inner"><div class="beian"><a href="http://www.beian.miit.gov.cn" rel="noopener" target="_blank">闽ICP备19023472号</a></div><div class="copyright"> &copy; 2016 – <span itemprop="copyrightYear">2020</span><span class="with-love"><i class="fa fa-user"></i></span> <span class="author" itemprop="copyrightHolder">张小超</span></div><div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v4.2.0</div> <span class="post-meta-divider">|</span><div class="theme-info">Theme – <a href="https://muse.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> v7.7.1</div><div class="busuanzi-count"><script async src="https://chaohang.top/cdn/js%2Fbusuanzi%2F2.3%2Fbusuanzi.pure.mini.js"></script><span class="post-meta-item" id="busuanzi_container_site_uv" style="display:none"><span class="post-meta-item-icon"><i class="fa fa-user"></i></span><span class="site-uv" title="Total Visitors"><span id="busuanzi_value_site_uv"></span></span></span> <span class="post-meta-divider">|</span><span class="post-meta-item" id="busuanzi_container_site_pv" style="display:none"><span class="post-meta-item-icon"><i class="fa fa-eye"></i></span><span class="site-pv" title="Total Views"><span id="busuanzi_value_site_pv"></span></span></span></div></div></footer></div><script src="//cdn.jsdelivr.net/npm/animejs@3.1.0/lib/anime.min.js"></script><script src="//cdn.jsdelivr.net/npm/lozad@1/dist/lozad.min.js"></script><script src="//cdn.jsdelivr.net/npm/velocity-animate@1/velocity.min.js"></script><script src="//cdn.jsdelivr.net/npm/velocity-animate@1/velocity.ui.min.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script><script src="/js/local-search.js"></script><script>
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#TCP-IP-协议族"><span class="nav-number">1.</span> <span class="nav-text">TCP&#x2F;IP 协议族</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#IP协议"><span class="nav-number">1.1.</span> <span class="nav-text">IP协议</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#TCP协议"><span class="nav-number">1.2.</span> <span class="nav-text">TCP协议</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#三次握手（three-way-handshaking）"><span class="nav-number">1.2.1.</span> <span class="nav-text">三次握手（three-way handshaking）</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#DNS服务"><span class="nav-number">1.3.</span> <span class="nav-text">DNS服务</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#整个服务的流程"><span class="nav-number">1.4.</span> <span class="nav-text">整个服务的流程</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#HTTP-协议"><span class="nav-number">2.</span> <span class="nav-text">HTTP 协议</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#HTTP-方法"><span class="nav-number">2.1.</span> <span class="nav-text">HTTP 方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#持久连接"><span class="nav-number">2.2.</span> <span class="nav-text">持久连接</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#HTTP-状态码"><span class="nav-number">2.3.</span> <span class="nav-text">HTTP 状态码</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">张小超</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">49</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">35</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+  <div class="beian"><a href="http://www.beian.miit.gov.cn" rel="noopener" target="_blank">闽ICP备19023472号 </a>
+  </div>
+
+<div class="copyright">
+  
+  &copy; 2016 – 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">张小超</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">Theme – <a href="https://muse.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> v7.7.1
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://chaohang.top/cdn/js%2Fbusuanzi%2F2.3%2Fbusuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="//cdn.jsdelivr.net/npm/animejs@3.1.0/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/lozad@1/dist/lozad.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/velocity-animate@1/velocity.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/velocity-animate@1/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
 NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
   NexT.utils.getScript('//cdn.jsdelivr.net/npm/valine@1/dist/Valine.min.js', () => {
     var GUEST = ['nick', 'mail', 'link'];
@@ -44,4 +564,7 @@ NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
     });
   }, window.Valine);
 });
-</script></body></html>
+</script>
+
+</body>
+</html>

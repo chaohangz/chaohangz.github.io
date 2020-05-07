@@ -1,1 +1,120 @@
-"use strict";window.addEventListener("DOMContentLoaded",function(){var t=CONFIG.algolia,e=t.indexName,a=t.appID,i=t.apiKey,s=instantsearch({indexName:e,searchClient:algoliasearch(a,i),searchFunction:function(e){document.querySelector(".search-input").value&&e.search()}});function n(){document.body.style.overflow="",document.querySelector(".search-pop-overlay").style.display="none",document.querySelector(".popup").style.display="none"}window.pjax&&s.on("render",function(){window.pjax.refresh(document.getElementById("algolia-hits"))}),s.addWidgets([instantsearch.widgets.configure({hitsPerPage:t.hits.per_page||10}),instantsearch.widgets.searchBox({container:".search-input-container",placeholder:t.labels.input_placeholder,showReset:!1,showSubmit:!1,showLoadingIndicator:!1,cssClasses:{input:"search-input"}}),instantsearch.widgets.stats({container:"#algolia-stats",templates:{text:function(e){return t.labels.hits_stats.replace(/\$\{hits}/,e.nbHits).replace(/\$\{time}/,e.processingTimeMS)+'\n            <span class="algolia-powered">\n              <img src="'+CONFIG.root+'images/algolia_logo.svg" alt="Algolia">\n            </span>\n            <hr>'}}}),instantsearch.widgets.hits({container:"#algolia-hits",templates:{item:function(e){return'<a href="'+(e.permalink?e.permalink:CONFIG.root+e.path)+'" class="algolia-hit-item-link">'+e._highlightResult.title.value+"</a>"},empty:function(e){return'<div id="algolia-hits-empty">\n              '+t.labels.hits_empty.replace(/\$\{query}/,e.query)+"\n            </div>"}},cssClasses:{item:"algolia-hit-item"}}),instantsearch.widgets.pagination({container:"#algolia-pagination",scrollTo:!1,showFirst:!1,showLast:!1,templates:{first:'<i class="fa fa-angle-double-left"></i>',last:'<i class="fa fa-angle-double-right"></i>',previous:'<i class="fa fa-angle-left"></i>',next:'<i class="fa fa-angle-right"></i>'},cssClasses:{root:"pagination",item:"pagination-item",link:"page-number",selectedItem:"current",disabledItem:"disabled-item"}})]),s.start(),document.querySelector(".popup-trigger").addEventListener("click",function(){document.body.style.overflow="hidden",document.querySelector(".search-pop-overlay").style.display="block",document.querySelector(".popup").style.display="block",document.querySelector(".search-input").focus()}),document.querySelector(".search-pop-overlay").addEventListener("click",n),document.querySelector(".popup-btn-close").addEventListener("click",n),window.addEventListener("pjax:success",n),window.addEventListener("keyup",function(e){"Escape"===e.key&&n()})});
+/* global instantsearch, algoliasearch, CONFIG */
+
+window.addEventListener('DOMContentLoaded', () => {
+  const algoliaSettings = CONFIG.algolia;
+  const { indexName, appID, apiKey } = algoliaSettings;
+
+  let search = instantsearch({
+    indexName,
+    searchClient  : algoliasearch(appID, apiKey),
+    searchFunction: helper => {
+      let searchInput = document.querySelector('.search-input');
+      if (searchInput.value) {
+        helper.search();
+      }
+    }
+  });
+
+  window.pjax && search.on('render', () => {
+    window.pjax.refresh(document.getElementById('algolia-hits'));
+  });
+
+  // Registering Widgets
+  search.addWidgets([
+    instantsearch.widgets.configure({
+      hitsPerPage: algoliaSettings.hits.per_page || 10
+    }),
+
+    instantsearch.widgets.searchBox({
+      container           : '.search-input-container',
+      placeholder         : algoliaSettings.labels.input_placeholder,
+      // Hide default icons of algolia search
+      showReset           : false,
+      showSubmit          : false,
+      showLoadingIndicator: false,
+      cssClasses          : {
+        input: 'search-input'
+      }
+    }),
+
+    instantsearch.widgets.stats({
+      container: '#algolia-stats',
+      templates: {
+        text: data => {
+          let stats = algoliaSettings.labels.hits_stats
+            .replace(/\$\{hits}/, data.nbHits)
+            .replace(/\$\{time}/, data.processingTimeMS);
+          return `${stats}
+            <span class="algolia-powered">
+              <img src="${CONFIG.root}images/algolia_logo.svg" alt="Algolia">
+            </span>
+            <hr>`;
+        }
+      }
+    }),
+
+    instantsearch.widgets.hits({
+      container: '#algolia-hits',
+      templates: {
+        item: data => {
+          let link = data.permalink ? data.permalink : CONFIG.root + data.path;
+          return `<a href="${link}" class="algolia-hit-item-link">${data._highlightResult.title.value}</a>`;
+        },
+        empty: data => {
+          return `<div id="algolia-hits-empty">
+              ${algoliaSettings.labels.hits_empty.replace(/\$\{query}/, data.query)}
+            </div>`;
+        }
+      },
+      cssClasses: {
+        item: 'algolia-hit-item'
+      }
+    }),
+
+    instantsearch.widgets.pagination({
+      container: '#algolia-pagination',
+      scrollTo : false,
+      showFirst: false,
+      showLast : false,
+      templates: {
+        first   : '<i class="fa fa-angle-double-left"></i>',
+        last    : '<i class="fa fa-angle-double-right"></i>',
+        previous: '<i class="fa fa-angle-left"></i>',
+        next    : '<i class="fa fa-angle-right"></i>'
+      },
+      cssClasses: {
+        root        : 'pagination',
+        item        : 'pagination-item',
+        link        : 'page-number',
+        selectedItem: 'current',
+        disabledItem: 'disabled-item'
+      }
+    })
+  ]);
+
+  search.start();
+
+  // Handle and trigger popup window
+  document.querySelector('.popup-trigger').addEventListener('click', () => {
+    document.body.style.overflow = 'hidden';
+    document.querySelector('.search-pop-overlay').style.display = 'block';
+    document.querySelector('.popup').style.display = 'block';
+    document.querySelector('.search-input').focus();
+  });
+
+  // Monitor main search box
+  const onPopupClose = () => {
+    document.body.style.overflow = '';
+    document.querySelector('.search-pop-overlay').style.display = 'none';
+    document.querySelector('.popup').style.display = 'none';
+  };
+
+  document.querySelector('.search-pop-overlay').addEventListener('click', onPopupClose);
+  document.querySelector('.popup-btn-close').addEventListener('click', onPopupClose);
+  window.addEventListener('pjax:success', onPopupClose);
+  window.addEventListener('keyup', event => {
+    if (event.key === 'Escape') {
+      onPopupClose();
+    }
+  });
+});

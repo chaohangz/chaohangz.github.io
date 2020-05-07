@@ -1,4 +1,1144 @@
-<!DOCTYPE html><html lang="zh-Hans"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=2"><meta name="theme-color" content="#222"><meta name="generator" content="Hexo 4.2.0"><link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png"><link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png"><link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png"><link rel="mask-icon" href="/images/logo.svg" color="#222"><link rel="stylesheet" href="/css/main.css"><link rel="stylesheet" href="//cdn.jsdelivr.net/npm/font-awesome@4/css/font-awesome.min.css"><script id="hexo-configurations">var NexT=window.NexT||{},CONFIG={hostname:"www.chaohang.top",root:"/",scheme:"Muse",version:"7.7.1",exturl:!1,sidebar:{position:"left",display:"post",padding:18,offset:12,onmobile:!1},copycode:{enable:!1,show_result:!1,style:null},back2top:{enable:!0,sidebar:!1,scrollpercent:!1},bookmark:{enable:!1,color:"#222",save:"auto"},fancybox:!1,mediumzoom:!1,lazyload:!0,pangu:!1,comments:{style:"tabs",active:null,storage:!0,lazyload:!1,nav:null},algolia:{hits:{per_page:10},labels:{input_placeholder:"Search for Posts",hits_empty:"We didn't find any results for the search: ${query}",hits_stats:"${hits} results found in ${time} ms"}},localsearch:{enable:!0,trigger:"auto",top_n_per_article:3,unescape:!1,preload:!1},motion:{enable:!0,async:!1,transition:{post_block:"fadeIn",post_header:"slideDownIn",post_body:"slideDownIn",coll_header:"slideLeftIn",sidebar:"slideUpIn"}},path:"search.xml"}</script><meta property="og:type" content="website"><meta property="og:title" content="张小超的博客"><meta property="og:url" content="https://www.chaohang.top/page/2/index.html"><meta property="og:site_name" content="张小超的博客"><meta property="article:author" content="张小超"><meta property="article:tag" content="Java"><meta property="article:tag" content=" JavaScript"><meta property="article:tag" content=" Node.js"><meta name="twitter:card" content="summary"><link rel="canonical" href="https://www.chaohang.top/page/2/"><script id="page-configurations">CONFIG.page={sidebar:"",isHome:!0,isPost:!1}</script><title>张小超的博客</title><noscript><style>.sidebar-inner,.use-motion .brand,.use-motion .collection-header,.use-motion .comments,.use-motion .menu-item,.use-motion .pagination,.use-motion .post-block,.use-motion .post-body,.use-motion .post-header{opacity:initial}.use-motion .site-subtitle,.use-motion .site-title{opacity:initial;top:initial}.use-motion .logo-line-before i{left:initial}.use-motion .logo-line-after i{right:initial}</style></noscript></head><body itemscope itemtype="http://schema.org/WebPage"><div class="container use-motion"><div class="headband"></div><header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="header-inner"><div class="site-brand-container"><div class="site-nav-toggle"><div class="toggle" aria-label="Toggle navigation bar"><span class="toggle-line toggle-line-first"></span><span class="toggle-line toggle-line-middle"></span><span class="toggle-line toggle-line-last"></span></div></div><div class="site-meta"><div><a href="/" class="brand" rel="start"><span class="logo-line-before"><i></i></span> <span class="site-title">张小超的博客</span><span class="logo-line-after"><i></i></span></a></div><h1 class="site-subtitle" itemprop="description">超超不会飞</h1></div><div class="site-nav-right"></div></div><nav class="site-nav"><ul id="menu" class="menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-fw fa-home"></i> Home</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i> Archives</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i> Tags</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i> About</a></li><li class="menu-item menu-item-search"><a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i> Search</a></li></ul></nav><div class="site-search"><div class="popup search-popup"><div class="search-header"><span class="search-icon"><i class="fa fa-search"></i></span><div class="search-input-container"> <input autocomplete="off" autocorrect="off" autocapitalize="off" placeholder="Searching..." spellcheck="false" type="search" class="search-input"></div><span class="popup-btn-close"><i class="fa fa-times-circle"></i></span></div><div id="search-result"></div></div><div class="search-pop-overlay"></div></div></div></header><div class="back-to-top"><i class="fa fa-arrow-up"></i> <span>0%</span></div><main class="main"><div class="main-inner"><div class="content-wrap"><div class="content"><div class="posts-expand"><article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-Hans"><link itemprop="mainEntityOfPage" href="https://www.chaohang.top/2019/08/25/%E5%A0%86/"><span hidden itemprop="author" itemscope itemtype="http://schema.org/Person"><meta itemprop="image" content="/images/avatar.gif"><meta itemprop="name" content="张小超"><meta itemprop="description" content=""></span><span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization"><meta itemprop="name" content="张小超的博客"></span><header class="post-header"><h2 class="post-title" itemprop="name headline"> <a href="/2019/08/25/%E5%A0%86/" class="post-title-link" itemprop="url">堆（优先队列）</a></h2><div class="post-meta"><span class="post-meta-item"><span class="post-meta-item-icon"><i class="fa fa-calendar-o"></i></span> <span class="post-meta-item-text">Posted on</span> <time title="Created: 2019-08-25 16:58:11" itemprop="dateCreated datePublished" datetime="2019-08-25T16:58:11+08:00">2019-08-25</time></span><span id="/2019/08/25/%E5%A0%86/" class="post-meta-item leancloud_visitors" data-flag-title="堆（优先队列）" title="Views"><span class="post-meta-item-icon"><i class="fa fa-eye"></i></span> <span class="post-meta-item-text">Views:</span><span class="leancloud-visitors-count"></span></span><span class="post-meta-item"><span class="post-meta-item-icon"><i class="fa fa-comment-o"></i></span> <span class="post-meta-item-text">Valine:</span><a title="valine" href="/2019/08/25/%E5%A0%86/#valine-comments" itemprop="discussionUrl"><span class="post-comments-count valine-comment-count" data-xid="/2019/08/25/%E5%A0%86/" itemprop="commentCount"></span></a></span></div></header><div class="post-body" itemprop="articleBody"><h2 id="定义"><a href="#定义" class="headerlink" title="定义"></a>定义</h2><p>堆(heap)也被称为优先队列(priority queue)。是一种特殊的树状数据结构。</p><div class="post-button"> <a class="btn" href="/2019/08/25/%E5%A0%86/#more" rel="contents">Read more &raquo;</a></div></div><footer class="post-footer"><div class="post-eof"></div></footer></article><article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-Hans"><link itemprop="mainEntityOfPage" href="https://www.chaohang.top/2019/08/20/LeetCode20%E2%80%94%E2%80%94%E6%9C%89%E6%95%88%E7%9A%84%E6%8B%AC%E5%8F%B7/"><span hidden itemprop="author" itemscope itemtype="http://schema.org/Person"><meta itemprop="image" content="/images/avatar.gif"><meta itemprop="name" content="张小超"><meta itemprop="description" content=""></span><span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization"><meta itemprop="name" content="张小超的博客"></span><header class="post-header"><h2 class="post-title" itemprop="name headline"> <a href="/2019/08/20/LeetCode20%E2%80%94%E2%80%94%E6%9C%89%E6%95%88%E7%9A%84%E6%8B%AC%E5%8F%B7/" class="post-title-link" itemprop="url">LeetCode20——有效的括号</a></h2><div class="post-meta"><span class="post-meta-item"><span class="post-meta-item-icon"><i class="fa fa-calendar-o"></i></span> <span class="post-meta-item-text">Posted on</span> <time title="Created: 2019-08-20 22:36:50" itemprop="dateCreated datePublished" datetime="2019-08-20T22:36:50+08:00">2019-08-20</time></span><span id="/2019/08/20/LeetCode20%E2%80%94%E2%80%94%E6%9C%89%E6%95%88%E7%9A%84%E6%8B%AC%E5%8F%B7/" class="post-meta-item leancloud_visitors" data-flag-title="LeetCode20——有效的括号" title="Views"><span class="post-meta-item-icon"><i class="fa fa-eye"></i></span> <span class="post-meta-item-text">Views:</span><span class="leancloud-visitors-count"></span></span><span class="post-meta-item"><span class="post-meta-item-icon"><i class="fa fa-comment-o"></i></span> <span class="post-meta-item-text">Valine:</span><a title="valine" href="/2019/08/20/LeetCode20%E2%80%94%E2%80%94%E6%9C%89%E6%95%88%E7%9A%84%E6%8B%AC%E5%8F%B7/#valine-comments" itemprop="discussionUrl"><span class="post-comments-count valine-comment-count" data-xid="/2019/08/20/LeetCode20%E2%80%94%E2%80%94%E6%9C%89%E6%95%88%E7%9A%84%E6%8B%AC%E5%8F%B7/" itemprop="commentCount"></span></a></span></div></header><div class="post-body" itemprop="articleBody"><h2 id="题目描述"><a href="#题目描述" class="headerlink" title="题目描述"></a>题目描述</h2><p>给定一个只包括 ‘(‘，’)’，’{‘，’}’，’[‘，’]’ 的字符串，判断字符串是否有效。</p><div class="post-button"> <a class="btn" href="/2019/08/20/LeetCode20%E2%80%94%E2%80%94%E6%9C%89%E6%95%88%E7%9A%84%E6%8B%AC%E5%8F%B7/#more" rel="contents">Read more &raquo;</a></div></div><footer class="post-footer"><div class="post-eof"></div></footer></article><article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-Hans"><link itemprop="mainEntityOfPage" href="https://www.chaohang.top/2019/08/18/LeetCode141%E2%80%94%E2%80%94%E7%8E%AF%E5%BD%A2%E9%93%BE%E8%A1%A8/"><span hidden itemprop="author" itemscope itemtype="http://schema.org/Person"><meta itemprop="image" content="/images/avatar.gif"><meta itemprop="name" content="张小超"><meta itemprop="description" content=""></span><span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization"><meta itemprop="name" content="张小超的博客"></span><header class="post-header"><h2 class="post-title" itemprop="name headline"> <a href="/2019/08/18/LeetCode141%E2%80%94%E2%80%94%E7%8E%AF%E5%BD%A2%E9%93%BE%E8%A1%A8/" class="post-title-link" itemprop="url">LeetCode141——环形链表</a></h2><div class="post-meta"><span class="post-meta-item"><span class="post-meta-item-icon"><i class="fa fa-calendar-o"></i></span> <span class="post-meta-item-text">Posted on</span> <time title="Created: 2019-08-18 10:04:01" itemprop="dateCreated datePublished" datetime="2019-08-18T10:04:01+08:00">2019-08-18</time></span><span id="/2019/08/18/LeetCode141%E2%80%94%E2%80%94%E7%8E%AF%E5%BD%A2%E9%93%BE%E8%A1%A8/" class="post-meta-item leancloud_visitors" data-flag-title="LeetCode141——环形链表" title="Views"><span class="post-meta-item-icon"><i class="fa fa-eye"></i></span> <span class="post-meta-item-text">Views:</span><span class="leancloud-visitors-count"></span></span><span class="post-meta-item"><span class="post-meta-item-icon"><i class="fa fa-comment-o"></i></span> <span class="post-meta-item-text">Valine:</span><a title="valine" href="/2019/08/18/LeetCode141%E2%80%94%E2%80%94%E7%8E%AF%E5%BD%A2%E9%93%BE%E8%A1%A8/#valine-comments" itemprop="discussionUrl"><span class="post-comments-count valine-comment-count" data-xid="/2019/08/18/LeetCode141%E2%80%94%E2%80%94%E7%8E%AF%E5%BD%A2%E9%93%BE%E8%A1%A8/" itemprop="commentCount"></span></a></span></div></header><div class="post-body" itemprop="articleBody"><h2 id="题目描述"><a href="#题目描述" class="headerlink" title="题目描述"></a>题目描述</h2><p>给定一个链表，如何判断链表中是否有环。</p><div class="post-button"> <a class="btn" href="/2019/08/18/LeetCode141%E2%80%94%E2%80%94%E7%8E%AF%E5%BD%A2%E9%93%BE%E8%A1%A8/#more" rel="contents">Read more &raquo;</a></div></div><footer class="post-footer"><div class="post-eof"></div></footer></article><article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-Hans"><link itemprop="mainEntityOfPage" href="https://www.chaohang.top/2019/08/13/LeetCode206%E2%80%94%E2%80%94%E5%8F%8D%E8%BD%AC%E9%93%BE%E8%A1%A8/"><span hidden itemprop="author" itemscope itemtype="http://schema.org/Person"><meta itemprop="image" content="/images/avatar.gif"><meta itemprop="name" content="张小超"><meta itemprop="description" content=""></span><span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization"><meta itemprop="name" content="张小超的博客"></span><header class="post-header"><h2 class="post-title" itemprop="name headline"> <a href="/2019/08/13/LeetCode206%E2%80%94%E2%80%94%E5%8F%8D%E8%BD%AC%E9%93%BE%E8%A1%A8/" class="post-title-link" itemprop="url">LeetCode206——反转链表</a></h2><div class="post-meta"><span class="post-meta-item"><span class="post-meta-item-icon"><i class="fa fa-calendar-o"></i></span> <span class="post-meta-item-text">Posted on</span> <time title="Created: 2019-08-13 14:50:56" itemprop="dateCreated datePublished" datetime="2019-08-13T14:50:56+08:00">2019-08-13</time></span><span id="/2019/08/13/LeetCode206%E2%80%94%E2%80%94%E5%8F%8D%E8%BD%AC%E9%93%BE%E8%A1%A8/" class="post-meta-item leancloud_visitors" data-flag-title="LeetCode206——反转链表" title="Views"><span class="post-meta-item-icon"><i class="fa fa-eye"></i></span> <span class="post-meta-item-text">Views:</span><span class="leancloud-visitors-count"></span></span><span class="post-meta-item"><span class="post-meta-item-icon"><i class="fa fa-comment-o"></i></span> <span class="post-meta-item-text">Valine:</span><a title="valine" href="/2019/08/13/LeetCode206%E2%80%94%E2%80%94%E5%8F%8D%E8%BD%AC%E9%93%BE%E8%A1%A8/#valine-comments" itemprop="discussionUrl"><span class="post-comments-count valine-comment-count" data-xid="/2019/08/13/LeetCode206%E2%80%94%E2%80%94%E5%8F%8D%E8%BD%AC%E9%93%BE%E8%A1%A8/" itemprop="commentCount"></span></a></span></div></header><div class="post-body" itemprop="articleBody"><h2 id="题目描述"><a href="#题目描述" class="headerlink" title="题目描述"></a>题目描述</h2><p>反转一个单链表。</p><p>示例:<br>输入: 1-&gt;2-&gt;3-&gt;4-&gt;5-&gt;NULL<br>输出: 5-&gt;4-&gt;3-&gt;2-&gt;1-&gt;NULL</p><p>进阶:<br>你可以迭代或递归地反转链表。你能否用两种方法解决这道题？</p><div class="post-button"> <a class="btn" href="/2019/08/13/LeetCode206%E2%80%94%E2%80%94%E5%8F%8D%E8%BD%AC%E9%93%BE%E8%A1%A8/#more" rel="contents">Read more &raquo;</a></div></div><footer class="post-footer"><div class="post-eof"></div></footer></article><article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-Hans"><link itemprop="mainEntityOfPage" href="https://www.chaohang.top/2019/08/10/%E6%9E%81%E5%AE%A2%E6%97%B6%E9%97%B4%E7%AE%97%E6%B3%9540%E8%AE%B2%E7%AC%94%E8%AE%B0%E4%B9%8B%E4%B8%80%E2%80%94%E2%80%94%E5%A6%82%E4%BD%95%E5%AD%A6%E4%B9%A0/"><span hidden itemprop="author" itemscope itemtype="http://schema.org/Person"><meta itemprop="image" content="/images/avatar.gif"><meta itemprop="name" content="张小超"><meta itemprop="description" content=""></span><span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization"><meta itemprop="name" content="张小超的博客"></span><header class="post-header"><h2 class="post-title" itemprop="name headline"> <a href="/2019/08/10/%E6%9E%81%E5%AE%A2%E6%97%B6%E9%97%B4%E7%AE%97%E6%B3%9540%E8%AE%B2%E7%AC%94%E8%AE%B0%E4%B9%8B%E4%B8%80%E2%80%94%E2%80%94%E5%A6%82%E4%BD%95%E5%AD%A6%E4%B9%A0/" class="post-title-link" itemprop="url">极客时间算法40讲笔记之一——如何学习</a></h2><div class="post-meta"><span class="post-meta-item"><span class="post-meta-item-icon"><i class="fa fa-calendar-o"></i></span> <span class="post-meta-item-text">Posted on</span> <time title="Created: 2019-08-10 16:16:55" itemprop="dateCreated datePublished" datetime="2019-08-10T16:16:55+08:00">2019-08-10</time></span><span id="/2019/08/10/%E6%9E%81%E5%AE%A2%E6%97%B6%E9%97%B4%E7%AE%97%E6%B3%9540%E8%AE%B2%E7%AC%94%E8%AE%B0%E4%B9%8B%E4%B8%80%E2%80%94%E2%80%94%E5%A6%82%E4%BD%95%E5%AD%A6%E4%B9%A0/" class="post-meta-item leancloud_visitors" data-flag-title="极客时间算法40讲笔记之一——如何学习" title="Views"><span class="post-meta-item-icon"><i class="fa fa-eye"></i></span> <span class="post-meta-item-text">Views:</span><span class="leancloud-visitors-count"></span></span><span class="post-meta-item"><span class="post-meta-item-icon"><i class="fa fa-comment-o"></i></span> <span class="post-meta-item-text">Valine:</span><a title="valine" href="/2019/08/10/%E6%9E%81%E5%AE%A2%E6%97%B6%E9%97%B4%E7%AE%97%E6%B3%9540%E8%AE%B2%E7%AC%94%E8%AE%B0%E4%B9%8B%E4%B8%80%E2%80%94%E2%80%94%E5%A6%82%E4%BD%95%E5%AD%A6%E4%B9%A0/#valine-comments" itemprop="discussionUrl"><span class="post-comments-count valine-comment-count" data-xid="/2019/08/10/%E6%9E%81%E5%AE%A2%E6%97%B6%E9%97%B4%E7%AE%97%E6%B3%9540%E8%AE%B2%E7%AC%94%E8%AE%B0%E4%B9%8B%E4%B8%80%E2%80%94%E2%80%94%E5%A6%82%E4%BD%95%E5%AD%A6%E4%B9%A0/" itemprop="commentCount"></span></a></span></div></header><div class="post-body" itemprop="articleBody"><h2 id="如何有效学习数据结构"><a href="#如何有效学习数据结构" class="headerlink" title="如何有效学习数据结构"></a>如何有效学习数据结构</h2><ol><li>Chunk it up (切碎知识点)<br> 比如要学习算法与数据结构，我们可以把想要学习的数据结构和算法罗列出来，在整理出他们之间的关系，然后各个击破。</li></ol><div class="post-button"> <a class="btn" href="/2019/08/10/%E6%9E%81%E5%AE%A2%E6%97%B6%E9%97%B4%E7%AE%97%E6%B3%9540%E8%AE%B2%E7%AC%94%E8%AE%B0%E4%B9%8B%E4%B8%80%E2%80%94%E2%80%94%E5%A6%82%E4%BD%95%E5%AD%A6%E4%B9%A0/#more" rel="contents">Read more &raquo;</a></div></div><footer class="post-footer"><div class="post-eof"></div></footer></article><article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-Hans"><link itemprop="mainEntityOfPage" href="https://www.chaohang.top/2019/08/03/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%E4%B9%8BTypeScript%E4%B8%AD%E7%9A%84%E5%8D%95%E4%BE%8B%E6%A8%A1%E5%BC%8F/"><span hidden itemprop="author" itemscope itemtype="http://schema.org/Person"><meta itemprop="image" content="/images/avatar.gif"><meta itemprop="name" content="张小超"><meta itemprop="description" content=""></span><span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization"><meta itemprop="name" content="张小超的博客"></span><header class="post-header"><h2 class="post-title" itemprop="name headline"> <a href="/2019/08/03/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%E4%B9%8BTypeScript%E4%B8%AD%E7%9A%84%E5%8D%95%E4%BE%8B%E6%A8%A1%E5%BC%8F/" class="post-title-link" itemprop="url">设计模式之TypeScript中的单例模式</a></h2><div class="post-meta"><span class="post-meta-item"><span class="post-meta-item-icon"><i class="fa fa-calendar-o"></i></span> <span class="post-meta-item-text">Posted on</span> <time title="Created: 2019-08-03 17:17:09" itemprop="dateCreated datePublished" datetime="2019-08-03T17:17:09+08:00">2019-08-03</time></span><span id="/2019/08/03/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%E4%B9%8BTypeScript%E4%B8%AD%E7%9A%84%E5%8D%95%E4%BE%8B%E6%A8%A1%E5%BC%8F/" class="post-meta-item leancloud_visitors" data-flag-title="设计模式之TypeScript中的单例模式" title="Views"><span class="post-meta-item-icon"><i class="fa fa-eye"></i></span> <span class="post-meta-item-text">Views:</span><span class="leancloud-visitors-count"></span></span><span class="post-meta-item"><span class="post-meta-item-icon"><i class="fa fa-comment-o"></i></span> <span class="post-meta-item-text">Valine:</span><a title="valine" href="/2019/08/03/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%E4%B9%8BTypeScript%E4%B8%AD%E7%9A%84%E5%8D%95%E4%BE%8B%E6%A8%A1%E5%BC%8F/#valine-comments" itemprop="discussionUrl"><span class="post-comments-count valine-comment-count" data-xid="/2019/08/03/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%E4%B9%8BTypeScript%E4%B8%AD%E7%9A%84%E5%8D%95%E4%BE%8B%E6%A8%A1%E5%BC%8F/" itemprop="commentCount"></span></a></span></div></header><div class="post-body" itemprop="articleBody"><h2 id="单例模式"><a href="#单例模式" class="headerlink" title="单例模式"></a>单例模式</h2><p>单例模式指的是一个类只能有一个实例存在。</p><p>在实际应用中有些场景我们只需要唯一实例的存在，如果出现多个实例就会出现问题，这个时候我们就需要用到单例模式。比如线程池，缓存，硬件设备等。</p><div class="post-button"> <a class="btn" href="/2019/08/03/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%E4%B9%8BTypeScript%E4%B8%AD%E7%9A%84%E5%8D%95%E4%BE%8B%E6%A8%A1%E5%BC%8F/#more" rel="contents">Read more &raquo;</a></div></div><footer class="post-footer"><div class="post-eof"></div></footer></article><article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-Hans"><link itemprop="mainEntityOfPage" href="https://www.chaohang.top/2019/07/23/%E6%B7%B1%E5%85%A5JavaScript%E4%B9%8B%E6%A8%A1%E6%8B%9Fapply-call-bind/"><span hidden itemprop="author" itemscope itemtype="http://schema.org/Person"><meta itemprop="image" content="/images/avatar.gif"><meta itemprop="name" content="张小超"><meta itemprop="description" content=""></span><span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization"><meta itemprop="name" content="张小超的博客"></span><header class="post-header"><h2 class="post-title" itemprop="name headline"> <a href="/2019/07/23/%E6%B7%B1%E5%85%A5JavaScript%E4%B9%8B%E6%A8%A1%E6%8B%9Fapply-call-bind/" class="post-title-link" itemprop="url">深入JavaScript之模拟apply,call,bind</a></h2><div class="post-meta"><span class="post-meta-item"><span class="post-meta-item-icon"><i class="fa fa-calendar-o"></i></span> <span class="post-meta-item-text">Posted on</span> <time title="Created: 2019-07-23 15:33:48" itemprop="dateCreated datePublished" datetime="2019-07-23T15:33:48+08:00">2019-07-23</time></span><span id="/2019/07/23/%E6%B7%B1%E5%85%A5JavaScript%E4%B9%8B%E6%A8%A1%E6%8B%9Fapply-call-bind/" class="post-meta-item leancloud_visitors" data-flag-title="深入JavaScript之模拟apply,call,bind" title="Views"><span class="post-meta-item-icon"><i class="fa fa-eye"></i></span> <span class="post-meta-item-text">Views:</span><span class="leancloud-visitors-count"></span></span><span class="post-meta-item"><span class="post-meta-item-icon"><i class="fa fa-comment-o"></i></span> <span class="post-meta-item-text">Valine:</span><a title="valine" href="/2019/07/23/%E6%B7%B1%E5%85%A5JavaScript%E4%B9%8B%E6%A8%A1%E6%8B%9Fapply-call-bind/#valine-comments" itemprop="discussionUrl"><span class="post-comments-count valine-comment-count" data-xid="/2019/07/23/%E6%B7%B1%E5%85%A5JavaScript%E4%B9%8B%E6%A8%A1%E6%8B%9Fapply-call-bind/" itemprop="commentCount"></span></a></span></div></header><div class="post-body" itemprop="articleBody"><p><code>apply</code> <code>call</code> <code>bind</code> 这三个函数可以改变 <code>this</code> 的绑定，语法上有略微差别，可以看我很早之前的一篇文章做过简单的介绍 <a href="https://www.jianshu.com/p/cca23ce280be" target="_blank" rel="noopener">浅谈JavaScript中的apply、call、bind</a>。</p><div class="post-button"> <a class="btn" href="/2019/07/23/%E6%B7%B1%E5%85%A5JavaScript%E4%B9%8B%E6%A8%A1%E6%8B%9Fapply-call-bind/#more" rel="contents">Read more &raquo;</a></div></div><footer class="post-footer"><div class="post-eof"></div></footer></article><article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-Hans"><link itemprop="mainEntityOfPage" href="https://www.chaohang.top/2019/06/19/%E6%9F%A5%E8%AF%A2%E5%90%84%E4%B8%AA%E7%A7%91%E7%9B%AE%E6%88%90%E7%BB%A9%E5%89%8D%E4%B8%89%E7%9A%84%E8%AE%B0%E5%BD%95/"><span hidden itemprop="author" itemscope itemtype="http://schema.org/Person"><meta itemprop="image" content="/images/avatar.gif"><meta itemprop="name" content="张小超"><meta itemprop="description" content=""></span><span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization"><meta itemprop="name" content="张小超的博客"></span><header class="post-header"><h2 class="post-title" itemprop="name headline"> <a href="/2019/06/19/%E6%9F%A5%E8%AF%A2%E5%90%84%E4%B8%AA%E7%A7%91%E7%9B%AE%E6%88%90%E7%BB%A9%E5%89%8D%E4%B8%89%E7%9A%84%E8%AE%B0%E5%BD%95/" class="post-title-link" itemprop="url">查询各个科目成绩前三的记录</a></h2><div class="post-meta"><span class="post-meta-item"><span class="post-meta-item-icon"><i class="fa fa-calendar-o"></i></span> <span class="post-meta-item-text">Posted on</span> <time title="Created: 2019-06-19 19:55:41" itemprop="dateCreated datePublished" datetime="2019-06-19T19:55:41+08:00">2019-06-19</time></span><span id="/2019/06/19/%E6%9F%A5%E8%AF%A2%E5%90%84%E4%B8%AA%E7%A7%91%E7%9B%AE%E6%88%90%E7%BB%A9%E5%89%8D%E4%B8%89%E7%9A%84%E8%AE%B0%E5%BD%95/" class="post-meta-item leancloud_visitors" data-flag-title="查询各个科目成绩前三的记录" title="Views"><span class="post-meta-item-icon"><i class="fa fa-eye"></i></span> <span class="post-meta-item-text">Views:</span><span class="leancloud-visitors-count"></span></span><span class="post-meta-item"><span class="post-meta-item-icon"><i class="fa fa-comment-o"></i></span> <span class="post-meta-item-text">Valine:</span><a title="valine" href="/2019/06/19/%E6%9F%A5%E8%AF%A2%E5%90%84%E4%B8%AA%E7%A7%91%E7%9B%AE%E6%88%90%E7%BB%A9%E5%89%8D%E4%B8%89%E7%9A%84%E8%AE%B0%E5%BD%95/#valine-comments" itemprop="discussionUrl"><span class="post-comments-count valine-comment-count" data-xid="/2019/06/19/%E6%9F%A5%E8%AF%A2%E5%90%84%E4%B8%AA%E7%A7%91%E7%9B%AE%E6%88%90%E7%BB%A9%E5%89%8D%E4%B8%89%E7%9A%84%E8%AE%B0%E5%BD%95/" itemprop="commentCount"></span></a></span></div></header><div class="post-body" itemprop="articleBody"><table><thead><tr><th>id</th><th>student_id</th><th>name</th><th>course_id</th><th>course_name</th><th>score</th></tr></thead><tbody><tr><td>1</td><td>2005001</td><td>张三</td><td>1</td><td>数学</td><td>69</td></tr><tr><td>2</td><td>2005002</td><td>李四</td><td>1</td><td>数学</td><td>89</td></tr><tr><td>3</td><td>2005005</td><td>王五</td><td>1</td><td>数学</td><td>23</td></tr><tr><td>3</td><td>2005001</td><td>张三</td><td>2</td><td>语文</td><td>69</td></tr><tr><td>3</td><td>2005002</td><td>李四</td><td>2</td><td>语文</td><td>73</td></tr><tr><td>3</td><td>2005005</td><td>王五</td><td>2</td><td>语文</td><td>88</td></tr><tr><td>1</td><td>2005006</td><td>赵六</td><td>2</td><td>语文</td><td>69</td></tr><tr><td>2</td><td>2005006</td><td>赵六</td><td>1</td><td>数学</td><td>89</td></tr><tr><td>3</td><td>2005007</td><td>郑七</td><td>2</td><td>语文</td><td>100</td></tr></tbody></table><div class="post-button"> <a class="btn" href="/2019/06/19/%E6%9F%A5%E8%AF%A2%E5%90%84%E4%B8%AA%E7%A7%91%E7%9B%AE%E6%88%90%E7%BB%A9%E5%89%8D%E4%B8%89%E7%9A%84%E8%AE%B0%E5%BD%95/#more" rel="contents">Read more &raquo;</a></div></div><footer class="post-footer"><div class="post-eof"></div></footer></article><article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-Hans"><link itemprop="mainEntityOfPage" href="https://www.chaohang.top/2019/06/19/mysql%E9%87%8D%E5%A4%8D%E6%95%B0%E6%8D%AE%E7%9A%84%E5%A4%84%E7%90%86/"><span hidden itemprop="author" itemscope itemtype="http://schema.org/Person"><meta itemprop="image" content="/images/avatar.gif"><meta itemprop="name" content="张小超"><meta itemprop="description" content=""></span><span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization"><meta itemprop="name" content="张小超的博客"></span><header class="post-header"><h2 class="post-title" itemprop="name headline"> <a href="/2019/06/19/mysql%E9%87%8D%E5%A4%8D%E6%95%B0%E6%8D%AE%E7%9A%84%E5%A4%84%E7%90%86/" class="post-title-link" itemprop="url">mysql重复数据的处理</a></h2><div class="post-meta"><span class="post-meta-item"><span class="post-meta-item-icon"><i class="fa fa-calendar-o"></i></span> <span class="post-meta-item-text">Posted on</span> <time title="Created: 2019-06-19 15:54:13" itemprop="dateCreated datePublished" datetime="2019-06-19T15:54:13+08:00">2019-06-19</time></span><span id="/2019/06/19/mysql%E9%87%8D%E5%A4%8D%E6%95%B0%E6%8D%AE%E7%9A%84%E5%A4%84%E7%90%86/" class="post-meta-item leancloud_visitors" data-flag-title="mysql重复数据的处理" title="Views"><span class="post-meta-item-icon"><i class="fa fa-eye"></i></span> <span class="post-meta-item-text">Views:</span><span class="leancloud-visitors-count"></span></span><span class="post-meta-item"><span class="post-meta-item-icon"><i class="fa fa-comment-o"></i></span> <span class="post-meta-item-text">Valine:</span><a title="valine" href="/2019/06/19/mysql%E9%87%8D%E5%A4%8D%E6%95%B0%E6%8D%AE%E7%9A%84%E5%A4%84%E7%90%86/#valine-comments" itemprop="discussionUrl"><span class="post-comments-count valine-comment-count" data-xid="/2019/06/19/mysql%E9%87%8D%E5%A4%8D%E6%95%B0%E6%8D%AE%E7%9A%84%E5%A4%84%E7%90%86/" itemprop="commentCount"></span></a></span></div></header><div class="post-body" itemprop="articleBody"><p>假设有一张表如下，含有部分重复数据，这些重复数据除了 <code>id</code> 不同，其他数据都相同。</p><div class="post-button"> <a class="btn" href="/2019/06/19/mysql%E9%87%8D%E5%A4%8D%E6%95%B0%E6%8D%AE%E7%9A%84%E5%A4%84%E7%90%86/#more" rel="contents">Read more &raquo;</a></div></div><footer class="post-footer"><div class="post-eof"></div></footer></article><article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-Hans"><link itemprop="mainEntityOfPage" href="https://www.chaohang.top/2019/06/19/LeetCode176%E2%80%94%E2%80%94%E7%AC%AC%E4%BA%8C%E9%AB%98%E7%9A%84%E8%96%AA%E6%B0%B4/"><span hidden itemprop="author" itemscope itemtype="http://schema.org/Person"><meta itemprop="image" content="/images/avatar.gif"><meta itemprop="name" content="张小超"><meta itemprop="description" content=""></span><span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization"><meta itemprop="name" content="张小超的博客"></span><header class="post-header"><h2 class="post-title" itemprop="name headline"> <a href="/2019/06/19/LeetCode176%E2%80%94%E2%80%94%E7%AC%AC%E4%BA%8C%E9%AB%98%E7%9A%84%E8%96%AA%E6%B0%B4/" class="post-title-link" itemprop="url">LeetCode176——第二高的薪水</a></h2><div class="post-meta"><span class="post-meta-item"><span class="post-meta-item-icon"><i class="fa fa-calendar-o"></i></span> <span class="post-meta-item-text">Posted on</span> <time title="Created: 2019-06-19 11:51:52" itemprop="dateCreated datePublished" datetime="2019-06-19T11:51:52+08:00">2019-06-19</time></span><span id="/2019/06/19/LeetCode176%E2%80%94%E2%80%94%E7%AC%AC%E4%BA%8C%E9%AB%98%E7%9A%84%E8%96%AA%E6%B0%B4/" class="post-meta-item leancloud_visitors" data-flag-title="LeetCode176——第二高的薪水" title="Views"><span class="post-meta-item-icon"><i class="fa fa-eye"></i></span> <span class="post-meta-item-text">Views:</span><span class="leancloud-visitors-count"></span></span><span class="post-meta-item"><span class="post-meta-item-icon"><i class="fa fa-comment-o"></i></span> <span class="post-meta-item-text">Valine:</span><a title="valine" href="/2019/06/19/LeetCode176%E2%80%94%E2%80%94%E7%AC%AC%E4%BA%8C%E9%AB%98%E7%9A%84%E8%96%AA%E6%B0%B4/#valine-comments" itemprop="discussionUrl"><span class="post-comments-count valine-comment-count" data-xid="/2019/06/19/LeetCode176%E2%80%94%E2%80%94%E7%AC%AC%E4%BA%8C%E9%AB%98%E7%9A%84%E8%96%AA%E6%B0%B4/" itemprop="commentCount"></span></a></span></div></header><div class="post-body" itemprop="articleBody"><h2 id="题目描述"><a href="#题目描述" class="headerlink" title="题目描述"></a>题目描述</h2><p>编写一个 SQL 查询，获取 <code>Employee</code> 表中第二高的薪水（<code>Salary</code>） 。</p><div class="post-button"> <a class="btn" href="/2019/06/19/LeetCode176%E2%80%94%E2%80%94%E7%AC%AC%E4%BA%8C%E9%AB%98%E7%9A%84%E8%96%AA%E6%B0%B4/#more" rel="contents">Read more &raquo;</a></div></div><footer class="post-footer"><div class="post-eof"></div></footer></article></div><nav class="pagination"><a class="extend prev" rel="prev" href="/"><i class="fa fa-angle-left" aria-label="Previous page"></i></a> <a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><span class="space">&hellip;</span><a class="page-number" href="/page/5/">5</a><a class="extend next" rel="next" href="/page/3/"><i class="fa fa-angle-right" aria-label="Next page"></i></a></nav></div><script>
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/font-awesome@4/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"www.chaohang.top","root":"/","scheme":"Muse","version":"7.7.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":3,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta property="og:type" content="website">
+<meta property="og:title" content="张小超的博客">
+<meta property="og:url" content="https://www.chaohang.top/page/2/index.html">
+<meta property="og:site_name" content="张小超的博客">
+<meta property="article:author" content="张小超">
+<meta property="article:tag" content="Java">
+<meta property="article:tag" content=" JavaScript">
+<meta property="article:tag" content=" Node.js">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://www.chaohang.top/page/2/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: true,
+    isPost: false
+  };
+</script>
+
+  <title>张小超的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">张小超的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <h1 class="site-subtitle" itemprop="description">超超不会飞</h1>
+      
+  </div>
+
+  <div class="site-nav-right"></div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>About</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.chaohang.top/2019/08/25/%E5%A0%86/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="张小超">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="张小超的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2019/08/25/%E5%A0%86/" class="post-title-link" itemprop="url">堆（优先队列）</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2019-08-25 16:58:11" itemprop="dateCreated datePublished" datetime="2019-08-25T16:58:11+08:00">2019-08-25</time>
+            </span>
+
+          
+            <span id="/2019/08/25/%E5%A0%86/" class="post-meta-item leancloud_visitors" data-flag-title="堆（优先队列）" title="Views">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine: </span>
+    
+    <a title="valine" href="/2019/08/25/%E5%A0%86/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2019/08/25/%E5%A0%86/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="定义"><a href="#定义" class="headerlink" title="定义"></a>定义</h2><p>堆(heap)也被称为优先队列(priority queue)。是一种特殊的树状数据结构。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2019/08/25/%E5%A0%86/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.chaohang.top/2019/08/20/LeetCode20%E2%80%94%E2%80%94%E6%9C%89%E6%95%88%E7%9A%84%E6%8B%AC%E5%8F%B7/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="张小超">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="张小超的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2019/08/20/LeetCode20%E2%80%94%E2%80%94%E6%9C%89%E6%95%88%E7%9A%84%E6%8B%AC%E5%8F%B7/" class="post-title-link" itemprop="url">LeetCode20——有效的括号</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2019-08-20 22:36:50" itemprop="dateCreated datePublished" datetime="2019-08-20T22:36:50+08:00">2019-08-20</time>
+            </span>
+
+          
+            <span id="/2019/08/20/LeetCode20%E2%80%94%E2%80%94%E6%9C%89%E6%95%88%E7%9A%84%E6%8B%AC%E5%8F%B7/" class="post-meta-item leancloud_visitors" data-flag-title="LeetCode20——有效的括号" title="Views">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine: </span>
+    
+    <a title="valine" href="/2019/08/20/LeetCode20%E2%80%94%E2%80%94%E6%9C%89%E6%95%88%E7%9A%84%E6%8B%AC%E5%8F%B7/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2019/08/20/LeetCode20%E2%80%94%E2%80%94%E6%9C%89%E6%95%88%E7%9A%84%E6%8B%AC%E5%8F%B7/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="题目描述"><a href="#题目描述" class="headerlink" title="题目描述"></a>题目描述</h2><p>给定一个只包括 ‘(‘，’)’，’{‘，’}’，’[‘，’]’ 的字符串，判断字符串是否有效。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2019/08/20/LeetCode20%E2%80%94%E2%80%94%E6%9C%89%E6%95%88%E7%9A%84%E6%8B%AC%E5%8F%B7/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.chaohang.top/2019/08/18/LeetCode141%E2%80%94%E2%80%94%E7%8E%AF%E5%BD%A2%E9%93%BE%E8%A1%A8/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="张小超">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="张小超的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2019/08/18/LeetCode141%E2%80%94%E2%80%94%E7%8E%AF%E5%BD%A2%E9%93%BE%E8%A1%A8/" class="post-title-link" itemprop="url">LeetCode141——环形链表</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2019-08-18 10:04:01" itemprop="dateCreated datePublished" datetime="2019-08-18T10:04:01+08:00">2019-08-18</time>
+            </span>
+
+          
+            <span id="/2019/08/18/LeetCode141%E2%80%94%E2%80%94%E7%8E%AF%E5%BD%A2%E9%93%BE%E8%A1%A8/" class="post-meta-item leancloud_visitors" data-flag-title="LeetCode141——环形链表" title="Views">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine: </span>
+    
+    <a title="valine" href="/2019/08/18/LeetCode141%E2%80%94%E2%80%94%E7%8E%AF%E5%BD%A2%E9%93%BE%E8%A1%A8/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2019/08/18/LeetCode141%E2%80%94%E2%80%94%E7%8E%AF%E5%BD%A2%E9%93%BE%E8%A1%A8/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="题目描述"><a href="#题目描述" class="headerlink" title="题目描述"></a>题目描述</h2><p>给定一个链表，如何判断链表中是否有环。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2019/08/18/LeetCode141%E2%80%94%E2%80%94%E7%8E%AF%E5%BD%A2%E9%93%BE%E8%A1%A8/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.chaohang.top/2019/08/13/LeetCode206%E2%80%94%E2%80%94%E5%8F%8D%E8%BD%AC%E9%93%BE%E8%A1%A8/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="张小超">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="张小超的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2019/08/13/LeetCode206%E2%80%94%E2%80%94%E5%8F%8D%E8%BD%AC%E9%93%BE%E8%A1%A8/" class="post-title-link" itemprop="url">LeetCode206——反转链表</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2019-08-13 14:50:56" itemprop="dateCreated datePublished" datetime="2019-08-13T14:50:56+08:00">2019-08-13</time>
+            </span>
+
+          
+            <span id="/2019/08/13/LeetCode206%E2%80%94%E2%80%94%E5%8F%8D%E8%BD%AC%E9%93%BE%E8%A1%A8/" class="post-meta-item leancloud_visitors" data-flag-title="LeetCode206——反转链表" title="Views">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine: </span>
+    
+    <a title="valine" href="/2019/08/13/LeetCode206%E2%80%94%E2%80%94%E5%8F%8D%E8%BD%AC%E9%93%BE%E8%A1%A8/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2019/08/13/LeetCode206%E2%80%94%E2%80%94%E5%8F%8D%E8%BD%AC%E9%93%BE%E8%A1%A8/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="题目描述"><a href="#题目描述" class="headerlink" title="题目描述"></a>题目描述</h2><p>反转一个单链表。</p>
+<p>示例:<br>输入: 1-&gt;2-&gt;3-&gt;4-&gt;5-&gt;NULL<br>输出: 5-&gt;4-&gt;3-&gt;2-&gt;1-&gt;NULL</p>
+<p>进阶:<br>你可以迭代或递归地反转链表。你能否用两种方法解决这道题？</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2019/08/13/LeetCode206%E2%80%94%E2%80%94%E5%8F%8D%E8%BD%AC%E9%93%BE%E8%A1%A8/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.chaohang.top/2019/08/10/%E6%9E%81%E5%AE%A2%E6%97%B6%E9%97%B4%E7%AE%97%E6%B3%9540%E8%AE%B2%E7%AC%94%E8%AE%B0%E4%B9%8B%E4%B8%80%E2%80%94%E2%80%94%E5%A6%82%E4%BD%95%E5%AD%A6%E4%B9%A0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="张小超">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="张小超的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2019/08/10/%E6%9E%81%E5%AE%A2%E6%97%B6%E9%97%B4%E7%AE%97%E6%B3%9540%E8%AE%B2%E7%AC%94%E8%AE%B0%E4%B9%8B%E4%B8%80%E2%80%94%E2%80%94%E5%A6%82%E4%BD%95%E5%AD%A6%E4%B9%A0/" class="post-title-link" itemprop="url">极客时间算法40讲笔记之一——如何学习</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2019-08-10 16:16:55" itemprop="dateCreated datePublished" datetime="2019-08-10T16:16:55+08:00">2019-08-10</time>
+            </span>
+
+          
+            <span id="/2019/08/10/%E6%9E%81%E5%AE%A2%E6%97%B6%E9%97%B4%E7%AE%97%E6%B3%9540%E8%AE%B2%E7%AC%94%E8%AE%B0%E4%B9%8B%E4%B8%80%E2%80%94%E2%80%94%E5%A6%82%E4%BD%95%E5%AD%A6%E4%B9%A0/" class="post-meta-item leancloud_visitors" data-flag-title="极客时间算法40讲笔记之一——如何学习" title="Views">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine: </span>
+    
+    <a title="valine" href="/2019/08/10/%E6%9E%81%E5%AE%A2%E6%97%B6%E9%97%B4%E7%AE%97%E6%B3%9540%E8%AE%B2%E7%AC%94%E8%AE%B0%E4%B9%8B%E4%B8%80%E2%80%94%E2%80%94%E5%A6%82%E4%BD%95%E5%AD%A6%E4%B9%A0/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2019/08/10/%E6%9E%81%E5%AE%A2%E6%97%B6%E9%97%B4%E7%AE%97%E6%B3%9540%E8%AE%B2%E7%AC%94%E8%AE%B0%E4%B9%8B%E4%B8%80%E2%80%94%E2%80%94%E5%A6%82%E4%BD%95%E5%AD%A6%E4%B9%A0/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="如何有效学习数据结构"><a href="#如何有效学习数据结构" class="headerlink" title="如何有效学习数据结构"></a>如何有效学习数据结构</h2><ol>
+<li>Chunk it up (切碎知识点)<br> 比如要学习算法与数据结构，我们可以把想要学习的数据结构和算法罗列出来，在整理出他们之间的关系，然后各个击破。</li>
+</ol>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2019/08/10/%E6%9E%81%E5%AE%A2%E6%97%B6%E9%97%B4%E7%AE%97%E6%B3%9540%E8%AE%B2%E7%AC%94%E8%AE%B0%E4%B9%8B%E4%B8%80%E2%80%94%E2%80%94%E5%A6%82%E4%BD%95%E5%AD%A6%E4%B9%A0/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.chaohang.top/2019/08/03/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%E4%B9%8BTypeScript%E4%B8%AD%E7%9A%84%E5%8D%95%E4%BE%8B%E6%A8%A1%E5%BC%8F/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="张小超">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="张小超的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2019/08/03/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%E4%B9%8BTypeScript%E4%B8%AD%E7%9A%84%E5%8D%95%E4%BE%8B%E6%A8%A1%E5%BC%8F/" class="post-title-link" itemprop="url">设计模式之TypeScript中的单例模式</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2019-08-03 17:17:09" itemprop="dateCreated datePublished" datetime="2019-08-03T17:17:09+08:00">2019-08-03</time>
+            </span>
+
+          
+            <span id="/2019/08/03/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%E4%B9%8BTypeScript%E4%B8%AD%E7%9A%84%E5%8D%95%E4%BE%8B%E6%A8%A1%E5%BC%8F/" class="post-meta-item leancloud_visitors" data-flag-title="设计模式之TypeScript中的单例模式" title="Views">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine: </span>
+    
+    <a title="valine" href="/2019/08/03/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%E4%B9%8BTypeScript%E4%B8%AD%E7%9A%84%E5%8D%95%E4%BE%8B%E6%A8%A1%E5%BC%8F/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2019/08/03/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%E4%B9%8BTypeScript%E4%B8%AD%E7%9A%84%E5%8D%95%E4%BE%8B%E6%A8%A1%E5%BC%8F/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="单例模式"><a href="#单例模式" class="headerlink" title="单例模式"></a>单例模式</h2><p>单例模式指的是一个类只能有一个实例存在。</p>
+<p>在实际应用中有些场景我们只需要唯一实例的存在，如果出现多个实例就会出现问题，这个时候我们就需要用到单例模式。比如线程池，缓存，硬件设备等。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2019/08/03/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%E4%B9%8BTypeScript%E4%B8%AD%E7%9A%84%E5%8D%95%E4%BE%8B%E6%A8%A1%E5%BC%8F/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.chaohang.top/2019/07/23/%E6%B7%B1%E5%85%A5JavaScript%E4%B9%8B%E6%A8%A1%E6%8B%9Fapply-call-bind/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="张小超">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="张小超的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2019/07/23/%E6%B7%B1%E5%85%A5JavaScript%E4%B9%8B%E6%A8%A1%E6%8B%9Fapply-call-bind/" class="post-title-link" itemprop="url">深入JavaScript之模拟apply,call,bind</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2019-07-23 15:33:48" itemprop="dateCreated datePublished" datetime="2019-07-23T15:33:48+08:00">2019-07-23</time>
+            </span>
+
+          
+            <span id="/2019/07/23/%E6%B7%B1%E5%85%A5JavaScript%E4%B9%8B%E6%A8%A1%E6%8B%9Fapply-call-bind/" class="post-meta-item leancloud_visitors" data-flag-title="深入JavaScript之模拟apply,call,bind" title="Views">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine: </span>
+    
+    <a title="valine" href="/2019/07/23/%E6%B7%B1%E5%85%A5JavaScript%E4%B9%8B%E6%A8%A1%E6%8B%9Fapply-call-bind/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2019/07/23/%E6%B7%B1%E5%85%A5JavaScript%E4%B9%8B%E6%A8%A1%E6%8B%9Fapply-call-bind/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p><code>apply</code> <code>call</code> <code>bind</code> 这三个函数可以改变 <code>this</code> 的绑定，语法上有略微差别，可以看我很早之前的一篇文章做过简单的介绍 <a href="https://www.jianshu.com/p/cca23ce280be" target="_blank" rel="noopener">浅谈JavaScript中的apply、call、bind</a>。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2019/07/23/%E6%B7%B1%E5%85%A5JavaScript%E4%B9%8B%E6%A8%A1%E6%8B%9Fapply-call-bind/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.chaohang.top/2019/06/19/%E6%9F%A5%E8%AF%A2%E5%90%84%E4%B8%AA%E7%A7%91%E7%9B%AE%E6%88%90%E7%BB%A9%E5%89%8D%E4%B8%89%E7%9A%84%E8%AE%B0%E5%BD%95/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="张小超">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="张小超的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2019/06/19/%E6%9F%A5%E8%AF%A2%E5%90%84%E4%B8%AA%E7%A7%91%E7%9B%AE%E6%88%90%E7%BB%A9%E5%89%8D%E4%B8%89%E7%9A%84%E8%AE%B0%E5%BD%95/" class="post-title-link" itemprop="url">查询各个科目成绩前三的记录</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2019-06-19 19:55:41" itemprop="dateCreated datePublished" datetime="2019-06-19T19:55:41+08:00">2019-06-19</time>
+            </span>
+
+          
+            <span id="/2019/06/19/%E6%9F%A5%E8%AF%A2%E5%90%84%E4%B8%AA%E7%A7%91%E7%9B%AE%E6%88%90%E7%BB%A9%E5%89%8D%E4%B8%89%E7%9A%84%E8%AE%B0%E5%BD%95/" class="post-meta-item leancloud_visitors" data-flag-title="查询各个科目成绩前三的记录" title="Views">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine: </span>
+    
+    <a title="valine" href="/2019/06/19/%E6%9F%A5%E8%AF%A2%E5%90%84%E4%B8%AA%E7%A7%91%E7%9B%AE%E6%88%90%E7%BB%A9%E5%89%8D%E4%B8%89%E7%9A%84%E8%AE%B0%E5%BD%95/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2019/06/19/%E6%9F%A5%E8%AF%A2%E5%90%84%E4%B8%AA%E7%A7%91%E7%9B%AE%E6%88%90%E7%BB%A9%E5%89%8D%E4%B8%89%E7%9A%84%E8%AE%B0%E5%BD%95/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <table>
+<thead>
+<tr>
+<th>id</th>
+<th>student_id</th>
+<th>name</th>
+<th>course_id</th>
+<th>course_name</th>
+<th>score</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>2005001</td>
+<td>张三</td>
+<td>1</td>
+<td>数学</td>
+<td>69</td>
+</tr>
+<tr>
+<td>2</td>
+<td>2005002</td>
+<td>李四</td>
+<td>1</td>
+<td>数学</td>
+<td>89</td>
+</tr>
+<tr>
+<td>3</td>
+<td>2005005</td>
+<td>王五</td>
+<td>1</td>
+<td>数学</td>
+<td>23</td>
+</tr>
+<tr>
+<td>3</td>
+<td>2005001</td>
+<td>张三</td>
+<td>2</td>
+<td>语文</td>
+<td>69</td>
+</tr>
+<tr>
+<td>3</td>
+<td>2005002</td>
+<td>李四</td>
+<td>2</td>
+<td>语文</td>
+<td>73</td>
+</tr>
+<tr>
+<td>3</td>
+<td>2005005</td>
+<td>王五</td>
+<td>2</td>
+<td>语文</td>
+<td>88</td>
+</tr>
+<tr>
+<td>1</td>
+<td>2005006</td>
+<td>赵六</td>
+<td>2</td>
+<td>语文</td>
+<td>69</td>
+</tr>
+<tr>
+<td>2</td>
+<td>2005006</td>
+<td>赵六</td>
+<td>1</td>
+<td>数学</td>
+<td>89</td>
+</tr>
+<tr>
+<td>3</td>
+<td>2005007</td>
+<td>郑七</td>
+<td>2</td>
+<td>语文</td>
+<td>100</td>
+</tr>
+</tbody>
+</table>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2019/06/19/%E6%9F%A5%E8%AF%A2%E5%90%84%E4%B8%AA%E7%A7%91%E7%9B%AE%E6%88%90%E7%BB%A9%E5%89%8D%E4%B8%89%E7%9A%84%E8%AE%B0%E5%BD%95/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.chaohang.top/2019/06/19/mysql%E9%87%8D%E5%A4%8D%E6%95%B0%E6%8D%AE%E7%9A%84%E5%A4%84%E7%90%86/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="张小超">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="张小超的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2019/06/19/mysql%E9%87%8D%E5%A4%8D%E6%95%B0%E6%8D%AE%E7%9A%84%E5%A4%84%E7%90%86/" class="post-title-link" itemprop="url">mysql重复数据的处理</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2019-06-19 15:54:13" itemprop="dateCreated datePublished" datetime="2019-06-19T15:54:13+08:00">2019-06-19</time>
+            </span>
+
+          
+            <span id="/2019/06/19/mysql%E9%87%8D%E5%A4%8D%E6%95%B0%E6%8D%AE%E7%9A%84%E5%A4%84%E7%90%86/" class="post-meta-item leancloud_visitors" data-flag-title="mysql重复数据的处理" title="Views">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine: </span>
+    
+    <a title="valine" href="/2019/06/19/mysql%E9%87%8D%E5%A4%8D%E6%95%B0%E6%8D%AE%E7%9A%84%E5%A4%84%E7%90%86/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2019/06/19/mysql%E9%87%8D%E5%A4%8D%E6%95%B0%E6%8D%AE%E7%9A%84%E5%A4%84%E7%90%86/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>假设有一张表如下，含有部分重复数据，这些重复数据除了 <code>id</code> 不同，其他数据都相同。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2019/06/19/mysql%E9%87%8D%E5%A4%8D%E6%95%B0%E6%8D%AE%E7%9A%84%E5%A4%84%E7%90%86/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.chaohang.top/2019/06/19/LeetCode176%E2%80%94%E2%80%94%E7%AC%AC%E4%BA%8C%E9%AB%98%E7%9A%84%E8%96%AA%E6%B0%B4/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="张小超">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="张小超的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2019/06/19/LeetCode176%E2%80%94%E2%80%94%E7%AC%AC%E4%BA%8C%E9%AB%98%E7%9A%84%E8%96%AA%E6%B0%B4/" class="post-title-link" itemprop="url">LeetCode176——第二高的薪水</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2019-06-19 11:51:52" itemprop="dateCreated datePublished" datetime="2019-06-19T11:51:52+08:00">2019-06-19</time>
+            </span>
+
+          
+            <span id="/2019/06/19/LeetCode176%E2%80%94%E2%80%94%E7%AC%AC%E4%BA%8C%E9%AB%98%E7%9A%84%E8%96%AA%E6%B0%B4/" class="post-meta-item leancloud_visitors" data-flag-title="LeetCode176——第二高的薪水" title="Views">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine: </span>
+    
+    <a title="valine" href="/2019/06/19/LeetCode176%E2%80%94%E2%80%94%E7%AC%AC%E4%BA%8C%E9%AB%98%E7%9A%84%E8%96%AA%E6%B0%B4/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2019/06/19/LeetCode176%E2%80%94%E2%80%94%E7%AC%AC%E4%BA%8C%E9%AB%98%E7%9A%84%E8%96%AA%E6%B0%B4/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="题目描述"><a href="#题目描述" class="headerlink" title="题目描述"></a>题目描述</h2><p>编写一个 SQL 查询，获取 <code>Employee</code> 表中第二高的薪水（<code>Salary</code>） 。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2019/06/19/LeetCode176%E2%80%94%E2%80%94%E7%AC%AC%E4%BA%8C%E9%AB%98%E7%9A%84%E8%96%AA%E6%B0%B4/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+  </div>
+
+  
+  <nav class="pagination">
+    <a class="extend prev" rel="prev" href="/"><i class="fa fa-angle-left" aria-label="Previous page"></i></a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><span class="space">&hellip;</span><a class="page-number" href="/page/5/">5</a><a class="extend next" rel="next" href="/page/3/"><i class="fa fa-angle-right" aria-label="Next page"></i></a>
+  </nav>
+
+
+
+          </div>
+          
+
+<script>
   window.addEventListener('tabs:register', () => {
     let activeClass = CONFIG.comments.activeClass;
     if (CONFIG.comments.storage) {
@@ -18,7 +1158,168 @@
       localStorage.setItem('comments_active', commentClass);
     });
   }
-</script></div><div class="toggle sidebar-toggle"><span class="toggle-line toggle-line-first"></span><span class="toggle-line toggle-line-middle"></span><span class="toggle-line toggle-line-last"></span></div><aside class="sidebar"><div class="sidebar-inner"><ul class="sidebar-nav motion-element"><li class="sidebar-nav-toc"> Table of Contents</li><li class="sidebar-nav-overview"> Overview</li></ul><div class="post-toc-wrap sidebar-panel"></div><div class="site-overview-wrap sidebar-panel"><div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person"><p class="site-author-name" itemprop="name">张小超</p><div class="site-description" itemprop="description"></div></div><div class="site-state-wrap motion-element"><nav class="site-state"><div class="site-state-item site-state-posts"> <a href="/archives/"><span class="site-state-item-count">49</span> <span class="site-state-item-name">posts</span></a></div><div class="site-state-item site-state-tags"> <a href="/tags/"><span class="site-state-item-count">35</span> <span class="site-state-item-name">tags</span></a></div></nav></div></div></div></aside><div id="sidebar-dimmer"></div></div></main><footer class="footer"><div class="footer-inner"><div class="beian"><a href="http://www.beian.miit.gov.cn" rel="noopener" target="_blank">闽ICP备19023472号</a></div><div class="copyright"> &copy; 2016 – <span itemprop="copyrightYear">2020</span><span class="with-love"><i class="fa fa-user"></i></span> <span class="author" itemprop="copyrightHolder">张小超</span></div><div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v4.2.0</div> <span class="post-meta-divider">|</span><div class="theme-info">Theme – <a href="https://muse.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> v7.7.1</div><div class="busuanzi-count"><script async src="https://chaohang.top/cdn/js%2Fbusuanzi%2F2.3%2Fbusuanzi.pure.mini.js"></script><span class="post-meta-item" id="busuanzi_container_site_uv" style="display:none"><span class="post-meta-item-icon"><i class="fa fa-user"></i></span><span class="site-uv" title="Total Visitors"><span id="busuanzi_value_site_uv"></span></span></span> <span class="post-meta-divider">|</span><span class="post-meta-item" id="busuanzi_container_site_pv" style="display:none"><span class="post-meta-item-icon"><i class="fa fa-eye"></i></span><span class="site-pv" title="Total Views"><span id="busuanzi_value_site_pv"></span></span></span></div></div></footer></div><script src="//cdn.jsdelivr.net/npm/animejs@3.1.0/lib/anime.min.js"></script><script src="//cdn.jsdelivr.net/npm/lozad@1/dist/lozad.min.js"></script><script src="//cdn.jsdelivr.net/npm/velocity-animate@1/velocity.min.js"></script><script src="//cdn.jsdelivr.net/npm/velocity-animate@1/velocity.ui.min.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script><script src="/js/local-search.js"></script><script>
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">张小超</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">49</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">35</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+  <div class="beian"><a href="http://www.beian.miit.gov.cn" rel="noopener" target="_blank">闽ICP备19023472号 </a>
+  </div>
+
+<div class="copyright">
+  
+  &copy; 2016 – 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">张小超</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">Theme – <a href="https://muse.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> v7.7.1
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://chaohang.top/cdn/js%2Fbusuanzi%2F2.3%2Fbusuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="//cdn.jsdelivr.net/npm/animejs@3.1.0/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/lozad@1/dist/lozad.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/velocity-animate@1/velocity.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/velocity-animate@1/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
 NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
   NexT.utils.getScript('//cdn.jsdelivr.net/npm/valine@1/dist/Valine.min.js', () => {
     var GUEST = ['nick', 'mail', 'link'];
@@ -44,4 +1345,7 @@ NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
     });
   }, window.Valine);
 });
-</script></body></html>
+</script>
+
+</body>
+</html>

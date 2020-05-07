@@ -1,4 +1,297 @@
-<!DOCTYPE html><html lang="zh-Hans"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=2"><meta name="theme-color" content="#222"><meta name="generator" content="Hexo 4.2.0"><link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png"><link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png"><link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png"><link rel="mask-icon" href="/images/logo.svg" color="#222"><link rel="stylesheet" href="/css/main.css"><link rel="stylesheet" href="//cdn.jsdelivr.net/npm/font-awesome@4/css/font-awesome.min.css"><script id="hexo-configurations">var NexT=window.NexT||{},CONFIG={hostname:"www.chaohang.top",root:"/",scheme:"Muse",version:"7.7.1",exturl:!1,sidebar:{position:"left",display:"post",padding:18,offset:12,onmobile:!1},copycode:{enable:!1,show_result:!1,style:null},back2top:{enable:!0,sidebar:!1,scrollpercent:!1},bookmark:{enable:!1,color:"#222",save:"auto"},fancybox:!1,mediumzoom:!1,lazyload:!0,pangu:!1,comments:{style:"tabs",active:null,storage:!0,lazyload:!1,nav:null},algolia:{hits:{per_page:10},labels:{input_placeholder:"Search for Posts",hits_empty:"We didn't find any results for the search: ${query}",hits_stats:"${hits} results found in ${time} ms"}},localsearch:{enable:!0,trigger:"auto",top_n_per_article:3,unescape:!1,preload:!1},motion:{enable:!0,async:!1,transition:{post_block:"fadeIn",post_header:"slideDownIn",post_body:"slideDownIn",coll_header:"slideLeftIn",sidebar:"slideUpIn"}},path:"search.xml"}</script><meta name="description" content="昨晚做了一个令人痛心疾首的操作，rm -rf something，把我个人电脑里的重要文件夹给删掉了，懵逼了半天才缓过来。还好是个人文件，不对公司造成影响。这件事也让我意识到 rm -rf 确实是个高风险操作，文件备份也是重中之重。"><meta property="og:type" content="article"><meta property="og:title" content="使用 trash 避免 rm -rf 悲剧"><meta property="og:url" content="https://www.chaohang.top/2019/04/24/%E4%BD%BF%E7%94%A8-trash-%E9%81%BF%E5%85%8D-rm-rf-%E6%82%B2%E5%89%A7/index.html"><meta property="og:site_name" content="张小超的博客"><meta property="og:description" content="昨晚做了一个令人痛心疾首的操作，rm -rf something，把我个人电脑里的重要文件夹给删掉了，懵逼了半天才缓过来。还好是个人文件，不对公司造成影响。这件事也让我意识到 rm -rf 确实是个高风险操作，文件备份也是重中之重。"><meta property="article:published_time" content="2019-04-24T10:04:26.000Z"><meta property="article:modified_time" content="2019-04-24T10:04:26.000Z"><meta property="article:author" content="张小超"><meta property="article:tag" content="tool"><meta name="twitter:card" content="summary"><link rel="canonical" href="https://www.chaohang.top/2019/04/24/%E4%BD%BF%E7%94%A8-trash-%E9%81%BF%E5%85%8D-rm-rf-%E6%82%B2%E5%89%A7/"><script id="page-configurations">CONFIG.page={sidebar:"",isHome:!1,isPost:!0}</script><title>使用 trash 避免 rm -rf 悲剧 | 张小超的博客</title><noscript><style>.sidebar-inner,.use-motion .brand,.use-motion .collection-header,.use-motion .comments,.use-motion .menu-item,.use-motion .pagination,.use-motion .post-block,.use-motion .post-body,.use-motion .post-header{opacity:initial}.use-motion .site-subtitle,.use-motion .site-title{opacity:initial;top:initial}.use-motion .logo-line-before i{left:initial}.use-motion .logo-line-after i{right:initial}</style></noscript></head><body itemscope itemtype="http://schema.org/WebPage"><div class="container use-motion"><div class="headband"></div><header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="header-inner"><div class="site-brand-container"><div class="site-nav-toggle"><div class="toggle" aria-label="Toggle navigation bar"><span class="toggle-line toggle-line-first"></span><span class="toggle-line toggle-line-middle"></span><span class="toggle-line toggle-line-last"></span></div></div><div class="site-meta"><div><a href="/" class="brand" rel="start"><span class="logo-line-before"><i></i></span> <span class="site-title">张小超的博客</span><span class="logo-line-after"><i></i></span></a></div><h1 class="site-subtitle" itemprop="description">超超不会飞</h1></div><div class="site-nav-right"></div></div><nav class="site-nav"><ul id="menu" class="menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-fw fa-home"></i> Home</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i> Archives</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i> Tags</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i> About</a></li><li class="menu-item menu-item-search"><a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i> Search</a></li></ul></nav><div class="site-search"><div class="popup search-popup"><div class="search-header"><span class="search-icon"><i class="fa fa-search"></i></span><div class="search-input-container"> <input autocomplete="off" autocorrect="off" autocapitalize="off" placeholder="Searching..." spellcheck="false" type="search" class="search-input"></div><span class="popup-btn-close"><i class="fa fa-times-circle"></i></span></div><div id="search-result"></div></div><div class="search-pop-overlay"></div></div></div></header><div class="back-to-top"><i class="fa fa-arrow-up"></i> <span>0%</span></div><main class="main"><div class="main-inner"><div class="content-wrap"><div class="content"><div class="posts-expand"><article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans"><link itemprop="mainEntityOfPage" href="https://www.chaohang.top/2019/04/24/%E4%BD%BF%E7%94%A8-trash-%E9%81%BF%E5%85%8D-rm-rf-%E6%82%B2%E5%89%A7/"><span hidden itemprop="author" itemscope itemtype="http://schema.org/Person"><meta itemprop="image" content="/images/avatar.gif"><meta itemprop="name" content="张小超"><meta itemprop="description" content=""></span><span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization"><meta itemprop="name" content="张小超的博客"></span><header class="post-header"><h2 class="post-title" itemprop="name headline"> 使用 trash 避免 rm -rf 悲剧</h2><div class="post-meta"><span class="post-meta-item"><span class="post-meta-item-icon"><i class="fa fa-calendar-o"></i></span> <span class="post-meta-item-text">Posted on</span> <time title="Created: 2019-04-24 18:04:26" itemprop="dateCreated datePublished" datetime="2019-04-24T18:04:26+08:00">2019-04-24</time></span><span id="/2019/04/24/%E4%BD%BF%E7%94%A8-trash-%E9%81%BF%E5%85%8D-rm-rf-%E6%82%B2%E5%89%A7/" class="post-meta-item leancloud_visitors" data-flag-title="使用 trash 避免 rm -rf 悲剧" title="Views"><span class="post-meta-item-icon"><i class="fa fa-eye"></i></span> <span class="post-meta-item-text">Views:</span><span class="leancloud-visitors-count"></span></span><span class="post-meta-item"><span class="post-meta-item-icon"><i class="fa fa-comment-o"></i></span> <span class="post-meta-item-text">Valine:</span><a title="valine" href="/2019/04/24/%E4%BD%BF%E7%94%A8-trash-%E9%81%BF%E5%85%8D-rm-rf-%E6%82%B2%E5%89%A7/#valine-comments" itemprop="discussionUrl"><span class="post-comments-count valine-comment-count" data-xid="/2019/04/24/%E4%BD%BF%E7%94%A8-trash-%E9%81%BF%E5%85%8D-rm-rf-%E6%82%B2%E5%89%A7/" itemprop="commentCount"></span></a></span></div></header><div class="post-body" itemprop="articleBody"><p>昨晚做了一个令人痛心疾首的操作，<code>rm -rf something</code>，把我个人电脑里的重要文件夹给删掉了，懵逼了半天才缓过来。还好是个人文件，不对公司造成影响。这件事也让我意识到 <code>rm -rf</code> 确实是个高风险操作，文件备份也是重中之重。</p><a id="more"></a><p>为了规避这个风险操作，我决定用 <code>trash</code> 替代 <code>rm</code>，这样文件就不会直接被删除，而是进入废纸篓。</p><h2 id="安装-trash"><a href="#安装-trash" class="headerlink" title="安装 trash"></a>安装 trash</h2><p><a href="https://formulae.brew.sh/formula/trash" target="_blank" rel="noopener">trash–CLI tool that moves files or folder to the trash</a></p><p>使用 homebrew 安装 trash<br><code>brew install trash</code></p><h2 id="配置命令行"><a href="#配置命令行" class="headerlink" title="配置命令行"></a>配置命令行</h2><p>安装完之后在 <code>.zshrc</code> 或者 <code>.bashrc</code> 添加以下配置，<code>.Trash</code> 是Mac下的废纸篓目录。</p><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">alias rm=trash</span><br><span class="line">alias r=trash</span><br><span class="line">alias rl='ls ~/.Trash'</span><br><span class="line">alias ur=undelfile</span><br><span class="line">undelfile()</span><br><span class="line">&#123;</span><br><span class="line">    mv -i ~/.Trash/$@ ./</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p><code>rm</code> 或 <code>r</code> 命令可以把文件或者文件夹移入废纸篓。</p><p><code>rl</code> 罗列出废纸篓内的文件。</p><p><code>ur</code> 把废纸篓内的某个文件移动到当前位置，相当于恢复。</p></div><footer class="post-footer"><div class="post-tags"> <a href="/tags/tool/" rel="tag"># tool</a></div><div class="post-nav"><div class="post-nav-item"><a href="/2019/04/14/%E5%AE%9E%E7%8E%B0%E4%B8%80%E4%B8%AA%E7%AE%80%E5%8D%95%E7%9A%84WebSocket%E8%81%8A%E5%A4%A9%E5%AE%A4/" rel="prev" title="实现一个简单的WebSocket聊天室"><i class="fa fa-chevron-left"></i> 实现一个简单的WebSocket聊天室</a></div><div class="post-nav-item"> <a href="/2019/05/26/LeetCode70%E2%80%94%E2%80%94%E7%88%AC%E6%A5%BC%E6%A2%AF/" rel="next" title="LeetCode70——爬楼梯">LeetCode70——爬楼梯<i class="fa fa-chevron-right"></i></a></div></div></footer></article></div></div><div class="comments" id="valine-comments"></div><script>
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/font-awesome@4/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"www.chaohang.top","root":"/","scheme":"Muse","version":"7.7.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":3,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="昨晚做了一个令人痛心疾首的操作，rm -rf something，把我个人电脑里的重要文件夹给删掉了，懵逼了半天才缓过来。还好是个人文件，不对公司造成影响。这件事也让我意识到 rm -rf 确实是个高风险操作，文件备份也是重中之重。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用 trash 避免 rm -rf 悲剧">
+<meta property="og:url" content="https://www.chaohang.top/2019/04/24/%E4%BD%BF%E7%94%A8-trash-%E9%81%BF%E5%85%8D-rm-rf-%E6%82%B2%E5%89%A7/index.html">
+<meta property="og:site_name" content="张小超的博客">
+<meta property="og:description" content="昨晚做了一个令人痛心疾首的操作，rm -rf something，把我个人电脑里的重要文件夹给删掉了，懵逼了半天才缓过来。还好是个人文件，不对公司造成影响。这件事也让我意识到 rm -rf 确实是个高风险操作，文件备份也是重中之重。">
+<meta property="article:published_time" content="2019-04-24T10:04:26.000Z">
+<meta property="article:modified_time" content="2019-04-24T10:04:26.000Z">
+<meta property="article:author" content="张小超">
+<meta property="article:tag" content="tool">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://www.chaohang.top/2019/04/24/%E4%BD%BF%E7%94%A8-trash-%E9%81%BF%E5%85%8D-rm-rf-%E6%82%B2%E5%89%A7/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true
+  };
+</script>
+
+  <title>使用 trash 避免 rm -rf 悲剧 | 张小超的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">张小超的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <h1 class="site-subtitle" itemprop="description">超超不会飞</h1>
+      
+  </div>
+
+  <div class="site-nav-right"></div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>About</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.chaohang.top/2019/04/24/%E4%BD%BF%E7%94%A8-trash-%E9%81%BF%E5%85%8D-rm-rf-%E6%82%B2%E5%89%A7/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="张小超">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="张小超的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          使用 trash 避免 rm -rf 悲剧
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2019-04-24 18:04:26" itemprop="dateCreated datePublished" datetime="2019-04-24T18:04:26+08:00">2019-04-24</time>
+            </span>
+
+          
+            <span id="/2019/04/24/%E4%BD%BF%E7%94%A8-trash-%E9%81%BF%E5%85%8D-rm-rf-%E6%82%B2%E5%89%A7/" class="post-meta-item leancloud_visitors" data-flag-title="使用 trash 避免 rm -rf 悲剧" title="Views">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine: </span>
+    
+    <a title="valine" href="/2019/04/24/%E4%BD%BF%E7%94%A8-trash-%E9%81%BF%E5%85%8D-rm-rf-%E6%82%B2%E5%89%A7/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2019/04/24/%E4%BD%BF%E7%94%A8-trash-%E9%81%BF%E5%85%8D-rm-rf-%E6%82%B2%E5%89%A7/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>昨晚做了一个令人痛心疾首的操作，<code>rm -rf something</code>，把我个人电脑里的重要文件夹给删掉了，懵逼了半天才缓过来。还好是个人文件，不对公司造成影响。这件事也让我意识到 <code>rm -rf</code> 确实是个高风险操作，文件备份也是重中之重。</p>
+<a id="more"></a>
+<p>为了规避这个风险操作，我决定用 <code>trash</code> 替代 <code>rm</code>，这样文件就不会直接被删除，而是进入废纸篓。</p>
+<h2 id="安装-trash"><a href="#安装-trash" class="headerlink" title="安装 trash"></a>安装 trash</h2><p><a href="https://formulae.brew.sh/formula/trash" target="_blank" rel="noopener">trash–CLI tool that moves files or folder to the trash</a></p>
+<p>使用 homebrew 安装 trash<br><code>brew install trash</code></p>
+<!-- more -->
+<h2 id="配置命令行"><a href="#配置命令行" class="headerlink" title="配置命令行"></a>配置命令行</h2><p>安装完之后在 <code>.zshrc</code> 或者 <code>.bashrc</code> 添加以下配置，<code>.Trash</code> 是Mac下的废纸篓目录。</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">alias rm=trash</span><br><span class="line">alias r=trash</span><br><span class="line">alias rl='ls ~/.Trash'</span><br><span class="line">alias ur=undelfile</span><br><span class="line">undelfile()</span><br><span class="line">&#123;</span><br><span class="line">    mv -i ~/.Trash/$@ ./</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><code>rm</code> 或 <code>r</code> 命令可以把文件或者文件夹移入废纸篓。</p>
+<p><code>rl</code> 罗列出废纸篓内的文件。</p>
+<p><code>ur</code> 把废纸篓内的某个文件移动到当前位置，相当于恢复。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/tool/" rel="tag"># tool</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/04/14/%E5%AE%9E%E7%8E%B0%E4%B8%80%E4%B8%AA%E7%AE%80%E5%8D%95%E7%9A%84WebSocket%E8%81%8A%E5%A4%A9%E5%AE%A4/" rel="prev" title="实现一个简单的WebSocket聊天室">
+      <i class="fa fa-chevron-left"></i> 实现一个简单的WebSocket聊天室
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/05/26/LeetCode70%E2%80%94%E2%80%94%E7%88%AC%E6%A5%BC%E6%A2%AF/" rel="next" title="LeetCode70——爬楼梯">
+      LeetCode70——爬楼梯 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
   window.addEventListener('tabs:register', () => {
     let activeClass = CONFIG.comments.activeClass;
     if (CONFIG.comments.storage) {
@@ -18,7 +311,169 @@
       localStorage.setItem('comments_active', commentClass);
     });
   }
-</script></div><div class="toggle sidebar-toggle"><span class="toggle-line toggle-line-first"></span><span class="toggle-line toggle-line-middle"></span><span class="toggle-line toggle-line-last"></span></div><aside class="sidebar"><div class="sidebar-inner"><ul class="sidebar-nav motion-element"><li class="sidebar-nav-toc"> Table of Contents</li><li class="sidebar-nav-overview"> Overview</li></ul><div class="post-toc-wrap sidebar-panel"><div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#安装-trash"><span class="nav-number">1.</span> <span class="nav-text">安装 trash</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置命令行"><span class="nav-number">2.</span> <span class="nav-text">配置命令行</span></a></li></ol></div></div><div class="site-overview-wrap sidebar-panel"><div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person"><p class="site-author-name" itemprop="name">张小超</p><div class="site-description" itemprop="description"></div></div><div class="site-state-wrap motion-element"><nav class="site-state"><div class="site-state-item site-state-posts"> <a href="/archives/"><span class="site-state-item-count">49</span> <span class="site-state-item-name">posts</span></a></div><div class="site-state-item site-state-tags"> <a href="/tags/"><span class="site-state-item-count">35</span> <span class="site-state-item-name">tags</span></a></div></nav></div></div></div></aside><div id="sidebar-dimmer"></div></div></main><footer class="footer"><div class="footer-inner"><div class="beian"><a href="http://www.beian.miit.gov.cn" rel="noopener" target="_blank">闽ICP备19023472号</a></div><div class="copyright"> &copy; 2016 – <span itemprop="copyrightYear">2020</span><span class="with-love"><i class="fa fa-user"></i></span> <span class="author" itemprop="copyrightHolder">张小超</span></div><div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v4.2.0</div> <span class="post-meta-divider">|</span><div class="theme-info">Theme – <a href="https://muse.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> v7.7.1</div><div class="busuanzi-count"><script async src="https://chaohang.top/cdn/js%2Fbusuanzi%2F2.3%2Fbusuanzi.pure.mini.js"></script><span class="post-meta-item" id="busuanzi_container_site_uv" style="display:none"><span class="post-meta-item-icon"><i class="fa fa-user"></i></span><span class="site-uv" title="Total Visitors"><span id="busuanzi_value_site_uv"></span></span></span> <span class="post-meta-divider">|</span><span class="post-meta-item" id="busuanzi_container_site_pv" style="display:none"><span class="post-meta-item-icon"><i class="fa fa-eye"></i></span><span class="site-pv" title="Total Views"><span id="busuanzi_value_site_pv"></span></span></span></div></div></footer></div><script src="//cdn.jsdelivr.net/npm/animejs@3.1.0/lib/anime.min.js"></script><script src="//cdn.jsdelivr.net/npm/lozad@1/dist/lozad.min.js"></script><script src="//cdn.jsdelivr.net/npm/velocity-animate@1/velocity.min.js"></script><script src="//cdn.jsdelivr.net/npm/velocity-animate@1/velocity.ui.min.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script><script src="/js/local-search.js"></script><script>
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#安装-trash"><span class="nav-number">1.</span> <span class="nav-text">安装 trash</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置命令行"><span class="nav-number">2.</span> <span class="nav-text">配置命令行</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">张小超</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">49</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">35</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+  <div class="beian"><a href="http://www.beian.miit.gov.cn" rel="noopener" target="_blank">闽ICP备19023472号 </a>
+  </div>
+
+<div class="copyright">
+  
+  &copy; 2016 – 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">张小超</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">Theme – <a href="https://muse.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> v7.7.1
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://chaohang.top/cdn/js%2Fbusuanzi%2F2.3%2Fbusuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="//cdn.jsdelivr.net/npm/animejs@3.1.0/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/lozad@1/dist/lozad.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/velocity-animate@1/velocity.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/velocity-animate@1/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
 NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
   NexT.utils.getScript('//cdn.jsdelivr.net/npm/valine@1/dist/Valine.min.js', () => {
     var GUEST = ['nick', 'mail', 'link'];
@@ -44,4 +499,7 @@ NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
     });
   }, window.Valine);
 });
-</script></body></html>
+</script>
+
+</body>
+</html>
