@@ -1,6 +1,171 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>MySQL的各种日志</title>
+    <url>/2020/06/01/MySQL%E7%9A%84%E5%90%84%E7%A7%8D%E6%97%A5%E5%BF%97/</url>
+    <content><![CDATA[<p><img data-src="http://cdn.chaohang.top/20200601115218.jpg" alt="Photo by hippopx.com">Photo by hippopx.com</p>
+<blockquote>
+<p>《MySQL实战45讲》笔记。</p>
+</blockquote>
+<a id="more"></a>
+<h2 id="1-redo-log——只是一块粉板"><a href="#1-redo-log——只是一块粉板" class="headerlink" title="1. redo log——只是一块粉板"></a>1. redo log——只是一块粉板</h2><p>孔乙己又来酒馆喝酒，兜里没钱手机也没电了，只能向掌柜的赊账。掌柜有一块粉板，当客人要赊账的时候就往上写一笔，等客人少的时候或者粉板写满了就记到账本里去。还好有这块粉板，不然每次客人要赊账，掌柜都要翻看账本，在密密麻麻的账本里找到赊账客人的名字绝对不是一件容易的事，有了粉板，掌柜只要往粉板上记一笔：“孔乙己 赊 两文”，空闲的时候再更新到账本里去，简单多了。</p>
+<p>同样的，MySQL也有一块“粉板”—— redo log。更新的时候，先写到 redo log 和内存里，这次更新就算是结束了。等到合适的时机再写到磁盘里，大大减小了写磁盘的次数。</p>
+<p>redo log 是固定大小、“循环写”的，就像粉板一样，顶多也就记个十几二十条，多了就记不下了，这时会把粉板上的帐都写到账本里，再擦掉粉板，从头开始记。假设 redo log 配置了4组文件，每个文件 1G ，一共可记录 4G 的操作，写满了就会擦掉一部分记录。</p>
+<p>redo log 是物理日志，记录的是“在某个数据页上做了什么修改”。</p>
+<p>有了 redo log，InnoDB 就可以保证即使数据库发生了异常重启，之前提交的记录都不会丢失，这个能力称为 <strong>crash-safe</strong>。</p>
+<h2 id="2-binlog"><a href="#2-binlog" class="headerlink" title="2. binlog"></a>2. binlog</h2><p>binlog 是 MySQL 的 Server 层实现的，所有引擎都可以使用。</p>
+<p>binlog 是逻辑日志，记录的是这个语句的原始逻辑，比如”给 ID=2 这一行的 c 字段加1“。</p>
+<p>binlog 是“追加写”的，一个文件写完了会切换到下一个，不会覆盖以前的日志。</p>
+<p><strong>为什么有了 redo log 还需要 binlog?</strong></p>
+<p>其实 redo log 才是那个新来的仔。MySQL 自带了 binlog 日志用于归档，没有 crash-safe 的能力。InnoDB 引擎以插件的形式引入 MySQL 时，为了能够实现 crash-safe 的能力，引入了 redo log 。</p>
+<p>一般我们用 binlog 做主从复制，数据恢复等操作。</p>
+<p><strong>binlog 是如何做数据恢复的？</strong></p>
+<p>一般我们做数据库备份是一周一备，一天一备，也可能一月一备。</p>
+<p>假设今天中午12点，我们发现部分数据被误删了。需要恢复到昨天晚上8点这个时间段。但是数据库是每天凌晨3点的时候备份，离我们最近的一份备份数据已经缺失，只能恢复到昨天凌晨3点。这个时候我们就可以拿出昨天凌晨3点到晚上8点这个时间段的 binlog，重放到数据缺失前的那个时刻。在把这份数据恢复到线上数据库去。</p>
+<h2 id="3-更新操作的执行流程"><a href="#3-更新操作的执行流程" class="headerlink" title="3. 更新操作的执行流程"></a>3. 更新操作的执行流程</h2><p>了解了 redo log 和 binlog 这两个日志的概念，我们再来看看执行器和 InnoDB 引擎在执行这个简单的 update 语句时的内部流程。</p>
+<ol>
+<li>执行器先找引擎取 ID=2 这一行。如果数据在内存就直接返回，如果不在内存就先从磁盘读入内存，再返回。</li>
+<li>执行器拿到数据，给这行的 c 值加 1。</li>
+<li>引擎将这行数据的改动更新到内存中，同时将这个更新操作记录到 redo log 里面，此时 redo log 处于<strong>prepare 状态</strong>。然后告知执行器执行完成了，随时可以提交事务。</li>
+<li>执行器生成这个操作的 binlog，并把 binlog 写入磁盘。</li>
+<li>执行器调用引擎的提交事务接口，引擎把刚刚写入的 redo log 改成 <strong>commit 状态</strong>，更新完成。</li>
+</ol>
+<p>下图出自《MySQL实战45讲》，浅色框表示是在 InnoDB 内部执行的，深色框表示实在执行器中执行的。</p>
+<p><img data-src="http://cdn.chaohang.top/20200528171340.png" alt=""></p>
+<h2 id="4-redo-log-和-binlog-的两阶段提交"><a href="#4-redo-log-和-binlog-的两阶段提交" class="headerlink" title="4. redo log 和 binlog 的两阶段提交"></a>4. redo log 和 binlog 的两阶段提交</h2><p><strong>为什么需要两阶段提交？</strong></p>
+<p>我们先假设没有两阶段提交时，可能会有以下两种情况：</p>
+<ol>
+<li>redo log 提交成功了，这时候数据库挂掉导致 binlog 没有成功写入。数据库重启之后通过 redo log 把数据恢复回来，但是 binlog 没有成功写入，导致我们在做主从复制或者数据恢复的时候，数据不一致。</li>
+<li>binlog 提交成功了，这时候数据库挂掉导致 redo log 没有成功写入。数据库重启之后，无法恢复崩溃之前提交的那个事务，这部分数据更改在主库缺失。但是 binlog 已经成功写入了，从库反而有了该事务的改动，导致数据不一致。</li>
+</ol>
+<p>综上我们知道，redo log 和 binlog 必须同时成功或同时失败，才能保证数据一致性。</p>
+<p><strong>两阶段提交是如何保证 redo log 和 binlog 同时成功或同时失败的？</strong></p>
+<p><img data-src="http://cdn.chaohang.top/20200528174315.png" alt="图片来自《MySQL实战45讲》"></p>
+<p>假设已经有了两阶段提交，分析一下以下两种情况：</p>
+<ol>
+<li>假设在上图的时刻A，redo log 处于 prepare 之后，写 binlog 之前，数据库挂掉了。由于此时 binlog 还没有写，redo log 也还没有提交，所以崩溃恢复后，这个事务会回滚。这时候 binlog 还没写，所以也不会传到备库。</li>
+<li>假设在上图的时刻B，写 binlog 之后，redo log 还没有 commit 前发生 crash。那么崩溃恢复时，MySQL 会做以下判断：<ol>
+<li>如果 redo log 里面的事务是完整的，也就是已经有了 commit 标识，则直接提交；</li>
+<li>如果 redo log 里面的事务只有完整的 prepare，则判断对应的事务 binlog 是否存在并完整：<br>a. 如果是，则提交事务；<br>b. 否则，回滚事务。</li>
+</ol>
+</li>
+</ol>
+<p><strong>那么 MySQL 是怎么知道 binlog 是否完整的？</strong></p>
+<p>一个事务的 binlog 是有完整的格式的：</p>
+<ul>
+<li>statement 格式的 binlog，最后会有 COMMIT;</li>
+<li>row 格式的 binlog，最后会有一个 XID event。</li>
+</ul>
+<h2 id="5-change-buffer"><a href="#5-change-buffer" class="headerlink" title="5. change buffer"></a>5. change buffer</h2><p><strong>什么是 change buffer ?</strong></p>
+<p>当需要更新一个数据时，如果数据页在内存里就直接更新了，如果数据页不在内存里，InnoDB 会将这些更新操作缓存在 change buffer 中，这样就不需要读磁盘了。在下次查询需要访问到这个数据页的时候，将数据页读入内存，然后执行 change buffer 中与这个页有关的操作。</p>
+<p>如果能够将更新操作先记录在 change buffer， 减少读磁盘，更新操作变快。而且数据读入内存是需要占用 buffer pool 的，所以这种方式还能够避免占用内存，提高内存利用率。</p>
+<p>change buffer 是可以持久化的数据，change buffer 在内存中有拷贝，也会被写入到磁盘中。</p>
+<p>将 change buffer 中的操作应用到原数据页，得到最新结果的过程称为 merge。以下情况会触发 merge:</p>
+<ol>
+<li>访问数据页</li>
+<li>系统有后台线程定期 merge</li>
+<li>数据库正常关闭也会触发 merge</li>
+</ol>
+<p><strong>为什么普通索引比唯一索引效率高？</strong></p>
+<ol>
+<li>查询时：<ol>
+<li>普通索引查出数据页，数据页读入内存，判断是否有相等的数据，返回数据。</li>
+<li>唯一索引查出数据页，数据页读入内存，直接返回数据。</li>
+<li>虽然普通索引多了一步判断，但是数据是以页为单位读入内存的，判断大概率是内存操作，消耗很小，可以忽略。</li>
+</ol>
+</li>
+<li>更新时：<ol>
+<li>普通索引直接更新内存或者缓存到 change buffer 中，结束。</li>
+<li>唯一索引更新时需要判断是否有数据冲突，所以无法利用 change buffer，当数据页不在内存时，必须读磁盘写入内存再做判断，效率低于普通索引。</li>
+</ol>
+</li>
+</ol>
+<p><strong>什么情况下不适合使用 change buffer?</strong></p>
+<p>如果某个业务更新后马上做查询，即使我们把更新先记录在 change buffer，读取操作也会马上把数据读入内存，而且立即触发 merge 操作。这种情况下，随机访问磁盘的次数没有减少，反而增加了 change buffer 的维护代价。所以对于这种业务，change buffer 反而起到了反作用。</p>
+<h2 id="6-change-buffer-和-redo-log"><a href="#6-change-buffer-和-redo-log" class="headerlink" title="6. change buffer 和 redo log"></a>6. change buffer 和 redo log</h2><h3 id="插入时"><a href="#插入时" class="headerlink" title="插入时"></a>插入时</h3><p><img data-src="http://cdn.chaohang.top/20200528200342.png" alt=""></p>
+<ol>
+<li>插入的数据页刚好在内存中，直接更新内存中的数据页（上图1）。</li>
+<li>数据页不在内存中，在 change buffer 里记录下对该数据页的改动（上图2）。</li>
+<li>将上述两个动作记入 redo log 中（上图3，4）。</li>
+</ol>
+<p>我们可以看到，执行这条语句的成本很低，写了两处内存（内存和change buffer），写了一处磁盘（redo log，两次操作合在一起写磁盘），而且还是顺序写（直接写日志文件）。</p>
+<p>同时，图中两个虚线箭头，是后台操作（异步操作，空闲时间就刷的那种），不影响该语句的响应时间。</p>
+<h3 id="查询时"><a href="#查询时" class="headerlink" title="查询时"></a>查询时</h3><p><img data-src="http://cdn.chaohang.top/20200528201114.png" alt=""></p>
+<ol>
+<li>数据在内存时，直接读取。</li>
+<li>数据不在内存时，从磁盘读入内存，然后应用 change buffer 里的操作日志，在内存生成一个最新的数据。</li>
+</ol>
+<h3 id="比较"><a href="#比较" class="headerlink" title="比较"></a>比较</h3><p>从上面两个案例我们可以看出：</p>
+<ol>
+<li>redo log 主要节省的是随机写磁盘的 IO 消耗（把更新时的随机写磁盘转成顺序写）。</li>
+<li>change buffer 主要节省的是随机读磁盘的 IO 消耗（减少更新时读磁盘的次数）。</li>
+</ol>
+<h2 id="7-binlog-和-redo-log-的持久化"><a href="#7-binlog-和-redo-log-的持久化" class="headerlink" title="7. binlog 和 redo log 的持久化"></a>7. binlog 和 redo log 的持久化</h2><h3 id="binlog-的写入机制"><a href="#binlog-的写入机制" class="headerlink" title="binlog 的写入机制"></a>binlog 的写入机制</h3><p>binlog 的写入逻辑：事务执行过程中，先把日志写到 binlog cache，事务提交的时候，再把 binlog cache 写到 binlog 文件中。</p>
+<p><strong>一个事务的 binlog 是不能被拆开写的，因此不论这个事务多大，也要确保一次性写入。</strong></p>
+<p>系统给 binlog cache 分配了一片内存，<strong>每个线程一个</strong>，参数 <code>binlog_cache_size</code> 用于控制单个线程内 binlog cache 所占内存的大小。如果超过了这个参数规定的大小，就要暂存的磁盘中。</p>
+<p>事务提交时，执行器把 binlog cache 里的完整事务写到 binlog file 和 磁盘中，并清空 binlog cache。状态如下图所示：</p>
+<p><img data-src="http://cdn.chaohang.top/20200529170736.png" alt=""></p>
+<ol>
+<li>图中的 write，指的是日志写入到文件系统的 page cache，并没有把数据持久化到磁盘，速度比较快。</li>
+<li>图中的 fsync，指的是日志最终持久化到磁盘，速度慢。</li>
+<li>write 和 fsync 的时机，由参数 sync_binlog 控制：<ol>
+<li>sync_binlog=0 时，表示每次提交事务都只 write，不 fsync；</li>
+<li>sync_binlog=1 时，表示每次提交事务都会执行 fsync；</li>
+<li>sync_binlog=N(N&gt;1) 时，表示每次提交事务都 write，但累积 N 个事务后才 fsync。</li>
+</ol>
+</li>
+<li>将 sync_binlog 设置为 N，对应的风险是：如果主机发生异常重启，会丢失最近 N 个事务的 binlog 日志（没有持久化到磁盘，主机挂了就丢失了）。</li>
+</ol>
+<h3 id="redo-log-的写入机制"><a href="#redo-log-的写入机制" class="headerlink" title="redo log 的写入机制"></a>redo log 的写入机制</h3><p><img data-src="http://cdn.chaohang.top/20200529173305.png" alt=""></p>
+<ol>
+<li>事务在执行过程中，生成的 redo log 会先写到 redo log buffer 中。</li>
+<li>写入到 page cache 的速度也很快，写入到磁盘的速度慢。</li>
+<li><code>innodb_flush_log_at_trx_commit</code> 参数用来控制 redo log 的写入策略：<ol>
+<li>设为 0 时，表示每次事务提交时都只是把 redo log 留在 redo log buffer 中；</li>
+<li>设为 1 时，表示每次事务提交时都将 redo log 直接持久化到磁盘；</li>
+<li>设为 2 时，表示每次事务提交时都只是把 redo log 写到 page cache。</li>
+</ol>
+</li>
+<li>InnoDB 有一个后台线程，每隔 1 秒，就会把 redo log buffer 中的日志，调用 write 写到文件系统的 page cache，然后调用 fsync 持久化到磁盘。</li>
+<li>事务执行过程中写入 redo log buffer 的记录，也会随着其他事务的提交或者定时写入过程持久化到磁盘中。也就是说有些还未提交的事务的 redo log 也会被持久化。</li>
+<li>redo log buffer 占用的空间即将达到 <code>innodb_log_buffer_size</code> 一半的时候，也会触发持久化操作。</li>
+</ol>
+<h3 id="分组提交"><a href="#分组提交" class="headerlink" title="分组提交"></a>分组提交</h3><p>为了降低写磁盘的次数，redo log 把 write 和 fsync 拆成两个步骤，当有并发时，事务A写完 page cahce，事务B也写完了 page cache，事务A触发 fsync 的时候，会把两个事务的 redo log 并在一组，一起写磁盘。</p>
+<p>并且为了能让更多的事务加入同一个组，InnoDB 让 redo log 和 binlog 的 write 和 fsync 交替执行，分组提交的优化，redo log 和 binlog 都有。</p>
+<p><img data-src="http://cdn.chaohang.top/20200529175020.png" alt=""></p>
+<p><strong>WAL 机制是减少磁盘写，但每次提交事务都要写 redo log 和 binlog，写磁盘的次数好像没有减少？</strong></p>
+<ol>
+<li>redo log 和 binlog 都是顺序写，磁盘的顺序写比随机写速度快；（日志写磁盘都是顺序写的，事务提交后直接把数据写磁盘就是随机访问）；</li>
+<li>组提交机制可以大幅降低磁盘的 IOPS 消耗。</li>
+</ol>
+<h3 id="MySQL-是如何保证-crash-safe-的。"><a href="#MySQL-是如何保证-crash-safe-的。" class="headerlink" title="MySQL 是如何保证 crash-safe 的。"></a>MySQL 是如何保证 crash-safe 的。</h3><p><strong>redo log 是如何保证 crash-safe 的。</strong><br>写到 redo log buffer 不能保证 crash-safe，写到 fs cache 也不能保证 crash-safe，只有 redo log 写入磁盘之后，数据库异常重启，从磁盘中的 redo log 拿出未执行的日志进行恢复，才算是 crash-safe。<br>这也说明了多个事务提交之后才写磁盘，还是会有事务丢失。只有每个事务提交后都进行写磁盘才能保证数据完全不丢失。</p>
+<p><strong>binlog 为什么无法保证 crash-safe?</strong></p>
+<ol>
+<li>如果 binlog 写入成功了，数据还没写入磁盘，数据库异常崩溃，重启后主库没有这部分数据，而通过 binlog 同步的从库却有了这部分配置，导致主从数据不一致。</li>
+<li>如果 数据写入磁盘，binlog 写入失败了，数据库异常崩溃，重启后主库有这部分数据，而通过 binlog 同步的从库没有这部分数据，导致主从数据不一致。</li>
+</ol>
+<p><strong>能否只使用 binlog 或 redo log 单个日志保证 crash-safe?</strong></p>
+<p>我的理解是：并不是单个 log 无法保证 crash-safe，而是 binlog 本身无法保证 crash-safe，因为 InnoDB 无法重新设计 binlog，所以引入了 redo log。并且花了很大力气来保证 redo log 和 binlog 的一致性。<br>如果重新设计 MySQL，可以使用 redo log 实现 binlog 的功能，也可以把 binlog 设计成 crash-safe 的，这样就只需要一种 log 了。</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://time.geekbang.org/column/article/68633" target="_blank" rel="noopener">02 | 日志系统：一条SQL更新语句是如何执行的？-极客时间</a></p>
+<p><a href="https://time.geekbang.org/column/article/70848" target="_blank" rel="noopener">09 | 普通索引和唯一索引，应该怎么选择？-极客时间</a></p>
+<p><a href="https://time.geekbang.org/column/article/71806" target="_blank" rel="noopener">12 | 为什么我的MySQL会”抖”一下？-极客时间</a></p>
+<p><a href="https://time.geekbang.org/column/article/73161" target="_blank" rel="noopener">15 | 答疑文章（一）：日志和索引相关问题-极客时间</a></p>
+<p><a href="https://time.geekbang.org/column/article/76161" target="_blank" rel="noopener">23 | MySQL是怎么保证数据不丢的？-极客时间</a></p>
+<blockquote>
+<p>本文首发于我的个人博客 <a href="https://chaohang.top" target="_blank" rel="noopener">https://chaohang.top</a></p>
+<p>作者 <a href="https://chaohang.top" target="_blank" rel="noopener">张小超</a></p>
+<p>公众号【超超不会飞】</p>
+<p>转载请注明出处</p>
+</blockquote>
+<p>欢迎关注我的微信公众号 【超超不会飞】，获取第一时间的更新。</p>
+<p><img data-src="http://cdn.chaohang.top/20200601135428.png" alt=""></p>
+]]></content>
+      <tags>
+        <tag>MySQL</tag>
+        <tag>笔记</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>早起实操手册</title>
     <url>/2020/05/07/%E6%97%A9%E8%B5%B7%E5%AE%9E%E6%93%8D%E6%89%8B%E5%86%8C/</url>
     <content><![CDATA[<p><img data-src="http://cdn.chaohang.top/20200507085953.jpg" alt="Photo by &lt;a href=&quot;https://stocksnap.io/author/helenalopes&quot;&gt;Helena Lopes&lt;/a&gt; from &lt;a href=&quot;https://stocksnap.io&quot;&gt;StockSnap&lt;/a&gt;"><br>Photo by <a href="https://stocksnap.io/author/helenalopes" target="_blank" rel="noopener">Helena Lopes</a> from <a href="https://stocksnap.io" target="_blank" rel="noopener">StockSnap</a></p>
@@ -57,6 +222,10 @@
 <p>欢迎关注我的微信公众号 【超超不会飞】，获取第一时间的更新。</p>
 <p><img data-src="http://cdn.chaohang.top/20200507084352.png" alt=""></p>
 ]]></content>
+      <tags>
+        <tag>生活</tag>
+        <tag>随笔</tag>
+      </tags>
   </entry>
   <entry>
     <title>深入理解Java虚拟机3——垃圾回收</title>
@@ -1097,7 +1266,7 @@
       </tags>
   </entry>
   <entry>
-    <title>mysql重复数据的处理</title>
+    <title>MySQL重复数据的处理</title>
     <url>/2019/06/19/mysql%E9%87%8D%E5%A4%8D%E6%95%B0%E6%8D%AE%E7%9A%84%E5%A4%84%E7%90%86/</url>
     <content><![CDATA[<p>假设有一张表如下，含有部分重复数据，这些重复数据除了 <code>id</code> 不同，其他数据都相同。</p>
 <a id="more"></a>
