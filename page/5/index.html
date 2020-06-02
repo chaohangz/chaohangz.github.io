@@ -180,6 +180,92 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.chaohang.top/2017/10/27/promise-%E5%92%8C-async-%E7%9A%84%E7%94%A8%E6%B3%95/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="张小超">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="张小超的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2017/10/27/promise-%E5%92%8C-async-%E7%9A%84%E7%94%A8%E6%B3%95/" class="post-title-link" itemprop="url">promise 和 async 的用法</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2017-10-27 09:56:34" itemprop="dateCreated datePublished" datetime="2017-10-27T09:56:34+08:00">2017-10-27</time>
+            </span>
+
+          
+            <span id="/2017/10/27/promise-%E5%92%8C-async-%E7%9A%84%E7%94%A8%E6%B3%95/" class="post-meta-item leancloud_visitors" data-flag-title="promise 和 async 的用法" title="Views">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine: </span>
+    
+    <a title="valine" href="/2017/10/27/promise-%E5%92%8C-async-%E7%9A%84%E7%94%A8%E6%B3%95/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2017/10/27/promise-%E5%92%8C-async-%E7%9A%84%E7%94%A8%E6%B3%95/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h3 id="promise"><a href="#promise" class="headerlink" title="promise"></a>promise</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 先构造一个 promise 函数</span></span><br><span class="line"><span class="comment">// resolve 和 reject 都是一个函数</span></span><br><span class="line"><span class="comment">// resolve 在成功时调用</span></span><br><span class="line"><span class="comment">// reject 在失败时调用</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">promise</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="keyword">new</span> <span class="built_in">Promise</span>(<span class="function">(<span class="params">resolve, reject</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">let</span> tar = <span class="built_in">Math</span>.random(<span class="number">0</span>, <span class="number">1</span>)</span><br><span class="line">    <span class="keyword">if</span> (tar &gt; <span class="number">0.5</span>) &#123;</span><br><span class="line">      <span class="built_in">console</span>.log(<span class="string">'suceess'</span>)</span><br><span class="line">      setTimeout(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">        resolve(<span class="string">'resolve'</span>)  </span><br><span class="line">      &#125;, <span class="number">1000</span>)</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      <span class="built_in">console</span>.log(<span class="string">'fail'</span>)</span><br><span class="line">      setTimeout(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">        reject(<span class="string">'reject'</span>)</span><br><span class="line">      &#125;, <span class="number">1000</span>)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// then 和 catch 第一个参数为resolve状态时的回调，第二个参数为reject状态时的回调</span></span><br><span class="line"><span class="comment">// catch 相当于 then(null, reject)</span></span><br><span class="line">promise().then(</span><br><span class="line">  (resolve) =&gt; <span class="built_in">console</span>.log(<span class="string">'then'</span>, resolve)</span><br><span class="line">).catch(</span><br><span class="line">  (reject) =&gt; <span class="built_in">console</span>.log(<span class="string">'catch'</span>, reject)</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">// then 后面还可以接 then 一直链式调用</span></span><br><span class="line"><span class="comment">// 第一个 then 接受的参数是 resolve 函数传过来的参数</span></span><br><span class="line"><span class="comment">// 第二个 then 接受一个参数是第一个 then 返回的值</span></span><br><span class="line">promise().then(</span><br><span class="line">  (resolve) =&gt; (resolve + <span class="number">1</span>)  <span class="comment">// 接受 resolve 返回 resolve + 1</span></span><br><span class="line">).then(</span><br><span class="line">  (plusOne) =&gt; <span class="built_in">console</span>.log(plusOne)  <span class="comment">// 接受 resolve +1 并打印</span></span><br><span class="line">).catch(</span><br><span class="line">  (reject) =&gt; <span class="built_in">console</span>.log(<span class="string">'catch'</span>, reject)</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2017/10/27/promise-%E5%92%8C-async-%E7%9A%84%E7%94%A8%E6%B3%95/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-Hans">
     <link itemprop="mainEntityOfPage" href="https://www.chaohang.top/2017/05/23/%E9%98%BF%E9%87%8C%E4%BA%91%E4%BA%91%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%9A%84%E7%AB%AF%E5%8F%A3%E9%85%8D%E7%BD%AE%E9%97%AE%E9%A2%98/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1010,97 +1096,11 @@
   
   
 
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://www.chaohang.top/2016/11/17/%E6%B5%85%E8%B0%88JavaScript%E4%B8%AD%E7%9A%84apply%E3%80%81call%E3%80%81bind/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="张小超">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="张小超的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2016/11/17/%E6%B5%85%E8%B0%88JavaScript%E4%B8%AD%E7%9A%84apply%E3%80%81call%E3%80%81bind/" class="post-title-link" itemprop="url">浅谈JavaScript中的apply、call、bind</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2016-11-17 15:17:19" itemprop="dateCreated datePublished" datetime="2016-11-17T15:17:19+08:00">2016-11-17</time>
-            </span>
-
-          
-            <span id="/2016/11/17/%E6%B5%85%E8%B0%88JavaScript%E4%B8%AD%E7%9A%84apply%E3%80%81call%E3%80%81bind/" class="post-meta-item leancloud_visitors" data-flag-title="浅谈JavaScript中的apply、call、bind" title="Views">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              <span class="post-meta-item-text">Views: </span>
-              <span class="leancloud-visitors-count"></span>
-            </span>
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="fa fa-comment-o"></i>
-      </span>
-      <span class="post-meta-item-text">Valine: </span>
-    
-    <a title="valine" href="/2016/11/17/%E6%B5%85%E8%B0%88JavaScript%E4%B8%AD%E7%9A%84apply%E3%80%81call%E3%80%81bind/#valine-comments" itemprop="discussionUrl">
-      <span class="post-comments-count valine-comment-count" data-xid="/2016/11/17/%E6%B5%85%E8%B0%88JavaScript%E4%B8%AD%E7%9A%84apply%E3%80%81call%E3%80%81bind/" itemprop="commentCount"></span>
-    </a>
-  </span>
-  
-  
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>apply,call,bine 这三兄弟经常让初学者感到疑惑。前两天准备面试时特地做了个比较，其实理解起来也不会太难。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2016/11/17/%E6%B5%85%E8%B0%88JavaScript%E4%B8%AD%E7%9A%84apply%E3%80%81call%E3%80%81bind/#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
   </div>
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/4/"><i class="fa fa-angle-left" aria-label="Previous page"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/4/">4</a><span class="page-number current">5</span>
+    <a class="extend prev" rel="prev" href="/page/4/"><i class="fa fa-angle-left" aria-label="Previous page"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/4/">4</a><span class="page-number current">5</span><a class="page-number" href="/page/6/">6</a><a class="extend next" rel="next" href="/page/6/"><i class="fa fa-angle-right" aria-label="Next page"></i></a>
   </nav>
 
 
@@ -1166,7 +1166,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">50</span>
+          <span class="site-state-item-count">51</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
