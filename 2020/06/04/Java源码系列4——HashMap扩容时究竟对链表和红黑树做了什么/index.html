@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/font-awesome@4/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"www.chaohang.top","root":"/","scheme":"Muse","version":"7.7.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":3,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="Photo by hippopx.com 我们知道 HashMap 的底层是由数组，链表，红黑树组成的，在 HashMap 做扩容操作时，除了把数组容量扩大为原来的两倍外，还会对所有元素重新计算 hash 值，因为长度扩大以后，hash值也随之改变。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java源码系列4——HashMap扩容时究竟对链表和红黑树做了什么?">
+<meta property="og:url" content="https://www.chaohang.top/2020/06/04/Java%E6%BA%90%E7%A0%81%E7%B3%BB%E5%88%974%E2%80%94%E2%80%94HashMap%E6%89%A9%E5%AE%B9%E6%97%B6%E7%A9%B6%E7%AB%9F%E5%AF%B9%E9%93%BE%E8%A1%A8%E5%92%8C%E7%BA%A2%E9%BB%91%E6%A0%91%E5%81%9A%E4%BA%86%E4%BB%80%E4%B9%88/index.html">
+<meta property="og:site_name" content="张小超的博客">
+<meta property="og:description" content="Photo by hippopx.com 我们知道 HashMap 的底层是由数组，链表，红黑树组成的，在 HashMap 做扩容操作时，除了把数组容量扩大为原来的两倍外，还会对所有元素重新计算 hash 值，因为长度扩大以后，hash值也随之改变。">
+<meta property="og:image" content="http://cdn.chaohang.top/20200604134416.jpg">
+<meta property="og:image" content="http://cdn.chaohang.top/20200602180032.png">
+<meta property="og:image" content="http://cdn.chaohang.top/20200603091606.png">
+<meta property="og:image" content="http://cdn.chaohang.top/20200603094454.png">
+<meta property="og:image" content="http://cdn.chaohang.top/20200603094617.png">
+<meta property="og:image" content="http://cdn.chaohang.top/20200603095225.png">
+<meta property="og:image" content="http://cdn.chaohang.top/20200602101339.png">
+<meta property="article:published_time" content="2020-06-04T03:27:53.000Z">
+<meta property="article:modified_time" content="2020-06-04T03:27:53.000Z">
+<meta property="article:author" content="张小超">
+<meta property="article:tag" content="Java">
+<meta property="article:tag" content="Java源码系">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://cdn.chaohang.top/20200604134416.jpg">
+
+<link rel="canonical" href="https://www.chaohang.top/2020/06/04/Java%E6%BA%90%E7%A0%81%E7%B3%BB%E5%88%974%E2%80%94%E2%80%94HashMap%E6%89%A9%E5%AE%B9%E6%97%B6%E7%A9%B6%E7%AB%9F%E5%AF%B9%E9%93%BE%E8%A1%A8%E5%92%8C%E7%BA%A2%E9%BB%91%E6%A0%91%E5%81%9A%E4%BA%86%E4%BB%80%E4%B9%88/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true
+  };
+</script>
+
+  <title>Java源码系列4——HashMap扩容时究竟对链表和红黑树做了什么? | 张小超的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">张小超的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <h1 class="site-subtitle" itemprop="description">超超不会飞</h1>
+      
+  </div>
+
+  <div class="site-nav-right"></div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>About</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.chaohang.top/2020/06/04/Java%E6%BA%90%E7%A0%81%E7%B3%BB%E5%88%974%E2%80%94%E2%80%94HashMap%E6%89%A9%E5%AE%B9%E6%97%B6%E7%A9%B6%E7%AB%9F%E5%AF%B9%E9%93%BE%E8%A1%A8%E5%92%8C%E7%BA%A2%E9%BB%91%E6%A0%91%E5%81%9A%E4%BA%86%E4%BB%80%E4%B9%88/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="张小超">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="张小超的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          Java源码系列4——HashMap扩容时究竟对链表和红黑树做了什么?
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2020-06-04 11:27:53" itemprop="dateCreated datePublished" datetime="2020-06-04T11:27:53+08:00">2020-06-04</time>
+            </span>
+
+          
+            <span id="/2020/06/04/Java%E6%BA%90%E7%A0%81%E7%B3%BB%E5%88%974%E2%80%94%E2%80%94HashMap%E6%89%A9%E5%AE%B9%E6%97%B6%E7%A9%B6%E7%AB%9F%E5%AF%B9%E9%93%BE%E8%A1%A8%E5%92%8C%E7%BA%A2%E9%BB%91%E6%A0%91%E5%81%9A%E4%BA%86%E4%BB%80%E4%B9%88/" class="post-meta-item leancloud_visitors" data-flag-title="Java源码系列4——HashMap扩容时究竟对链表和红黑树做了什么?" title="Views">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine: </span>
+    
+    <a title="valine" href="/2020/06/04/Java%E6%BA%90%E7%A0%81%E7%B3%BB%E5%88%974%E2%80%94%E2%80%94HashMap%E6%89%A9%E5%AE%B9%E6%97%B6%E7%A9%B6%E7%AB%9F%E5%AF%B9%E9%93%BE%E8%A1%A8%E5%92%8C%E7%BA%A2%E9%BB%91%E6%A0%91%E5%81%9A%E4%BA%86%E4%BB%80%E4%B9%88/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2020/06/04/Java%E6%BA%90%E7%A0%81%E7%B3%BB%E5%88%974%E2%80%94%E2%80%94HashMap%E6%89%A9%E5%AE%B9%E6%97%B6%E7%A9%B6%E7%AB%9F%E5%AF%B9%E9%93%BE%E8%A1%A8%E5%92%8C%E7%BA%A2%E9%BB%91%E6%A0%91%E5%81%9A%E4%BA%86%E4%BB%80%E4%B9%88/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p><img data-src="http://cdn.chaohang.top/20200604134416.jpg" alt="Photo by hippopx.com">Photo by hippopx.com</p>
+<p>我们知道 HashMap 的底层是由数组，链表，红黑树组成的，在 HashMap 做扩容操作时，除了把数组容量扩大为原来的两倍外，还会对所有元素重新计算 hash 值，因为长度扩大以后，hash值也随之改变。</p>
+<a id="more"></a>
+<p>如果是简单的 Node 对象，只需要重新计算下标放进去就可以了，如果是链表和红黑树，那么操作就会比较复杂，下面我们就来看下，JDK1.8 下的 HashMap 在扩容时对链表和红黑树做了哪些优化（骚操作）？</p>
+<h2 id="rehash-时，链表怎么处理？"><a href="#rehash-时，链表怎么处理？" class="headerlink" title="rehash 时，链表怎么处理？"></a>rehash 时，链表怎么处理？</h2><p>假设一个 HashMap 原本 bucket 大小为 16。下标 3 这个位置上的 19, 3, 35 由于索引冲突组成链表。</p>
+<p><img data-src="http://cdn.chaohang.top/20200602180032.png" alt="http://cdn.chaohang.top/20200602180032.png"></p>
+<p>当 HashMap 由 16 扩容到 32 时，19, 3, 35 重新 hash 之后拆成两条链表。</p>
+<p><img data-src="http://cdn.chaohang.top/20200603091606.png" alt="http://cdn.chaohang.top/20200603091606.png"></p>
+<p>查看 JDK1.8 HashMap 的源码，我们可以看到关于链表的优化操作如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 把原有链表拆成两个链表</span></span><br><span class="line"><span class="comment">// 链表1存放在低位（原索引位置）</span></span><br><span class="line">Node&lt;K,V&gt; loHead = <span class="keyword">null</span>, loTail = <span class="keyword">null</span>;</span><br><span class="line"><span class="comment">// 链表2存放在高位（原索引 + 旧数组长度）</span></span><br><span class="line">Node&lt;K,V&gt; hiHead = <span class="keyword">null</span>, hiTail = <span class="keyword">null</span>;</span><br><span class="line">Node&lt;K,V&gt; next;</span><br><span class="line"><span class="keyword">do</span> &#123;</span><br><span class="line">    next = e.next;</span><br><span class="line">    <span class="comment">// 链表1</span></span><br><span class="line">    <span class="keyword">if</span> ((e.hash &amp; oldCap) == <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="keyword">if</span> (loTail == <span class="keyword">null</span>)</span><br><span class="line">            loHead = e;</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">            loTail.next = e;</span><br><span class="line">        loTail = e;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 链表2</span></span><br><span class="line">    <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (hiTail == <span class="keyword">null</span>)</span><br><span class="line">            hiHead = e;</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">            hiTail.next = e;</span><br><span class="line">        hiTail = e;</span><br><span class="line">    &#125;</span><br><span class="line">&#125; <span class="keyword">while</span> ((e = next) != <span class="keyword">null</span>);</span><br><span class="line"><span class="comment">// 链表1存放于原索引位置</span></span><br><span class="line"><span class="keyword">if</span> (loTail != <span class="keyword">null</span>) &#123;</span><br><span class="line">    loTail.next = <span class="keyword">null</span>;</span><br><span class="line">    newTab[j] = loHead;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 链表2存放原索引加上旧数组长度的偏移量</span></span><br><span class="line"><span class="keyword">if</span> (hiTail != <span class="keyword">null</span>) &#123;</span><br><span class="line">    hiTail.next = <span class="keyword">null</span>;</span><br><span class="line">    newTab[j + oldCap] = hiHead;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>正常我们是把所有元素都重新计算一下下标值，再决定放入哪个桶，JDK1.8 优化成直接把链表拆成高位和低位两条，通过位运算来决定放在原索引处或者原索引加原数组长度的偏移量处。我们通过位运算来分析下。</p>
+<p>先回顾一下原 hash 的求余过程：</p>
+<p><img data-src="http://cdn.chaohang.top/20200603094454.png" alt=""></p>
+<p>再看一下 rehash 时，判断时做的位操作，也就是这句 <code>e.hash &amp; oldCap</code>：</p>
+<p><img data-src="http://cdn.chaohang.top/20200603094617.png" alt=""></p>
+<p>再看下扩容后的实际求余过程：</p>
+<p><img data-src="http://cdn.chaohang.top/20200603095225.png" alt=""></p>
+<p>这波操作是不是很666，为什么 2 的整数幂 - 1可以作 &amp; 操作可以代替求余计算，因为 2 的整数幂 - 1 的二进制比较特殊，就是一串 11111，与这串数字 1 作 &amp; 操作，结果就是保留下原数字的低位，去掉原数字的高位，达到求余的效果。2 的整数幂的二进制也比较特殊，就是一个 1 后面跟上一串 0。</p>
+<p>HashMap 的扩容都是扩大为原来大小的两倍，从二进制上看就是给这串数字加个 0，比如 16 -&gt; 32 = 10000 -&gt; 100000，那么他的 n - 1 就是 15 -&gt; 32 = 1111 -&gt; 11111。也就是多了一位，所以扩容后的下标可以从原有的下标推算出来。差异就在于上图我标红的地方，如果标红处是 0，那么扩容后再求余结果不变，如果标红处是 1，那么扩容后再求余就为原索引 + 原偏移量。如何判断标红处是 0 还是 1，就是把 <code>e.hash &amp; oldCap</code>。</p>
+<h2 id="rehash-时，红黑树怎么处理？"><a href="#rehash-时，红黑树怎么处理？" class="headerlink" title="rehash 时，红黑树怎么处理？"></a>rehash 时，红黑树怎么处理？</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 红黑树转链表阈值</span></span><br><span class="line"><span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> UNTREEIFY_THRESHOLD = <span class="number">6</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 扩容操作</span></span><br><span class="line"><span class="keyword">final</span> Node&lt;K,V&gt;[] resize() &#123;</span><br><span class="line">    <span class="comment">// ....</span></span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (e <span class="keyword">instanceof</span> TreeNode)</span><br><span class="line">       ((TreeNode&lt;K,V&gt;)e).split(<span class="keyword">this</span>, newTab, j, oldCap);</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">final</span> <span class="keyword">void</span> <span class="title">split</span><span class="params">(HashMap&lt;K,V&gt; map, Node&lt;K,V&gt;[] tab, <span class="keyword">int</span> index, <span class="keyword">int</span> bit)</span> </span>&#123;</span><br><span class="line">    TreeNode&lt;K,V&gt; b = <span class="keyword">this</span>;</span><br><span class="line">    <span class="comment">// Relink into lo and hi lists, preserving order</span></span><br><span class="line">    <span class="comment">// 和链表同样的套路，分成高位和低位</span></span><br><span class="line">    TreeNode&lt;K,V&gt; loHead = <span class="keyword">null</span>, loTail = <span class="keyword">null</span>;</span><br><span class="line">    TreeNode&lt;K,V&gt; hiHead = <span class="keyword">null</span>, hiTail = <span class="keyword">null</span>;</span><br><span class="line">    <span class="keyword">int</span> lc = <span class="number">0</span>, hc = <span class="number">0</span>;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">      * TreeNode 是间接继承于 Node，保留了 next，可以像链表一样遍历</span></span><br><span class="line"><span class="comment">      * 这里的操作和链表的一毛一样</span></span><br><span class="line"><span class="comment">      */</span></span><br><span class="line">    <span class="keyword">for</span> (TreeNode&lt;K,V&gt; e = b, next; e != <span class="keyword">null</span>; e = next) &#123;</span><br><span class="line">        next = (TreeNode&lt;K,V&gt;)e.next;</span><br><span class="line">        e.next = <span class="keyword">null</span>;</span><br><span class="line">        <span class="comment">// bit 就是 oldCap</span></span><br><span class="line">        <span class="keyword">if</span> ((e.hash &amp; bit) == <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="keyword">if</span> ((e.prev = loTail) == <span class="keyword">null</span>)</span><br><span class="line">                loHead = e;</span><br><span class="line">            <span class="keyword">else</span></span><br><span class="line">            <span class="comment">// 尾插</span></span><br><span class="line">                loTail.next = e;</span><br><span class="line">            loTail = e;</span><br><span class="line">            ++lc;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">if</span> ((e.prev = hiTail) == <span class="keyword">null</span>)</span><br><span class="line">                hiHead = e;</span><br><span class="line">            <span class="keyword">else</span></span><br><span class="line">                hiTail.next = e;</span><br><span class="line">            hiTail = e;</span><br><span class="line">            ++hc;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 树化低位链表</span></span><br><span class="line">    <span class="keyword">if</span> (loHead != <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="comment">// 如果 loHead 不为空，且链表长度小于等于 6，则将红黑树转成链表</span></span><br><span class="line">        <span class="keyword">if</span> (lc &lt;= UNTREEIFY_THRESHOLD)</span><br><span class="line">            tab[index] = loHead.untreeify(map);</span><br><span class="line">        <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="comment">/**</span></span><br><span class="line"><span class="comment">              * hiHead == null 时，表明扩容后，</span></span><br><span class="line"><span class="comment">              * 所有节点仍在原位置，树结构不变，无需重新树化</span></span><br><span class="line"><span class="comment">              */</span></span><br><span class="line">            tab[index] = loHead;</span><br><span class="line">            <span class="keyword">if</span> (hiHead != <span class="keyword">null</span>) <span class="comment">// (else is already treeified)</span></span><br><span class="line">                loHead.treeify(tab);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 树化高位链表，逻辑与上面一致</span></span><br><span class="line">    <span class="keyword">if</span> (hiHead != <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="keyword">if</span> (hc &lt;= UNTREEIFY_THRESHOLD)</span><br><span class="line">            tab[index + bit] = hiHead.untreeify(map);</span><br><span class="line">        <span class="keyword">else</span> &#123;</span><br><span class="line">            tab[index + bit] = hiHead;</span><br><span class="line">            <span class="keyword">if</span> (loHead != <span class="keyword">null</span>)</span><br><span class="line">                hiHead.treeify(tab);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>从源码可以看出，红黑树的拆分和链表的逻辑基本一致，不同的地方在于，重新映射后，会将红黑树拆分成两条链表，根据链表的长度，判断需不需要把链表重新进行树化。</p>
+<h2 id="源码系列文章"><a href="#源码系列文章" class="headerlink" title="源码系列文章"></a>源码系列文章</h2><p><a href="http://chaohang.top/2020/02/11/Java%E6%BA%90%E7%A0%81%E7%B3%BB%E5%88%971%E2%80%94%E2%80%94ArrayList/" target="_blank" rel="noopener">Java源码系列1——ArrayList</a></p>
+<p><a href="http://chaohang.top/2020/02/12/Java%E6%BA%90%E7%A0%81%E7%B3%BB%E5%88%972%E2%80%94%E2%80%94HashMap/" target="_blank" rel="noopener">Java源码系列2——HashMap</a></p>
+<p><a href="http://chaohang.top/2020/02/16/Java%E6%BA%90%E7%A0%81%E7%B3%BB%E5%88%973%E2%80%94%E2%80%94LinkedHashMap/" target="_blank" rel="noopener">Java源码系列3——LinkedHashMap</a></p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://segmentfault.com/a/1190000012926722" target="_blank" rel="noopener">HashMap 源码详细分析(JDK1.8)</a></p>
+<blockquote>
+<p>本文首发于我的个人博客 <a href="http://chaohang.top" target="_blank" rel="noopener">http://chaohang.top</a></p>
+<p>作者<a href="http://chaohang.top" target="_blank" rel="noopener">张小超</a></p>
+<p>转载请注明出处</p>
+</blockquote>
+<p>欢迎关注我的微信公众号 【超超不会飞】，获取第一时间的更新。</p>
+<p><img data-src="http://cdn.chaohang.top/20200602101339.png" alt=""></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Java/" rel="tag"># Java</a>
+              <a href="/tags/Java%E6%BA%90%E7%A0%81%E7%B3%BB/" rel="tag"># Java源码系</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/06/02/MySQL%E6%98%AF%E5%A6%82%E4%BD%95%E5%AE%9E%E7%8E%B0%E5%8F%AF%E9%87%8D%E5%A4%8D%E8%AF%BB%E7%9A%84/" rel="prev" title="MySQL是如何实现可重复读的?">
+      <i class="fa fa-chevron-left"></i> MySQL是如何实现可重复读的?
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let activeClass = CONFIG.comments.activeClass;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#rehash-时，链表怎么处理？"><span class="nav-number">1.</span> <span class="nav-text">rehash 时，链表怎么处理？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#rehash-时，红黑树怎么处理？"><span class="nav-number">2.</span> <span class="nav-text">rehash 时，红黑树怎么处理？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#源码系列文章"><span class="nav-number">3.</span> <span class="nav-text">源码系列文章</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考"><span class="nav-number">4.</span> <span class="nav-text">参考</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">张小超</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">52</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">39</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+  <div class="beian"><a href="http://www.beian.miit.gov.cn" rel="noopener" target="_blank">闽ICP备19023472号 </a>
+  </div>
+
+<div class="copyright">
+  
+  &copy; 2016 – 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">张小超</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">Theme – <a href="https://muse.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> v7.7.1
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://chaohang.top/cdn/js%2Fbusuanzi%2F2.3%2Fbusuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="//cdn.jsdelivr.net/npm/animejs@3.1.0/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/lozad@1/dist/lozad.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/velocity-animate@1/velocity.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/velocity-animate@1/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/valine@1/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'L0Iqsf0FUlKjzj6KJCTnwSf0-9Nh9j0Va',
+      appKey     : 'KxXflLfIf2O0c32s49pBtVxE',
+      placeholder: "留下你的爪印🐾",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : true,
+      lang       : 'zh-cn' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

@@ -180,6 +180,91 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.chaohang.top/2017/11/29/%E8%A7%A3%E5%86%B3-iPhone-%E5%BE%AE%E4%BF%A1-H5-%E6%97%A0%E6%B3%95%E8%87%AA%E5%8A%A8%E6%92%AD%E6%94%BE%E9%9F%B3%E4%B9%90%E9%97%AE%E9%A2%98/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="张小超">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="张小超的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2017/11/29/%E8%A7%A3%E5%86%B3-iPhone-%E5%BE%AE%E4%BF%A1-H5-%E6%97%A0%E6%B3%95%E8%87%AA%E5%8A%A8%E6%92%AD%E6%94%BE%E9%9F%B3%E4%B9%90%E9%97%AE%E9%A2%98/" class="post-title-link" itemprop="url">解决 iPhone 微信 H5 无法自动播放音乐问题</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2017-11-29 17:29:26" itemprop="dateCreated datePublished" datetime="2017-11-29T17:29:26+08:00">2017-11-29</time>
+            </span>
+
+          
+            <span id="/2017/11/29/%E8%A7%A3%E5%86%B3-iPhone-%E5%BE%AE%E4%BF%A1-H5-%E6%97%A0%E6%B3%95%E8%87%AA%E5%8A%A8%E6%92%AD%E6%94%BE%E9%9F%B3%E4%B9%90%E9%97%AE%E9%A2%98/" class="post-meta-item leancloud_visitors" data-flag-title="解决 iPhone 微信 H5 无法自动播放音乐问题" title="Views">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine: </span>
+    
+    <a title="valine" href="/2017/11/29/%E8%A7%A3%E5%86%B3-iPhone-%E5%BE%AE%E4%BF%A1-H5-%E6%97%A0%E6%B3%95%E8%87%AA%E5%8A%A8%E6%92%AD%E6%94%BE%E9%9F%B3%E4%B9%90%E9%97%AE%E9%A2%98/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2017/11/29/%E8%A7%A3%E5%86%B3-iPhone-%E5%BE%AE%E4%BF%A1-H5-%E6%97%A0%E6%B3%95%E8%87%AA%E5%8A%A8%E6%92%AD%E6%94%BE%E9%9F%B3%E4%B9%90%E9%97%AE%E9%A2%98/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>使用 wx sdk 在html导入sdk js文件。（<strong>如果网站是https导入的sdk也要使用https！</strong>）<br>然后在 <code>wx.ready</code> 中设置 play 方法并复制给全局变量 fm，当需要使用的时候再调用 fm()</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 全局变量 fm2</span></span><br><span class="line"><span class="keyword">var</span> fm2;</span><br><span class="line"></span><br><span class="line">wx.config(&#123;</span><br><span class="line">  debug : <span class="literal">false</span>, <span class="comment">// 这里为false</span></span><br><span class="line">  appId : <span class="string">''</span>, <span class="comment">// 以下随意填写即可</span></span><br><span class="line">  timestamp : (<span class="keyword">new</span> <span class="built_in">Date</span>()).getTime(),</span><br><span class="line">  nonceStr : <span class="string">''</span>,</span><br><span class="line">  signature : <span class="string">''</span>,</span><br><span class="line">  jsApiList : [<span class="string">'checkJsApi'</span>]</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">wx.ready(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  $(<span class="string">'#music1'</span>).play();  <span class="comment">// 第一段音乐页面加载后自动播放</span></span><br><span class="line">  $(<span class="string">'#music2'</span>).load();  <span class="comment">// 第二段音乐等待，触发 fm2 时播放</span></span><br><span class="line"></span><br><span class="line">  fm2 = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">    music2.play();</span><br><span class="line">  &#125;;</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">fm2(); <span class="comment">//调用之后即可播放</span></span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>本文首发于我的个人博客 <a href="http://chaohang.top" target="_blank" rel="noopener">http://chaohang.top</a></p>
+<p>作者<a href="http://chaohang.top" target="_blank" rel="noopener">张小超</a></p>
+<p>转载请注明出处</p>
+</blockquote>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-Hans">
     <link itemprop="mainEntityOfPage" href="https://www.chaohang.top/2017/10/27/promise-%E5%92%8C-async-%E7%9A%84%E7%94%A8%E6%B3%95/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1006,96 +1091,6 @@
   
   
 
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://www.chaohang.top/2016/11/20/Git-%E7%9A%84%E7%AE%80%E5%8D%95%E4%BD%BF%E7%94%A8/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="张小超">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="张小超的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2016/11/20/Git-%E7%9A%84%E7%AE%80%E5%8D%95%E4%BD%BF%E7%94%A8/" class="post-title-link" itemprop="url">Git 的简单使用</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2016-11-20 19:59:39" itemprop="dateCreated datePublished" datetime="2016-11-20T19:59:39+08:00">2016-11-20</time>
-            </span>
-
-          
-            <span id="/2016/11/20/Git-%E7%9A%84%E7%AE%80%E5%8D%95%E4%BD%BF%E7%94%A8/" class="post-meta-item leancloud_visitors" data-flag-title="Git 的简单使用" title="Views">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              <span class="post-meta-item-text">Views: </span>
-              <span class="leancloud-visitors-count"></span>
-            </span>
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="fa fa-comment-o"></i>
-      </span>
-      <span class="post-meta-item-text">Valine: </span>
-    
-    <a title="valine" href="/2016/11/20/Git-%E7%9A%84%E7%AE%80%E5%8D%95%E4%BD%BF%E7%94%A8/#valine-comments" itemprop="discussionUrl">
-      <span class="post-comments-count valine-comment-count" data-xid="/2016/11/20/Git-%E7%9A%84%E7%AE%80%E5%8D%95%E4%BD%BF%E7%94%A8/" itemprop="commentCount"></span>
-    </a>
-  </span>
-  
-  
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>一直在使用Git，仅限于简单的使用，但还是记不住几个简单。在这边总结一下，加深印象，也方便查找。</p>
-<h3 id="安装Git"><a href="#安装Git" class="headerlink" title="安装Git"></a>安装Git</h3><p>平常主要在windows和ubuntu上工作，就以windows为例，Linux和Mac平台应该也差不多，反而是windows上坑比较多。</p>
-<p>在windows上首先要下载Git，谷歌上搜一下，傻瓜式下载安装。Linux上不同发行版会有点小差异，不过你可以输入git，系统会提示你如何进行安装。</p>
-<p>我们可以简单的把Git看成三个部分：本地、暂存区、远程仓库。下面我们来简单介绍各部分的作用。</p>
-<h3 id="存入暂存区"><a href="#存入暂存区" class="headerlink" title="存入暂存区"></a>存入暂存区</h3>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2016/11/20/Git-%E7%9A%84%E7%AE%80%E5%8D%95%E4%BD%BF%E7%94%A8/#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
   </div>
 
   
@@ -1166,14 +1161,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">51</span>
+          <span class="site-state-item-count">52</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">38</span>
+        <span class="site-state-item-count">39</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>

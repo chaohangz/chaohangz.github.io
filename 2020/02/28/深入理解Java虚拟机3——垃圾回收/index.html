@@ -20,12 +20,13 @@
     var CONFIG = {"hostname":"www.chaohang.top","root":"/","scheme":"Muse","version":"7.7.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":3,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="《深入理解Java虚拟机》第3章读书笔记  本文介绍了如何判断对象是否存活，三种垃圾回收算法，分析比较了几种垃圾收集器的特点。本文并非原创，是《深入理解Java虚拟机》第3章的整理、总结和补充。">
+  <meta name="description" content="Photo by hippopx.com  《深入理解Java虚拟机》第3章读书笔记">
 <meta property="og:type" content="article">
 <meta property="og:title" content="深入理解Java虚拟机3——垃圾回收">
 <meta property="og:url" content="https://www.chaohang.top/2020/02/28/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA3%E2%80%94%E2%80%94%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/index.html">
 <meta property="og:site_name" content="张小超的博客">
-<meta property="og:description" content="《深入理解Java虚拟机》第3章读书笔记  本文介绍了如何判断对象是否存活，三种垃圾回收算法，分析比较了几种垃圾收集器的特点。本文并非原创，是《深入理解Java虚拟机》第3章的整理、总结和补充。">
+<meta property="og:description" content="Photo by hippopx.com  《深入理解Java虚拟机》第3章读书笔记">
+<meta property="og:image" content="http://cdn.chaohang.top/20200604135953.jpg">
 <meta property="og:image" content="http://cdn.chaohang.top/20200227072300.png">
 <meta property="og:image" content="http://cdn.chaohang.top/20200227073303.png">
 <meta property="og:image" content="http://cdn.chaohang.top/20200227074938.png">
@@ -48,7 +49,7 @@
 <meta property="article:tag" content="JVM">
 <meta property="article:tag" content="深入理解Java虚拟机">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="http://cdn.chaohang.top/20200227072300.png">
+<meta name="twitter:image" content="http://cdn.chaohang.top/20200604135953.jpg">
 
 <link rel="canonical" href="https://www.chaohang.top/2020/02/28/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA3%E2%80%94%E2%80%94%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/">
 
@@ -258,11 +259,12 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <blockquote>
+        <p><img data-src="http://cdn.chaohang.top/20200604135953.jpg" alt="Photo by hippopx.com">Photo by hippopx.com</p>
+<blockquote>
 <p>《深入理解Java虚拟机》第3章读书笔记</p>
 </blockquote>
-<p>本文介绍了如何判断对象是否存活，三种垃圾回收算法，分析比较了几种垃圾收集器的特点。本文并非原创，是《深入理解Java虚拟机》第3章的整理、总结和补充。</p>
 <a id="more"></a>
+<p>本文介绍了如何判断对象是否存活，三种垃圾回收算法，分析比较了几种垃圾收集器的特点。本文并非原创，是《深入理解Java虚拟机》第3章的整理、总结和补充。</p>
 <h2 id="对象已死？"><a href="#对象已死？" class="headerlink" title="对象已死？"></a>对象已死？</h2><p>垃圾收集器在对堆进行回收前，要先判断哪些对象“存活”，哪些已经“死去”。</p>
 <h3 id="引用计数算法"><a href="#引用计数算法" class="headerlink" title="引用计数算法"></a>引用计数算法</h3><p>给对象中添加一个引用计数器，每当有一个地方引用它时，计数器就加1；当引用失效时，计数器就减1；任何时刻计数器为0的对象就是不可能再被使用的。</p>
 <p>主流的Java虚拟机里面没有选用引用计数算法来管理内存。</p>
@@ -547,14 +549,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">51</span>
+          <span class="site-state-item-count">52</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">38</span>
+        <span class="site-state-item-count">39</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>

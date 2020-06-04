@@ -20,13 +20,13 @@
     var CONFIG = {"hostname":"www.chaohang.top","root":"/","scheme":"Muse","version":"7.7.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":3,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="Photo by hippopx.com  《MySQL实战45讲》笔记。  简单理解一下可重复读可重复读是指：一个事务执行过程中看到的数据，总是跟这个事务在启动时看到的数据是一致的。">
+  <meta name="description" content="Photo by picography.co  《MySQL实战45讲》笔记。  简单理解一下可重复读可重复读是指：一个事务执行过程中看到的数据，总是跟这个事务在启动时看到的数据是一致的。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="MySQL是如何实现可重复读的?">
 <meta property="og:url" content="https://www.chaohang.top/2020/06/02/MySQL%E6%98%AF%E5%A6%82%E4%BD%95%E5%AE%9E%E7%8E%B0%E5%8F%AF%E9%87%8D%E5%A4%8D%E8%AF%BB%E7%9A%84/index.html">
 <meta property="og:site_name" content="张小超的博客">
-<meta property="og:description" content="Photo by hippopx.com  《MySQL实战45讲》笔记。  简单理解一下可重复读可重复读是指：一个事务执行过程中看到的数据，总是跟这个事务在启动时看到的数据是一致的。">
-<meta property="og:image" content="http://cdn.chaohang.top/20200602102321.jpg">
+<meta property="og:description" content="Photo by picography.co  《MySQL实战45讲》笔记。  简单理解一下可重复读可重复读是指：一个事务执行过程中看到的数据，总是跟这个事务在启动时看到的数据是一致的。">
+<meta property="og:image" content="http://cdn.chaohang.top/20200603175143.jpg">
 <meta property="og:image" content="http://cdn.chaohang.top/20200602084022.png">
 <meta property="og:image" content="http://cdn.chaohang.top/20200602085031.png">
 <meta property="og:image" content="http://cdn.chaohang.top/20200602091315.png">
@@ -38,7 +38,7 @@
 <meta property="article:tag" content="MySQL">
 <meta property="article:tag" content="笔记">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="http://cdn.chaohang.top/20200602102321.jpg">
+<meta name="twitter:image" content="http://cdn.chaohang.top/20200603175143.jpg">
 
 <link rel="canonical" href="https://www.chaohang.top/2020/06/02/MySQL%E6%98%AF%E5%A6%82%E4%BD%95%E5%AE%9E%E7%8E%B0%E5%8F%AF%E9%87%8D%E5%A4%8D%E8%AF%BB%E7%9A%84/">
 
@@ -248,7 +248,7 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <p><img data-src="http://cdn.chaohang.top/20200602102321.jpg" alt="Photo by hippopx.com">Photo by hippopx.com</p>
+        <p><img data-src="http://cdn.chaohang.top/20200603175143.jpg" alt="Photo by picography.co">Photo by picography.co</p>
 <blockquote>
 <p>《MySQL实战45讲》笔记。</p>
 </blockquote>
@@ -257,7 +257,7 @@
 <p>我们可以简单理解为：在可重复读隔离级别下，事务在启动的时候就”拍了个快照“。注意，这个快照是基于整个库的。</p>
 <p>这时，你可能就会想，如果一个库有 100G，那么我启动一个事务，MySQL就要拷贝 100G 的数据出来，这个过程得多慢啊。可是，我平时的事务执行起来很快啊。</p>
 <p>实际上，我们并不需要拷贝出这 100G 的数据。我们来看下”快照“是怎么实现的。</p>
-<h2 id="拍个快照"><a href="#拍个快照" class="headerlink" title="拍个快照"></a>拍个快照</h2><p>InnoDB 里面每个事务都有一个唯一的事务 ID，叫作 transaction id。它在事务开始的时候想 InnoDB 的事务系统申请的，是按申请顺序严格递增的。</p>
+<h2 id="拍个快照"><a href="#拍个快照" class="headerlink" title="拍个快照"></a>拍个快照</h2><p>InnoDB 里面每个事务都有一个唯一的事务 ID，叫作 transaction id。它在事务开始的时候向 InnoDB 的事务系统申请的，是按申请顺序严格递增的。</p>
 <p>每条记录在更新的时候都会同时记录一条 undo log，这条 log 就会记录上当前事务的 transaction id，记为 row trx_id。记录上的最新值，通过回滚操作，都可以得到前一个状态的值。</p>
 <p>如下图所示，一行记录被多个事务更新之后，最新值为 k=22。假设事务A在 trx_id=15 这个事务<strong>提交后启动</strong>，事务A 要读取该行时，就通过 undo log，计算出该事务启动瞬间该行的值为 k=10。</p>
 <p><img data-src="http://cdn.chaohang.top/20200602084022.png" alt=""></p>
@@ -439,7 +439,10 @@
     <a href="/2020/06/01/MySQL%E7%9A%84%E5%90%84%E7%A7%8D%E6%97%A5%E5%BF%97/" rel="prev" title="MySQL的各种日志">
       <i class="fa fa-chevron-left"></i> MySQL的各种日志
     </a></div>
-      <div class="post-nav-item"></div>
+      <div class="post-nav-item">
+    <a href="/2020/06/04/Java%E6%BA%90%E7%A0%81%E7%B3%BB%E5%88%974%E2%80%94%E2%80%94HashMap%E6%89%A9%E5%AE%B9%E6%97%B6%E7%A9%B6%E7%AB%9F%E5%AF%B9%E9%93%BE%E8%A1%A8%E5%92%8C%E7%BA%A2%E9%BB%91%E6%A0%91%E5%81%9A%E4%BA%86%E4%BB%80%E4%B9%88/" rel="next" title="Java源码系列4——HashMap扩容时究竟对链表和红黑树做了什么?">
+      Java源码系列4——HashMap扩容时究竟对链表和红黑树做了什么? <i class="fa fa-chevron-right"></i>
+    </a></div>
     </div>
       </footer>
     
@@ -514,14 +517,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">51</span>
+          <span class="site-state-item-count">52</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">38</span>
+        <span class="site-state-item-count">39</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>
