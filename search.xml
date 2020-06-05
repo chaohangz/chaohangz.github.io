@@ -6,7 +6,7 @@
     <content><![CDATA[<p><img data-src="http://cdn.chaohang.top/20200604134416.jpg" alt="Photo by hippopx.com">Photo by hippopx.com</p>
 <p>我们知道 HashMap 的底层是由数组，链表，红黑树组成的，在 HashMap 做扩容操作时，除了把数组容量扩大为原来的两倍外，还会对所有元素重新计算 hash 值，因为长度扩大以后，hash值也随之改变。</p>
 <a id="more"></a>
-<p>如果是简单的 Node 对象，只需要重新计算下标放进去就可以了，如果是链表和红黑树，那么操作就会比较复杂，下面我们就来看下，JDK1.8 下的 HashMap 在扩容时对链表和红黑树做了哪些优化（骚操作）？</p>
+<p>如果是简单的 Node 对象，只需要重新计算下标放进去就可以了，如果是链表和红黑树，那么操作就会比较复杂，下面我们就来看下，JDK1.8 下的 HashMap 在扩容时对链表和红黑树做了哪些优化？</p>
 <h2 id="rehash-时，链表怎么处理？"><a href="#rehash-时，链表怎么处理？" class="headerlink" title="rehash 时，链表怎么处理？"></a>rehash 时，链表怎么处理？</h2><p>假设一个 HashMap 原本 bucket 大小为 16。下标 3 这个位置上的 19, 3, 35 由于索引冲突组成链表。</p>
 <p><img data-src="http://cdn.chaohang.top/20200602180032.png" alt="http://cdn.chaohang.top/20200602180032.png"></p>
 <p>当 HashMap 由 16 扩容到 32 时，19, 3, 35 重新 hash 之后拆成两条链表。</p>
@@ -34,7 +34,7 @@
 <p>转载请注明出处</p>
 </blockquote>
 <p>欢迎关注我的微信公众号 【超超不会飞】，获取第一时间的更新。</p>
-<p><img data-src="http://cdn.chaohang.top/20200602101339.png" alt=""></p>
+<p><img data-src="http://cdn.chaohang.top/20200605101838.png" alt=""></p>
 ]]></content>
       <tags>
         <tag>Java</tag>
@@ -64,7 +64,7 @@
 <p><img data-src="http://cdn.chaohang.top/20200602085031.png" alt=""></p>
 <ol>
 <li>如果 trx_id 小于低水位，表示这个版本在事务启动前已经提交，可见；</li>
-<li>如果 trx_id 大于高水为，表示这个版本在事务启动后生成，不可见；</li>
+<li>如果 trx_id 大于高水位，表示这个版本在事务启动后生成，不可见；</li>
 <li>如果 trx_id 大于低水位，小于高水位，分为两种情况：<ol>
 <li>若 trx_id 在数组中，表示这个版本在事务启动时还未提交，不可见；</li>
 <li>若 trx_id 不在数组中，表示这个版本在事务启动时已经提交，可见。</li>
@@ -212,7 +212,7 @@
 <p>转载请注明出处</p>
 </blockquote>
 <p>欢迎关注我的微信公众号 【超超不会飞】，获取第一时间的更新。</p>
-<p><img data-src="http://cdn.chaohang.top/20200602101339.png" alt=""></p>
+<p><img data-src="http://cdn.chaohang.top/20200605101838.png" alt=""></p>
 ]]></content>
       <tags>
         <tag>MySQL</tag>
@@ -377,7 +377,7 @@
 <p>转载请注明出处</p>
 </blockquote>
 <p>欢迎关注我的微信公众号 【超超不会飞】，获取第一时间的更新。</p>
-<p><img data-src="http://cdn.chaohang.top/20200602101339.png" alt=""></p>
+<p><img data-src="http://cdn.chaohang.top/20200605101838.png" alt=""></p>
 ]]></content>
       <tags>
         <tag>MySQL</tag>
@@ -439,7 +439,7 @@
 <p>转载请注明出处</p>
 </blockquote>
 <p>欢迎关注我的微信公众号 【超超不会飞】，获取第一时间的更新。</p>
-<p><img data-src="http://cdn.chaohang.top/20200602101339.png" alt=""></p>
+<p><img data-src="http://cdn.chaohang.top/20200605101838.png" alt=""></p>
 ]]></content>
       <tags>
         <tag>生活</tag>
@@ -636,7 +636,7 @@
 <p>转载请注明出处</p>
 </blockquote>
 <p>欢迎关注我的微信公众号 【超超不会飞】，获取第一时间的更新。</p>
-<p><img data-src="http://cdn.chaohang.top/20200602101339.png" alt=""></p>
+<p><img data-src="http://cdn.chaohang.top/20200605101838.png" alt=""></p>
 ]]></content>
       <tags>
         <tag>Java</tag>
@@ -702,7 +702,7 @@
 <p>转载请注明出处</p>
 </blockquote>
 <p>欢迎关注我的微信公众号 【超超不会飞】，获取第一时间的更新。</p>
-<p><img data-src="http://cdn.chaohang.top/20200602101339.png" alt=""></p>
+<p><img data-src="http://cdn.chaohang.top/20200605101838.png" alt=""></p>
 ]]></content>
       <tags>
         <tag>Java</tag>
@@ -777,7 +777,7 @@
 <p>转载请注明出处</p>
 </blockquote>
 <p>欢迎关注我的微信公众号 【超超不会飞】，获取第一时间的更新。</p>
-<p><img data-src="http://cdn.chaohang.top/20200602101339.png" alt=""></p>
+<p><img data-src="http://cdn.chaohang.top/20200605101838.png" alt=""></p>
 ]]></content>
       <tags>
         <tag>博客</tag>
@@ -856,7 +856,7 @@
 <p>转载请注明出处</p>
 </blockquote>
 <p>欢迎关注我的微信公众号 【超超不会飞】，获取第一时间的更新。</p>
-<p><img data-src="http://cdn.chaohang.top/20200602101339.png" alt=""></p>
+<p><img data-src="http://cdn.chaohang.top/20200605101838.png" alt=""></p>
 ]]></content>
       <tags>
         <tag>Java</tag>
@@ -933,7 +933,7 @@
 <p>转载请注明出处</p>
 </blockquote>
 <p>欢迎关注我的微信公众号 【超超不会飞】，获取第一时间的更新。</p>
-<p><img data-src="http://cdn.chaohang.top/20200602101339.png" alt=""></p>
+<p><img data-src="http://cdn.chaohang.top/20200605101838.png" alt=""></p>
 ]]></content>
       <tags>
         <tag>Java</tag>
@@ -997,7 +997,7 @@
 <p>转载请注明出处</p>
 </blockquote>
 <p>欢迎关注我的微信公众号 【超超不会飞】，获取第一时间的更新。</p>
-<p><img data-src="http://cdn.chaohang.top/20200602101339.png" alt=""></p>
+<p><img data-src="http://cdn.chaohang.top/20200605101838.png" alt=""></p>
 ]]></content>
       <tags>
         <tag>Java</tag>
@@ -1048,7 +1048,7 @@
 <p>转载请注明出处</p>
 </blockquote>
 <p>欢迎关注我的微信公众号 【超超不会飞】，获取第一时间的更新。</p>
-<p><img data-src="http://cdn.chaohang.top/20200602101339.png" alt=""></p>
+<p><img data-src="http://cdn.chaohang.top/20200605101838.png" alt=""></p>
 ]]></content>
       <tags>
         <tag>Java</tag>
@@ -1119,7 +1119,7 @@
 <p>转载请注明出处</p>
 </blockquote>
 <p>欢迎关注我的微信公众号 【超超不会飞】，获取第一时间的更新。</p>
-<p><img data-src="http://cdn.chaohang.top/20200602101339.png" alt=""></p>
+<p><img data-src="http://cdn.chaohang.top/20200605101838.png" alt=""></p>
 ]]></content>
       <tags>
         <tag>Java</tag>
@@ -1183,7 +1183,7 @@
 <p>转载请注明出处</p>
 </blockquote>
 <p>欢迎关注我的微信公众号 【超超不会飞】，获取第一时间的更新。</p>
-<p><img data-src="http://cdn.chaohang.top/20200602101339.png" alt=""></p>
+<p><img data-src="http://cdn.chaohang.top/20200605101838.png" alt=""></p>
 ]]></content>
       <tags>
         <tag>Java</tag>
