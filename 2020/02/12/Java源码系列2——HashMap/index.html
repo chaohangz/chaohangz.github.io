@@ -248,7 +248,7 @@
         <p><img data-src="http://cdn.chaohang.top/20200604134547.jpg" alt="Photo by hippopx.com">Photo by hippopx.com</p>
 <p><code>HashMap</code> 的源码很多也很复杂，本文只是摘取简单常用的部分代码进行分析。能力有限，欢迎指正。</p>
 <a id="more"></a>
-<h2 id="HASH-值的计算"><a href="#HASH-值的计算" class="headerlink" title="HASH 值的计算"></a>HASH 值的计算</h2><h3 id="前置知识——位运算"><a href="#前置知识——位运算" class="headerlink" title="前置知识——位运算"></a>前置知识——位运算</h3><p>按位异或操作符<code>^</code>：1^1=0, 0^0=0, 1^0=0, 值相同为0，值不同为1。按位异或就是对二进制中的每一位进行异或运算。</p>
+<h2 id="HASH-值的计算"><a href="#HASH-值的计算" class="headerlink" title="HASH 值的计算"></a>HASH 值的计算</h2><h3 id="前置知识——位运算"><a href="#前置知识——位运算" class="headerlink" title="前置知识——位运算"></a>前置知识——位运算</h3><p>按位异或操作符<code>^</code>：1^1=0, 0^0=0, 1^0=1, 值相同为0，值不同为1。按位异或就是对二进制中的每一位进行异或运算。</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">   1111 0000 1111 1110</span><br><span class="line">^  1111 1111 0000 1111</span><br><span class="line">______________________</span><br><span class="line">   0000 1111 1111 0001</span><br></pre></td></tr></table></figure>
 <p>按位右移补零操作符<code>&gt;&gt;&gt;</code>：左操作数按右操作数指定的位数右移，移动得到的空位以零填充。</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">        1110 1101 1001 1111</span><br><span class="line">&gt;&gt;&gt; 4  </span><br><span class="line">___________________________</span><br><span class="line">        0000 1110 1101 1001</span><br></pre></td></tr></table></figure>
@@ -400,14 +400,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">52</span>
+          <span class="site-state-item-count">53</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">39</span>
+        <span class="site-state-item-count">40</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>
