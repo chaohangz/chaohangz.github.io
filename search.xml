@@ -24,6 +24,13 @@
 <p>如果子类2重写了父类的 f 方法，并用 <code>protected</code> 修饰，那么在子类2所在的包下可以访问。</p>
 <figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 与基类处于不同包的子类2</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">package</span> com.example.demo.base2;</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ProSon2</span> <span class="keyword">extends</span> <span class="title">ProFather</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">f</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>.f();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        ProSon2 son2 = <span class="keyword">new</span> ProSon2();</span><br><span class="line">        <span class="comment">// f 方法被 son2 重写，在子类可见</span></span><br><span class="line">        son2.f();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 与基类处于不同包的测试类</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">package</span> com.example.demo.base2;</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Base2Test</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// f 方法来自于ProSon2在同一个包内可见</span></span><br><span class="line">        son2.f();  <span class="comment">// ok</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a href="https://www.runoob.com/w3cnote/java-protected-keyword-detailed-explanation.html" target="_blank" rel="noopener">Java protected 关键字详解</a></p>
+<blockquote>
+<p>本文首发于我的个人博客 <a href="https://chaohang.top" target="_blank" rel="noopener">https://chaohang.top</a></p>
+<p>作者<a href="https://chaohang.top" target="_blank" rel="noopener">张小超</a></p>
+<p>转载请注明出处</p>
+</blockquote>
+<p>欢迎关注我的微信公众号 【超超不会飞】，获取第一时间的更新。</p>
+<p><img data-src="http://cdn.chaohang.top/20200605101838.png" alt=""></p>
 ]]></content>
       <tags>
         <tag>Java</tag>
@@ -54,13 +61,13 @@
 <p>HashMap 的扩容都是扩大为原来大小的两倍，从二进制上看就是给这串数字加个 0，比如 16 -&gt; 32 = 10000 -&gt; 100000，那么他的 n - 1 就是 15 -&gt; 32 = 1111 -&gt; 11111。也就是多了一位，所以扩容后的下标可以从原有的下标推算出来。差异就在于上图我标红的地方，如果标红处是 0，那么扩容后再求余结果不变，如果标红处是 1，那么扩容后再求余就为原索引 + 原偏移量。如何判断标红处是 0 还是 1，就是把 <code>e.hash &amp; oldCap</code>。</p>
 <h2 id="rehash-时，红黑树怎么处理？"><a href="#rehash-时，红黑树怎么处理？" class="headerlink" title="rehash 时，红黑树怎么处理？"></a>rehash 时，红黑树怎么处理？</h2><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 红黑树转链表阈值</span></span><br><span class="line"><span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> UNTREEIFY_THRESHOLD = <span class="number">6</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 扩容操作</span></span><br><span class="line"><span class="keyword">final</span> Node&lt;K,V&gt;[] resize() &#123;</span><br><span class="line">    <span class="comment">// ....</span></span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (e <span class="keyword">instanceof</span> TreeNode)</span><br><span class="line">       ((TreeNode&lt;K,V&gt;)e).split(<span class="keyword">this</span>, newTab, j, oldCap);</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">final</span> <span class="keyword">void</span> <span class="title">split</span><span class="params">(HashMap&lt;K,V&gt; map, Node&lt;K,V&gt;[] tab, <span class="keyword">int</span> index, <span class="keyword">int</span> bit)</span> </span>&#123;</span><br><span class="line">    TreeNode&lt;K,V&gt; b = <span class="keyword">this</span>;</span><br><span class="line">    <span class="comment">// Relink into lo and hi lists, preserving order</span></span><br><span class="line">    <span class="comment">// 和链表同样的套路，分成高位和低位</span></span><br><span class="line">    TreeNode&lt;K,V&gt; loHead = <span class="keyword">null</span>, loTail = <span class="keyword">null</span>;</span><br><span class="line">    TreeNode&lt;K,V&gt; hiHead = <span class="keyword">null</span>, hiTail = <span class="keyword">null</span>;</span><br><span class="line">    <span class="keyword">int</span> lc = <span class="number">0</span>, hc = <span class="number">0</span>;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">      * TreeNode 是间接继承于 Node，保留了 next，可以像链表一样遍历</span></span><br><span class="line"><span class="comment">      * 这里的操作和链表的一毛一样</span></span><br><span class="line"><span class="comment">      */</span></span><br><span class="line">    <span class="keyword">for</span> (TreeNode&lt;K,V&gt; e = b, next; e != <span class="keyword">null</span>; e = next) &#123;</span><br><span class="line">        next = (TreeNode&lt;K,V&gt;)e.next;</span><br><span class="line">        e.next = <span class="keyword">null</span>;</span><br><span class="line">        <span class="comment">// bit 就是 oldCap</span></span><br><span class="line">        <span class="keyword">if</span> ((e.hash &amp; bit) == <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="keyword">if</span> ((e.prev = loTail) == <span class="keyword">null</span>)</span><br><span class="line">                loHead = e;</span><br><span class="line">            <span class="keyword">else</span></span><br><span class="line">            <span class="comment">// 尾插</span></span><br><span class="line">                loTail.next = e;</span><br><span class="line">            loTail = e;</span><br><span class="line">            ++lc;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">if</span> ((e.prev = hiTail) == <span class="keyword">null</span>)</span><br><span class="line">                hiHead = e;</span><br><span class="line">            <span class="keyword">else</span></span><br><span class="line">                hiTail.next = e;</span><br><span class="line">            hiTail = e;</span><br><span class="line">            ++hc;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 树化低位链表</span></span><br><span class="line">    <span class="keyword">if</span> (loHead != <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="comment">// 如果 loHead 不为空，且链表长度小于等于 6，则将红黑树转成链表</span></span><br><span class="line">        <span class="keyword">if</span> (lc &lt;= UNTREEIFY_THRESHOLD)</span><br><span class="line">            tab[index] = loHead.untreeify(map);</span><br><span class="line">        <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="comment">/**</span></span><br><span class="line"><span class="comment">              * hiHead == null 时，表明扩容后，</span></span><br><span class="line"><span class="comment">              * 所有节点仍在原位置，树结构不变，无需重新树化</span></span><br><span class="line"><span class="comment">              */</span></span><br><span class="line">            tab[index] = loHead;</span><br><span class="line">            <span class="keyword">if</span> (hiHead != <span class="keyword">null</span>) <span class="comment">// (else is already treeified)</span></span><br><span class="line">                loHead.treeify(tab);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 树化高位链表，逻辑与上面一致</span></span><br><span class="line">    <span class="keyword">if</span> (hiHead != <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="keyword">if</span> (hc &lt;= UNTREEIFY_THRESHOLD)</span><br><span class="line">            tab[index + bit] = hiHead.untreeify(map);</span><br><span class="line">        <span class="keyword">else</span> &#123;</span><br><span class="line">            tab[index + bit] = hiHead;</span><br><span class="line">            <span class="keyword">if</span> (loHead != <span class="keyword">null</span>)</span><br><span class="line">                hiHead.treeify(tab);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>从源码可以看出，红黑树的拆分和链表的逻辑基本一致，不同的地方在于，重新映射后，会将红黑树拆分成两条链表，根据链表的长度，判断需不需要把链表重新进行树化。</p>
-<h2 id="源码系列文章"><a href="#源码系列文章" class="headerlink" title="源码系列文章"></a>源码系列文章</h2><p><a href="http://chaohang.top/2020/02/11/Java%E6%BA%90%E7%A0%81%E7%B3%BB%E5%88%971%E2%80%94%E2%80%94ArrayList/" target="_blank" rel="noopener">Java源码系列1——ArrayList</a></p>
-<p><a href="http://chaohang.top/2020/02/12/Java%E6%BA%90%E7%A0%81%E7%B3%BB%E5%88%972%E2%80%94%E2%80%94HashMap/" target="_blank" rel="noopener">Java源码系列2——HashMap</a></p>
-<p><a href="http://chaohang.top/2020/02/16/Java%E6%BA%90%E7%A0%81%E7%B3%BB%E5%88%973%E2%80%94%E2%80%94LinkedHashMap/" target="_blank" rel="noopener">Java源码系列3——LinkedHashMap</a></p>
+<h2 id="源码系列文章"><a href="#源码系列文章" class="headerlink" title="源码系列文章"></a>源码系列文章</h2><p><a href="https://chaohang.top/2020/02/11/Java%E6%BA%90%E7%A0%81%E7%B3%BB%E5%88%971%E2%80%94%E2%80%94ArrayList/" target="_blank" rel="noopener">Java源码系列1——ArrayList</a></p>
+<p><a href="https://chaohang.top/2020/02/12/Java%E6%BA%90%E7%A0%81%E7%B3%BB%E5%88%972%E2%80%94%E2%80%94HashMap/" target="_blank" rel="noopener">Java源码系列2——HashMap</a></p>
+<p><a href="https://chaohang.top/2020/02/16/Java%E6%BA%90%E7%A0%81%E7%B3%BB%E5%88%973%E2%80%94%E2%80%94LinkedHashMap/" target="_blank" rel="noopener">Java源码系列3——LinkedHashMap</a></p>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://segmentfault.com/a/1190000012926722" target="_blank" rel="noopener">HashMap 源码详细分析(JDK1.8)</a></p>
 <blockquote>
-<p>本文首发于我的个人博客 <a href="http://chaohang.top" target="_blank" rel="noopener">http://chaohang.top</a></p>
-<p>作者<a href="http://chaohang.top" target="_blank" rel="noopener">张小超</a></p>
+<p>本文首发于我的个人博客 <a href="https://chaohang.top" target="_blank" rel="noopener">https://chaohang.top</a></p>
+<p>作者<a href="https://chaohang.top" target="_blank" rel="noopener">张小超</a></p>
 <p>转载请注明出处</p>
 </blockquote>
 <p>欢迎关注我的微信公众号 【超超不会飞】，获取第一时间的更新。</p>
@@ -955,12 +962,12 @@
 </blockquote>
 <h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a href="https://segmentfault.com/a/1190000012964859" target="_blank" rel="noopener">LinkedHashMap 源码详细分析（JDK1.8）</a></p>
 <p><a href="https://cloud.tencent.com/developer/article/1183299" target="_blank" rel="noopener">【Java入门提高篇】Day28 Java容器类详解（十）LinkedHashMap详解</a></p>
-<h2 id="源码系列文章"><a href="#源码系列文章" class="headerlink" title="源码系列文章"></a>源码系列文章</h2><p><a href="http://chaohang.top/2020/02/11/Java%E6%BA%90%E7%A0%81%E7%B3%BB%E5%88%971%E2%80%94%E2%80%94ArrayList/" target="_blank" rel="noopener">Java源码系列1——ArrayList</a></p>
-<p><a href="http://chaohang.top/2020/02/12/Java%E6%BA%90%E7%A0%81%E7%B3%BB%E5%88%972%E2%80%94%E2%80%94HashMap/" target="_blank" rel="noopener">Java源码系列2——HashMap</a></p>
-<p><a href="http://chaohang.top/2020/02/16/Java%E6%BA%90%E7%A0%81%E7%B3%BB%E5%88%973%E2%80%94%E2%80%94LinkedHashMap/" target="_blank" rel="noopener">Java源码系列3——LinkedHashMap</a></p>
+<h2 id="源码系列文章"><a href="#源码系列文章" class="headerlink" title="源码系列文章"></a>源码系列文章</h2><p><a href="https://chaohang.top/2020/02/11/Java%E6%BA%90%E7%A0%81%E7%B3%BB%E5%88%971%E2%80%94%E2%80%94ArrayList/" target="_blank" rel="noopener">Java源码系列1——ArrayList</a></p>
+<p><a href="https://chaohang.top/2020/02/12/Java%E6%BA%90%E7%A0%81%E7%B3%BB%E5%88%972%E2%80%94%E2%80%94HashMap/" target="_blank" rel="noopener">Java源码系列2——HashMap</a></p>
+<p><a href="https://chaohang.top/2020/02/16/Java%E6%BA%90%E7%A0%81%E7%B3%BB%E5%88%973%E2%80%94%E2%80%94LinkedHashMap/" target="_blank" rel="noopener">Java源码系列3——LinkedHashMap</a></p>
 <blockquote>
-<p>本文首发于我的个人博客 <a href="http://chaohang.top" target="_blank" rel="noopener">http://chaohang.top</a></p>
-<p>作者<a href="http://chaohang.top" target="_blank" rel="noopener">张小超</a></p>
+<p>本文首发于我的个人博客 <a href="https://chaohang.top" target="_blank" rel="noopener">https://chaohang.top</a></p>
+<p>作者<a href="https://chaohang.top" target="_blank" rel="noopener">张小超</a></p>
 <p>转载请注明出处</p>
 </blockquote>
 <p>欢迎关注我的微信公众号 【超超不会飞】，获取第一时间的更新。</p>
@@ -1016,15 +1023,15 @@
 <figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">final</span> <span class="keyword">void</span> <span class="title">treeifyBin</span><span class="params">(Node&lt;K,V&gt;[] tab, <span class="keyword">int</span> hash)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">int</span> n, index; Node&lt;K,V&gt; e;</span><br><span class="line">  <span class="keyword">if</span> (tab == <span class="keyword">null</span> || (n = tab.length) &lt; MIN_TREEIFY_CAPACITY)</span><br><span class="line">    resize();</span><br><span class="line">  <span class="keyword">else</span> <span class="keyword">if</span> ((e = tab[index = (n - <span class="number">1</span>) &amp; hash]) != <span class="keyword">null</span>) &#123;</span><br><span class="line">    ...</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>为什么要树化？</p>
 <p><strong>本质上是个安全问题。</strong>因为链表查询影响性能，如果有人恶意造成哈希碰撞，就会构成哈希碰撞拒绝服务攻击，服务端CPU被大量占用用于链表查询，造成服务变慢或不可用。</p>
-<h2 id="源码系列文章"><a href="#源码系列文章" class="headerlink" title="源码系列文章"></a>源码系列文章</h2><p><a href="http://chaohang.top/2020/02/11/Java%E6%BA%90%E7%A0%81%E7%B3%BB%E5%88%971%E2%80%94%E2%80%94ArrayList/" target="_blank" rel="noopener">Java源码系列1——ArrayList</a></p>
-<p><a href="http://chaohang.top/2020/02/12/Java%E6%BA%90%E7%A0%81%E7%B3%BB%E5%88%972%E2%80%94%E2%80%94HashMap/" target="_blank" rel="noopener">Java源码系列2——HashMap</a></p>
-<p><a href="http://chaohang.top/2020/02/16/Java%E6%BA%90%E7%A0%81%E7%B3%BB%E5%88%973%E2%80%94%E2%80%94LinkedHashMap/" target="_blank" rel="noopener">Java源码系列3——LinkedHashMap</a></p>
+<h2 id="源码系列文章"><a href="#源码系列文章" class="headerlink" title="源码系列文章"></a>源码系列文章</h2><p><a href="https://chaohang.top/2020/02/11/Java%E6%BA%90%E7%A0%81%E7%B3%BB%E5%88%971%E2%80%94%E2%80%94ArrayList/" target="_blank" rel="noopener">Java源码系列1——ArrayList</a></p>
+<p><a href="https://chaohang.top/2020/02/12/Java%E6%BA%90%E7%A0%81%E7%B3%BB%E5%88%972%E2%80%94%E2%80%94HashMap/" target="_blank" rel="noopener">Java源码系列2——HashMap</a></p>
+<p><a href="https://chaohang.top/2020/02/16/Java%E6%BA%90%E7%A0%81%E7%B3%BB%E5%88%973%E2%80%94%E2%80%94LinkedHashMap/" target="_blank" rel="noopener">Java源码系列3——LinkedHashMap</a></p>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://tech.meituan.com/2016/06/24/java-hashmap.html" target="_blank" rel="noopener">Java 8系列之重新认识HashMap</a></p>
 <p><a href="https://www.zhihu.com/question/20733617/answer/111577937" target="_blank" rel="noopener">JDK 源码中 HashMap 的 hash 方法原理是什么？胖君的回答</a></p>
 <p><a href="https://segmentfault.com/a/1190000012926722" target="_blank" rel="noopener">HashMap 源码详细分析(JDK1.8)</a></p>
 <blockquote>
-<p>本文首发于我的个人博客 <a href="http://chaohang.top" target="_blank" rel="noopener">http://chaohang.top</a></p>
-<p>作者<a href="http://chaohang.top" target="_blank" rel="noopener">张小超</a></p>
+<p>本文首发于我的个人博客 <a href="https://chaohang.top" target="_blank" rel="noopener">https://chaohang.top</a></p>
+<p>作者<a href="https://chaohang.top" target="_blank" rel="noopener">张小超</a></p>
 <p>转载请注明出处</p>
 </blockquote>
 <p>欢迎关注我的微信公众号 【超超不会飞】，获取第一时间的更新。</p>
@@ -1070,12 +1077,12 @@
 <li>线程不安全</li>
 <li>每次扩容原有数组大小的一半</li>
 </ol>
-<h2 id="源码系列文章"><a href="#源码系列文章" class="headerlink" title="源码系列文章"></a>源码系列文章</h2><p><a href="http://chaohang.top/2020/02/11/Java%E6%BA%90%E7%A0%81%E7%B3%BB%E5%88%971%E2%80%94%E2%80%94ArrayList/" target="_blank" rel="noopener">Java源码系列1——ArrayList</a></p>
-<p><a href="http://chaohang.top/2020/02/12/Java%E6%BA%90%E7%A0%81%E7%B3%BB%E5%88%972%E2%80%94%E2%80%94HashMap/" target="_blank" rel="noopener">Java源码系列2——HashMap</a></p>
-<p><a href="http://chaohang.top/2020/02/16/Java%E6%BA%90%E7%A0%81%E7%B3%BB%E5%88%973%E2%80%94%E2%80%94LinkedHashMap/" target="_blank" rel="noopener">Java源码系列3——LinkedHashMap</a></p>
+<h2 id="源码系列文章"><a href="#源码系列文章" class="headerlink" title="源码系列文章"></a>源码系列文章</h2><p><a href="https://chaohang.top/2020/02/11/Java%E6%BA%90%E7%A0%81%E7%B3%BB%E5%88%971%E2%80%94%E2%80%94ArrayList/" target="_blank" rel="noopener">Java源码系列1——ArrayList</a></p>
+<p><a href="https://chaohang.top/2020/02/12/Java%E6%BA%90%E7%A0%81%E7%B3%BB%E5%88%972%E2%80%94%E2%80%94HashMap/" target="_blank" rel="noopener">Java源码系列2——HashMap</a></p>
+<p><a href="https://chaohang.top/2020/02/16/Java%E6%BA%90%E7%A0%81%E7%B3%BB%E5%88%973%E2%80%94%E2%80%94LinkedHashMap/" target="_blank" rel="noopener">Java源码系列3——LinkedHashMap</a></p>
 <blockquote>
-<p>本文首发于我的个人博客 <a href="http://chaohang.top" target="_blank" rel="noopener">http://chaohang.top</a></p>
-<p>作者<a href="http://chaohang.top" target="_blank" rel="noopener">张小超</a></p>
+<p>本文首发于我的个人博客 <a href="https://chaohang.top" target="_blank" rel="noopener">https://chaohang.top</a></p>
+<p>作者<a href="https://chaohang.top" target="_blank" rel="noopener">张小超</a></p>
 <p>转载请注明出处</p>
 </blockquote>
 <p>欢迎关注我的微信公众号 【超超不会飞】，获取第一时间的更新。</p>
@@ -1145,8 +1152,8 @@
 <p><a href="https://book.douban.com/subject/26767354/" target="_blank" rel="noopener">Spring 实战</a></p>
 <p><a href="https://book.douban.com/subject/3897837/" target="_blank" rel="noopener">Spring 揭秘</a></p>
 <blockquote>
-<p>本文首发于我的个人博客 <a href="http://chaohang.top" target="_blank" rel="noopener">http://chaohang.top</a></p>
-<p>作者<a href="http://chaohang.top" target="_blank" rel="noopener">张小超</a></p>
+<p>本文首发于我的个人博客 <a href="https://chaohang.top" target="_blank" rel="noopener">https://chaohang.top</a></p>
+<p>作者<a href="https://chaohang.top" target="_blank" rel="noopener">张小超</a></p>
 <p>转载请注明出处</p>
 </blockquote>
 <p>欢迎关注我的微信公众号 【超超不会飞】，获取第一时间的更新。</p>
@@ -1209,8 +1216,8 @@
 <h1 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h1><p><a href="https://www.cnblogs.com/yangming1996/p/9295168.html" target="_blank" rel="noopener">JAVA 注解的基本原理</a></p>
 <p><a href="https://www.jianshu.com/p/f5b564693c43" target="_blank" rel="noopener">Java注解基本原理</a></p>
 <blockquote>
-<p>本文首发于我的个人博客 <a href="http://chaohang.top" target="_blank" rel="noopener">http://chaohang.top</a></p>
-<p>作者<a href="http://chaohang.top" target="_blank" rel="noopener">张小超</a></p>
+<p>本文首发于我的个人博客 <a href="https://chaohang.top" target="_blank" rel="noopener">https://chaohang.top</a></p>
+<p>作者<a href="https://chaohang.top" target="_blank" rel="noopener">张小超</a></p>
 <p>转载请注明出处</p>
 </blockquote>
 <p>欢迎关注我的微信公众号 【超超不会飞】，获取第一时间的更新。</p>
@@ -1671,8 +1678,8 @@
 <li>V8 使用 Incremental Marking 来减少全停顿带来的影响。</li>
 </ol>
 <blockquote>
-<p>本文首发于我的个人博客 <a href="http://chaohang.top" target="_blank" rel="noopener">http://chaohang.top</a></p>
-<p>作者<a href="http://chaohang.top" target="_blank" rel="noopener">张小超</a></p>
+<p>本文首发于我的个人博客 <a href="https://chaohang.top" target="_blank" rel="noopener">https://chaohang.top</a></p>
+<p>作者<a href="https://chaohang.top" target="_blank" rel="noopener">张小超</a></p>
 <p>转载请注明出处</p>
 </blockquote>
 ]]></content>
@@ -1836,8 +1843,8 @@
 <li>微信回执表尽量详细的记录微信传回的所有必有参数，以备出问题时排查，可以直接丢到mongodb里。</li>
 </ol>
 <blockquote>
-<p>本文首发于我的个人博客 <a href="http://chaohang.top" target="_blank" rel="noopener">http://chaohang.top</a></p>
-<p>作者<a href="http://chaohang.top" target="_blank" rel="noopener">张小超</a></p>
+<p>本文首发于我的个人博客 <a href="https://chaohang.top" target="_blank" rel="noopener">https://chaohang.top</a></p>
+<p>作者<a href="https://chaohang.top" target="_blank" rel="noopener">张小超</a></p>
 <p>转载请注明出处</p>
 </blockquote>
 ]]></content>
@@ -1895,8 +1902,8 @@
 <p><img data-src="http://cdn.chaohang.top/20200121114129.png" alt=""></p>
 <h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a href="https://mp.weixin.qq.com/wiki?t=resource/res_main&amp;id=mp1421140842" target="_blank" rel="noopener">微信网页授权官方文档</a></p>
 <blockquote>
-<p>本文首发于我的个人博客 <a href="http://chaohang.top" target="_blank" rel="noopener">http://chaohang.top</a></p>
-<p>作者<a href="http://chaohang.top" target="_blank" rel="noopener">张小超</a></p>
+<p>本文首发于我的个人博客 <a href="https://chaohang.top" target="_blank" rel="noopener">https://chaohang.top</a></p>
+<p>作者<a href="https://chaohang.top" target="_blank" rel="noopener">张小超</a></p>
 <p>转载请注明出处</p>
 </blockquote>
 ]]></content>
@@ -1927,8 +1934,8 @@
 <p><img data-src="http://cdn.chaohang.top/20200212113003.png" alt="获取用户手机号，前后端交互流程"></p>
 <h2 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h2><p><a href="https://developers.weixin.qq.com/miniprogram/dev/api/" target="_blank" rel="noopener">小程序开发文档</a></p>
 <blockquote>
-<p>本文首发于我的个人博客 <a href="http://chaohang.top" target="_blank" rel="noopener">http://chaohang.top</a></p>
-<p>作者<a href="http://chaohang.top" target="_blank" rel="noopener">张小超</a></p>
+<p>本文首发于我的个人博客 <a href="https://chaohang.top" target="_blank" rel="noopener">https://chaohang.top</a></p>
+<p>作者<a href="https://chaohang.top" target="_blank" rel="noopener">张小超</a></p>
 <p>转载请注明出处</p>
 </blockquote>
 ]]></content>
@@ -1949,8 +1956,8 @@
 <h2 id="调用"><a href="#调用" class="headerlink" title="调用"></a>调用</h2><figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">const</span> params = &#123;</span><br><span class="line">      debug: <span class="literal">false</span>,</span><br><span class="line">      jsApiList: [],  <span class="comment">// 需要获取的能力，由前端传入</span></span><br><span class="line">      url: <span class="string">''</span>,        <span class="comment">// 申请能力并且在后台配置过的域名</span></span><br><span class="line">&#125;;</span><br><span class="line">ctx.body = <span class="keyword">await</span> WECHAT_API.getJsConfig(params);</span><br></pre></td></tr></table></figure>
 <h2 id="接入多个微信公众号"><a href="#接入多个微信公众号" class="headerlink" title="接入多个微信公众号"></a>接入多个微信公众号</h2><p>待我重构归来。。。。。。</p>
 <blockquote>
-<p>本文首发于我的个人博客 <a href="http://chaohang.top" target="_blank" rel="noopener">http://chaohang.top</a></p>
-<p>作者<a href="http://chaohang.top" target="_blank" rel="noopener">张小超</a></p>
+<p>本文首发于我的个人博客 <a href="https://chaohang.top" target="_blank" rel="noopener">https://chaohang.top</a></p>
+<p>作者<a href="https://chaohang.top" target="_blank" rel="noopener">张小超</a></p>
 <p>转载请注明出处</p>
 </blockquote>
 ]]></content>
@@ -2007,8 +2014,8 @@
 <p><img data-src="http://cdn.chaohang.top/20200212113415.png" alt=""></p>
 <h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>使用 REFERER + 私有空间 已经可以解决盗链问题了，但是如果视频被下载仍然是个问题。需要对视频做加密处理，但是即使做了加密处理，也阻止不了录屏。完全杜绝视频泄露是很难的，或者我们可以采取其他方式加大盗用的成本，比如在视频里加上水印或者观看者ID，甚至让水印或者观看者ID在视频里四处游走（影响观看体验）。</p>
 <blockquote>
-<p>本文首发于我的个人博客 <a href="http://chaohang.top" target="_blank" rel="noopener">http://chaohang.top</a></p>
-<p>作者<a href="http://chaohang.top" target="_blank" rel="noopener">张小超</a></p>
+<p>本文首发于我的个人博客 <a href="https://chaohang.top" target="_blank" rel="noopener">https://chaohang.top</a></p>
+<p>作者<a href="https://chaohang.top" target="_blank" rel="noopener">张小超</a></p>
 <p>转载请注明出处</p>
 </blockquote>
 ]]></content>
@@ -2145,8 +2152,8 @@
 <figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">const</span> serialize = <span class="function">(<span class="params">obj</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">const</span> str = [];</span><br><span class="line">  <span class="built_in">Object</span>.keys(obj).sort().forEach(<span class="function">(<span class="params">key</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (obj.hasOwnProperty(key)) &#123;</span><br><span class="line">      str.push(<span class="built_in">encodeURIComponent</span>(key) + <span class="string">'='</span> + <span class="built_in">encodeURIComponent</span>(obj[key]));</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;);</span><br><span class="line">  <span class="keyword">return</span> str.join(<span class="string">'&amp;'</span>);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
 <h2 id="注意"><a href="#注意" class="headerlink" title="注意"></a>注意</h2><p>RSA 算法有一定的计算量，加上 Node 不适合做计算密集型的操作。当接口被频繁调用可能会占用主线程，阻塞其他接口，使用了 RSA 的接口并发量会下降十倍左右。如非必要，谨慎在 Node 里使用 RSA。</p>
 <blockquote>
-<p>本文首发于我的个人博客 <a href="http://chaohang.top" target="_blank" rel="noopener">http://chaohang.top</a></p>
-<p>作者<a href="http://chaohang.top" target="_blank" rel="noopener">张小超</a></p>
+<p>本文首发于我的个人博客 <a href="https://chaohang.top" target="_blank" rel="noopener">https://chaohang.top</a></p>
+<p>作者<a href="https://chaohang.top" target="_blank" rel="noopener">张小超</a></p>
 <p>转载请注明出处</p>
 </blockquote>
 ]]></content>
@@ -2209,8 +2216,8 @@
 <p><a href="https://www.jianshu.com/p/f73b39ae02dc" target="_blank" rel="noopener">七牛上传开发（三）使用NodeJS生成带数据处理的凭证</a></p>
 <p><a href="https://github.com/qiniu/nodejs-sdk/blob/master/examples/create_uptoken.js" target="_blank" rel="noopener">nodejs-sdk example</a></p>
 <blockquote>
-<p>本文首发于我的个人博客 <a href="http://chaohang.top" target="_blank" rel="noopener">http://chaohang.top</a></p>
-<p>作者<a href="http://chaohang.top" target="_blank" rel="noopener">张小超</a></p>
+<p>本文首发于我的个人博客 <a href="https://chaohang.top" target="_blank" rel="noopener">https://chaohang.top</a></p>
+<p>作者<a href="https://chaohang.top" target="_blank" rel="noopener">张小超</a></p>
 <p>转载请注明出处</p>
 </blockquote>
 ]]></content>
@@ -2260,8 +2267,8 @@
     <content><![CDATA[<p>使用 wx sdk 在html导入sdk js文件。（<strong>如果网站是https导入的sdk也要使用https！</strong>）<br>然后在 <code>wx.ready</code> 中设置 play 方法并复制给全局变量 fm，当需要使用的时候再调用 fm()</p>
 <figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 全局变量 fm2</span></span><br><span class="line"><span class="keyword">var</span> fm2;</span><br><span class="line"></span><br><span class="line">wx.config(&#123;</span><br><span class="line">  debug : <span class="literal">false</span>, <span class="comment">// 这里为false</span></span><br><span class="line">  appId : <span class="string">''</span>, <span class="comment">// 以下随意填写即可</span></span><br><span class="line">  timestamp : (<span class="keyword">new</span> <span class="built_in">Date</span>()).getTime(),</span><br><span class="line">  nonceStr : <span class="string">''</span>,</span><br><span class="line">  signature : <span class="string">''</span>,</span><br><span class="line">  jsApiList : [<span class="string">'checkJsApi'</span>]</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">wx.ready(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  $(<span class="string">'#music1'</span>).play();  <span class="comment">// 第一段音乐页面加载后自动播放</span></span><br><span class="line">  $(<span class="string">'#music2'</span>).load();  <span class="comment">// 第二段音乐等待，触发 fm2 时播放</span></span><br><span class="line"></span><br><span class="line">  fm2 = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">    music2.play();</span><br><span class="line">  &#125;;</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">fm2(); <span class="comment">//调用之后即可播放</span></span><br></pre></td></tr></table></figure>
 <blockquote>
-<p>本文首发于我的个人博客 <a href="http://chaohang.top" target="_blank" rel="noopener">http://chaohang.top</a></p>
-<p>作者<a href="http://chaohang.top" target="_blank" rel="noopener">张小超</a></p>
+<p>本文首发于我的个人博客 <a href="https://chaohang.top" target="_blank" rel="noopener">https://chaohang.top</a></p>
+<p>作者<a href="https://chaohang.top" target="_blank" rel="noopener">张小超</a></p>
 <p>转载请注明出处</p>
 </blockquote>
 ]]></content>
@@ -2316,8 +2323,8 @@
 <p>其实在购买时就可以选取要开放的端口，第一次嘛，没有经验，都是直接默认选项。怪不得小伙伴说他服务器的配置都没有动过，应该是购买的时候就已经设置好的。</p>
 <p>趁年轻，多踩坑。</p>
 <blockquote>
-<p>本文首发于我的个人博客 <a href="http://chaohang.top" target="_blank" rel="noopener">http://chaohang.top</a></p>
-<p>作者<a href="http://chaohang.top" target="_blank" rel="noopener">张小超</a></p>
+<p>本文首发于我的个人博客 <a href="https://chaohang.top" target="_blank" rel="noopener">https://chaohang.top</a></p>
+<p>作者<a href="https://chaohang.top" target="_blank" rel="noopener">张小超</a></p>
 <p>转载请注明出处</p>
 </blockquote>
 ]]></content>
@@ -2470,8 +2477,8 @@
 <li>了解了完整的web应用是如何运作的，包括服务器，数据库，前端是如何联系在一起的。</li>
 </ol>
 <blockquote>
-<p>本文首发于我的个人博客 <a href="http://chaohang.top" target="_blank" rel="noopener">http://chaohang.top</a></p>
-<p>作者<a href="http://chaohang.top" target="_blank" rel="noopener">张小超</a></p>
+<p>本文首发于我的个人博客 <a href="https://chaohang.top" target="_blank" rel="noopener">https://chaohang.top</a></p>
+<p>作者<a href="https://chaohang.top" target="_blank" rel="noopener">张小超</a></p>
 <p>转载请注明出处</p>
 </blockquote>
 ]]></content>
