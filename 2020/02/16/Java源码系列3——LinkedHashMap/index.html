@@ -26,7 +26,7 @@
 <meta property="og:url" content="https://www.chaohang.top/2020/02/16/Java%E6%BA%90%E7%A0%81%E7%B3%BB%E5%88%973%E2%80%94%E2%80%94LinkedHashMap/index.html">
 <meta property="og:site_name" content="张小超的博客">
 <meta property="og:description" content="什么是LinkedHashMap？LinkedHashMap 是 HashMap 的有序实现。LinkedHashMap 用一条双向链表来维护顺序，迭代的时候也使用自己实现的迭代器。">
-<meta property="og:image" content="http://cdn.chaohang.top/20200812105955.jpg">
+<meta property="og:image" content="http://cdn.chaohang.top/20200812114738.jpg">
 <meta property="og:image" content="http://cdn.chaohang.top/20200216153655.png">
 <meta property="og:image" content="http://cdn.chaohang.top/20200216153931.png">
 <meta property="og:image" content="http://cdn.chaohang.top/20200216144036.png">
@@ -40,7 +40,7 @@
 <meta property="article:tag" content="Java">
 <meta property="article:tag" content="Java源码系列">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="http://cdn.chaohang.top/20200812105955.jpg">
+<meta name="twitter:image" content="http://cdn.chaohang.top/20200812114738.jpg">
 
 <link rel="canonical" href="https://www.chaohang.top/2020/02/16/Java%E6%BA%90%E7%A0%81%E7%B3%BB%E5%88%973%E2%80%94%E2%80%94LinkedHashMap/">
 
@@ -250,7 +250,7 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <p><img data-src="http://cdn.chaohang.top/20200812105955.jpg" alt=""></p>
+        <p><img data-src="http://cdn.chaohang.top/20200812114738.jpg" alt=""></p>
 <h2 id="什么是LinkedHashMap？"><a href="#什么是LinkedHashMap？" class="headerlink" title="什么是LinkedHashMap？"></a>什么是LinkedHashMap？</h2><p><code>LinkedHashMap</code> 是 <code>HashMap</code> 的有序实现。<code>LinkedHashMap</code> 用一条双向链表来维护顺序，迭代的时候也使用自己实现的迭代器。</p>
 <a id="more"></a>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">    HashMap&lt;String, Integer&gt; h = <span class="keyword">new</span> HashMap&lt;&gt;(<span class="number">33</span>);</span><br><span class="line">    h.put(<span class="string">"one"</span>, <span class="number">1</span>);</span><br><span class="line">    h.put(<span class="string">"two"</span>, <span class="number">2</span>);</span><br><span class="line">    h.put(<span class="string">"three"</span>, <span class="number">3</span>);</span><br><span class="line">    h.put(<span class="string">"four"</span>, <span class="number">4</span>);</span><br><span class="line">    <span class="keyword">for</span> (String key : h.keySet()) &#123;</span><br><span class="line">        System.out.println(<span class="string">"key:"</span> + key + <span class="string">"value:"</span> + h.get(key));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    LinkedHashMap&lt;String, Integer&gt; lh = <span class="keyword">new</span> LinkedHashMap&lt;&gt;(<span class="number">33</span>);</span><br><span class="line">    lh.put(<span class="string">"one"</span>, <span class="number">1</span>);</span><br><span class="line">    lh.put(<span class="string">"two"</span>, <span class="number">2</span>);</span><br><span class="line">    lh.put(<span class="string">"three"</span>, <span class="number">3</span>);</span><br><span class="line">    lh.put(<span class="string">"four"</span>, <span class="number">4</span>);</span><br><span class="line">    <span class="keyword">for</span> (String key : lh.keySet()) &#123;</span><br><span class="line">        System.out.println(<span class="string">"key:"</span> + key + <span class="string">"value:"</span> + lh.get(key));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
