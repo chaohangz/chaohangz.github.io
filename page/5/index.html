@@ -682,31 +682,8 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h1 id="源码"><a href="#源码" class="headerlink" title="源码"></a><a href="https://github.com/chaohangz/vueBlog" target="_blank" rel="noopener">源码</a></h1><p>耗时半载（半个月）的大项目终于完成了。这是一个博客系统，使用 Vue 做前端框架，Node + express 做后端，数据库使用的是 MongoDB。实现了用户注册、用户登录、博客管理（文章的修改和删除）、文章编辑（Markdown）、标签分类等功能。</p>
-<p>很早之前就想写一个个人博客。学了 Vue 之后，把前端部分写出来，然后 Node 一直拖拖拉拉的学了很久，中间又跑去实习了一段时间，所以直到回学校之后才列了个计划把这个项目实现了。</p>
-<p>翻出之前写的前端部分，好丑啊，干脆推掉重写吧。前端模仿的是 hexo 的经典主题 <a href="https://github.com/iissnan/hexo-theme-next" target="_blank" rel="noopener">NexT</a> ，本来是想把源码直接拿过来用的，后来发现还不如自己写来得快，就全部自己动手实现成 vue components。</p>
-<h2 id="实现的功能"><a href="#实现的功能" class="headerlink" title="实现的功能"></a>实现的功能</h2><ol>
-<li>文章的编辑，修改，删除</li>
-<li>支持使用 <code>Markdown</code> 编辑与实时预览</li>
-<li>支持代码高亮</li>
-<li>给文章添加标签</li>
-<li>支持用户注册登录</li>
-</ol>
-<h2 id="使用到的技术"><a href="#使用到的技术" class="headerlink" title="使用到的技术"></a>使用到的技术</h2><h3 id="前端"><a href="#前端" class="headerlink" title="前端"></a>前端</h3><ol>
-<li>Vue.js</li>
-<li>vue-cli</li>
-<li>vue-router</li>
-<li>vue-resource</li>
-<li>element-ui</li>
-<li>marked</li>
-<li>highlight.js</li>
-</ol>
-<h3 id="后端"><a href="#后端" class="headerlink" title="后端"></a>后端</h3><ol>
-<li>Node.js</li>
-<li>Express</li>
-<li>Mongoose</li>
-</ol>
-<h2 id="基本思路"><a href="#基本思路" class="headerlink" title="基本思路"></a>基本思路</h2><p>前端使用 <code>vue-router</code> 操作路由，实现单页应用的效果。使用 <code>vue-resource</code> 从后台获取数据，数据的处理全部都在前端，所以后端要做的事情很简单——把前端打包好的数据存进数据库中和从数据库中取出数据。前后端使用统一的路由命名规则。</p>
+          <p><img data-src="http://cdn.chaohang.top/20200812110436.jpg" alt=""></p>
+<h1 id="源码"><a href="#源码" class="headerlink" title="源码"></a><a href="https://github.com/chaohangz/vueBlog" target="_blank" rel="noopener">源码</a></h1><p>耗时半载（半个月）的大项目终于完成了。这是一个博客系统，使用 Vue 做前端框架，Node + express 做后端，数据库使用的是 MongoDB。实现了用户注册、用户登录、博客管理（文章的修改和删除）、文章编辑（Markdown）、标签分类等功能。</p>
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2017/04/22/%E4%B8%80%E4%B8%AA-Vue-Node-MongoDB-%E5%8D%9A%E5%AE%A2%E7%B3%BB%E7%BB%9F/#more" rel="contents">

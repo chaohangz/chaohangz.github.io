@@ -20,13 +20,13 @@
     var CONFIG = {"hostname":"www.chaohang.top","root":"/","scheme":"Muse","version":"7.7.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":3,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="Photo by hippopx.com 我们知道 HashMap 的底层是由数组，链表，红黑树组成的，在 HashMap 做扩容操作时，除了把数组容量扩大为原来的两倍外，还会对所有元素重新计算 hash 值，因为长度扩大以后，hash值也随之改变。">
+  <meta name="description" content="我们知道 HashMap 的底层是由数组，链表，红黑树组成的，在 HashMap 做扩容操作时，除了把数组容量扩大为原来的两倍外，还会对所有元素重新计算 hash 值，因为长度扩大以后，hash值也随之改变。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Java源码系列4——HashMap扩容时究竟对链表和红黑树做了什么?">
 <meta property="og:url" content="https://www.chaohang.top/2020/06/04/Java%E6%BA%90%E7%A0%81%E7%B3%BB%E5%88%974%E2%80%94%E2%80%94HashMap%E6%89%A9%E5%AE%B9%E6%97%B6%E7%A9%B6%E7%AB%9F%E5%AF%B9%E9%93%BE%E8%A1%A8%E5%92%8C%E7%BA%A2%E9%BB%91%E6%A0%91%E5%81%9A%E4%BA%86%E4%BB%80%E4%B9%88/index.html">
 <meta property="og:site_name" content="张小超的博客">
-<meta property="og:description" content="Photo by hippopx.com 我们知道 HashMap 的底层是由数组，链表，红黑树组成的，在 HashMap 做扩容操作时，除了把数组容量扩大为原来的两倍外，还会对所有元素重新计算 hash 值，因为长度扩大以后，hash值也随之改变。">
-<meta property="og:image" content="http://cdn.chaohang.top/20200604134416.jpg">
+<meta property="og:description" content="我们知道 HashMap 的底层是由数组，链表，红黑树组成的，在 HashMap 做扩容操作时，除了把数组容量扩大为原来的两倍外，还会对所有元素重新计算 hash 值，因为长度扩大以后，hash值也随之改变。">
+<meta property="og:image" content="http://cdn.chaohang.top/20200812105955.jpg">
 <meta property="og:image" content="http://cdn.chaohang.top/20200602180032.png">
 <meta property="og:image" content="http://cdn.chaohang.top/20200603091606.png">
 <meta property="og:image" content="http://cdn.chaohang.top/20200603094454.png">
@@ -39,7 +39,7 @@
 <meta property="article:tag" content="Java">
 <meta property="article:tag" content="Java源码系">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="http://cdn.chaohang.top/20200604134416.jpg">
+<meta name="twitter:image" content="http://cdn.chaohang.top/20200812105955.jpg">
 
 <link rel="canonical" href="https://www.chaohang.top/2020/06/04/Java%E6%BA%90%E7%A0%81%E7%B3%BB%E5%88%974%E2%80%94%E2%80%94HashMap%E6%89%A9%E5%AE%B9%E6%97%B6%E7%A9%B6%E7%AB%9F%E5%AF%B9%E9%93%BE%E8%A1%A8%E5%92%8C%E7%BA%A2%E9%BB%91%E6%A0%91%E5%81%9A%E4%BA%86%E4%BB%80%E4%B9%88/">
 
@@ -249,7 +249,7 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <p><img data-src="http://cdn.chaohang.top/20200604134416.jpg" alt="Photo by hippopx.com">Photo by hippopx.com</p>
+        <p><img data-src="http://cdn.chaohang.top/20200812105955.jpg" alt=""></p>
 <p>我们知道 HashMap 的底层是由数组，链表，红黑树组成的，在 HashMap 做扩容操作时，除了把数组容量扩大为原来的两倍外，还会对所有元素重新计算 hash 值，因为长度扩大以后，hash值也随之改变。</p>
 <a id="more"></a>
 <p>如果是简单的 Node 对象，只需要重新计算下标放进去就可以了，如果是链表和红黑树，那么操作就会比较复杂，下面我们就来看下，JDK1.8 下的 HashMap 在扩容时对链表和红黑树做了哪些优化？</p>
