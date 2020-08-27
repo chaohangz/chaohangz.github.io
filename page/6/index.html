@@ -180,6 +180,95 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.chaohang.top/2017/04/16/%E3%80%8AAlgorithms-Unlocked%E3%80%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B02%E2%80%94%E2%80%94%E4%BA%8C%E5%88%86%E6%9F%A5%E6%89%BE%E5%92%8C%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="张小超">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="张小超的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2017/04/16/%E3%80%8AAlgorithms-Unlocked%E3%80%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B02%E2%80%94%E2%80%94%E4%BA%8C%E5%88%86%E6%9F%A5%E6%89%BE%E5%92%8C%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95/" class="post-title-link" itemprop="url">《Algorithms Unlocked》读书笔记2——二分查找和排序算法</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2017-04-16 20:43:49" itemprop="dateCreated datePublished" datetime="2017-04-16T20:43:49+08:00">2017-04-16</time>
+            </span>
+
+          
+            <span id="/2017/04/16/%E3%80%8AAlgorithms-Unlocked%E3%80%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B02%E2%80%94%E2%80%94%E4%BA%8C%E5%88%86%E6%9F%A5%E6%89%BE%E5%92%8C%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95/" class="post-meta-item leancloud_visitors" data-flag-title="《Algorithms Unlocked》读书笔记2——二分查找和排序算法" title="Views">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine: </span>
+    
+    <a title="valine" href="/2017/04/16/%E3%80%8AAlgorithms-Unlocked%E3%80%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B02%E2%80%94%E2%80%94%E4%BA%8C%E5%88%86%E6%9F%A5%E6%89%BE%E5%92%8C%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2017/04/16/%E3%80%8AAlgorithms-Unlocked%E3%80%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B02%E2%80%94%E2%80%94%E4%BA%8C%E5%88%86%E6%9F%A5%E6%89%BE%E5%92%8C%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p><a href="https://book.douban.com/subject/20421419/" target="_blank" rel="noopener">《Algorithms Unlocked》</a>是 《算法导论》的合著者之一 Thomas H. Cormen 写的一本算法基础，算是啃CLRS前的开胃菜和辅助教材。如果CLRS的厚度让人望而生畏，这本200多页的小读本刚好合适带你入门。</p>
+<p>书中没有涉及编程语言，直接用文字描述算法，我用 JavaScript 对书中的算法进行描述。</p>
+<h2 id="二分查找"><a href="#二分查找" class="headerlink" title="二分查找"></a>二分查找</h2><p>在排好序的数组中查找目标值x。在p到r区间中，总是取索引为q的中间值与x进行比较，如果array[q]大于x，则比较p到q-1区间，否则比较q+1到r区间，直到array[q]等于x或p&gt;r。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 利用二分法在已经排好序的数组中查找值x</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">binarySearch</span>(<span class="params">array, x</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">let</span> p = <span class="number">1</span>;</span><br><span class="line">  <span class="keyword">let</span> r = array.length - <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">while</span> (p &lt;= r) &#123;</span><br><span class="line">    <span class="keyword">let</span> q = <span class="built_in">Math</span>.round((p + r) / <span class="number">2</span>);  <span class="comment">//四舍五入取整</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (array[q] === x) &#123;</span><br><span class="line">      <span class="keyword">return</span> q;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      <span class="keyword">if</span> (array[q] &gt; x) &#123;</span><br><span class="line">        <span class="comment">// 如果q没有减一，遇到找不到x的情况，</span></span><br><span class="line">        <span class="comment">// 就会陷入while循环中出不来，因为p会一直等于r</span></span><br><span class="line">        r = q - <span class="number">1</span>; </span><br><span class="line">      &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        p = q + <span class="number">1</span>;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> <span class="string">'NOT-FOUND'</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2017/04/16/%E3%80%8AAlgorithms-Unlocked%E3%80%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B02%E2%80%94%E2%80%94%E4%BA%8C%E5%88%86%E6%9F%A5%E6%89%BE%E5%92%8C%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-Hans">
     <link itemprop="mainEntityOfPage" href="https://www.chaohang.top/2017/04/10/%E3%80%8AAlgorithms-Unlocked%E3%80%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B01%E2%80%94%E2%80%94%E5%BE%AA%E7%8E%AF%E5%92%8C%E9%80%92%E5%BD%92/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -514,14 +603,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">53</span>
+          <span class="site-state-item-count">54</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">40</span>
+        <span class="site-state-item-count">36</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>

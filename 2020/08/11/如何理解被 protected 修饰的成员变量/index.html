@@ -22,8 +22,8 @@
 
   <meta name="description" content="被 protected 修饰的成员对于本包和其子类可见：  基类的 protected 成员在包内可见 若继承了基类的子类与基类不在同一个包中，那么在子类中，子类实例可以访问其从基类继承而来的 protected 方法，不能访问基类中的 protected 方法。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Java学习笔记1——如何理解被 protected 修饰的成员变量？">
-<meta property="og:url" content="https://www.chaohang.top/2020/08/11/Java%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B01/index.html">
+<meta property="og:title" content="如何理解被 protected 修饰的成员变量？">
+<meta property="og:url" content="https://www.chaohang.top/2020/08/11/%E5%A6%82%E4%BD%95%E7%90%86%E8%A7%A3%E8%A2%AB%20protected%20%E4%BF%AE%E9%A5%B0%E7%9A%84%E6%88%90%E5%91%98%E5%8F%98%E9%87%8F/index.html">
 <meta property="og:site_name" content="张小超的博客">
 <meta property="og:description" content="被 protected 修饰的成员对于本包和其子类可见：  基类的 protected 成员在包内可见 若继承了基类的子类与基类不在同一个包中，那么在子类中，子类实例可以访问其从基类继承而来的 protected 方法，不能访问基类中的 protected 方法。">
 <meta property="og:image" content="http://cdn.chaohang.top/20200812114819.jpg">
@@ -36,7 +36,7 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="http://cdn.chaohang.top/20200812114819.jpg">
 
-<link rel="canonical" href="https://www.chaohang.top/2020/08/11/Java%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B01/">
+<link rel="canonical" href="https://www.chaohang.top/2020/08/11/%E5%A6%82%E4%BD%95%E7%90%86%E8%A7%A3%E8%A2%AB%20protected%20%E4%BF%AE%E9%A5%B0%E7%9A%84%E6%88%90%E5%91%98%E5%8F%98%E9%87%8F/">
 
 
 <script id="page-configurations">
@@ -48,7 +48,7 @@
   };
 </script>
 
-  <title>Java学习笔记1——如何理解被 protected 修饰的成员变量？ | 张小超的博客</title>
+  <title>如何理解被 protected 修饰的成员变量？ | 张小超的博客</title>
   
 
 
@@ -186,7 +186,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://www.chaohang.top/2020/08/11/Java%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B01/">
+    <link itemprop="mainEntityOfPage" href="https://www.chaohang.top/2020/08/11/%E5%A6%82%E4%BD%95%E7%90%86%E8%A7%A3%E8%A2%AB%20protected%20%E4%BF%AE%E9%A5%B0%E7%9A%84%E6%88%90%E5%91%98%E5%8F%98%E9%87%8F/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -199,7 +199,7 @@
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
-          Java学习笔记1——如何理解被 protected 修饰的成员变量？
+          如何理解被 protected 修饰的成员变量？
         </h2>
 
         <div class="post-meta">
@@ -213,7 +213,7 @@
             </span>
 
           
-            <span id="/2020/08/11/Java%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B01/" class="post-meta-item leancloud_visitors" data-flag-title="Java学习笔记1——如何理解被 protected 修饰的成员变量？" title="Views">
+            <span id="/2020/08/11/%E5%A6%82%E4%BD%95%E7%90%86%E8%A7%A3%E8%A2%AB%20protected%20%E4%BF%AE%E9%A5%B0%E7%9A%84%E6%88%90%E5%91%98%E5%8F%98%E9%87%8F/" class="post-meta-item leancloud_visitors" data-flag-title="如何理解被 protected 修饰的成员变量？" title="Views">
               <span class="post-meta-item-icon">
                 <i class="fa fa-eye"></i>
               </span>
@@ -228,8 +228,8 @@
       </span>
       <span class="post-meta-item-text">Valine: </span>
     
-    <a title="valine" href="/2020/08/11/Java%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B01/#valine-comments" itemprop="discussionUrl">
-      <span class="post-comments-count valine-comment-count" data-xid="/2020/08/11/Java%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B01/" itemprop="commentCount"></span>
+    <a title="valine" href="/2020/08/11/%E5%A6%82%E4%BD%95%E7%90%86%E8%A7%A3%E8%A2%AB%20protected%20%E4%BF%AE%E9%A5%B0%E7%9A%84%E6%88%90%E5%91%98%E5%8F%98%E9%87%8F/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2020/08/11/%E5%A6%82%E4%BD%95%E7%90%86%E8%A7%A3%E8%A2%AB%20protected%20%E4%BF%AE%E9%A5%B0%E7%9A%84%E6%88%90%E5%91%98%E5%8F%98%E9%87%8F/" itemprop="commentCount"></span>
     </a>
   </span>
   
@@ -294,7 +294,10 @@
     <a href="/2020/06/04/Java%E6%BA%90%E7%A0%81%E7%B3%BB%E5%88%974%E2%80%94%E2%80%94HashMap%E6%89%A9%E5%AE%B9%E6%97%B6%E7%A9%B6%E7%AB%9F%E5%AF%B9%E9%93%BE%E8%A1%A8%E5%92%8C%E7%BA%A2%E9%BB%91%E6%A0%91%E5%81%9A%E4%BA%86%E4%BB%80%E4%B9%88/" rel="prev" title="Java源码系列4——HashMap扩容时究竟对链表和红黑树做了什么?">
       <i class="fa fa-chevron-left"></i> Java源码系列4——HashMap扩容时究竟对链表和红黑树做了什么?
     </a></div>
-      <div class="post-nav-item"></div>
+      <div class="post-nav-item">
+    <a href="/2020/08/27/%E3%80%8A%E6%90%9E%E5%AE%9A1%E3%80%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/" rel="next" title="《搞定1》读书笔记">
+      《搞定1》读书笔记 <i class="fa fa-chevron-right"></i>
+    </a></div>
     </div>
       </footer>
     
@@ -369,14 +372,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">53</span>
+          <span class="site-state-item-count">54</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">40</span>
+        <span class="site-state-item-count">36</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>
