@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>对比Redis中RDB和AOF持久化</title>
+    <title>对比 Redis 中 RDB 和 AOF 持久化</title>
     <url>/2020/09/15/%E5%AF%B9%E6%AF%94Redis%E4%B8%ADRDB%E5%92%8CAOF%E6%8C%81%E4%B9%85%E5%8C%96/</url>
     <content><![CDATA[<p><img data-src="http://cdn.chaohang.top/20200915140846.jpg" alt=""></p>
 <h2 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h2><p>Redis 是内存数据库，数据存储在内存中，一旦服务器进程退出，数据就丢失了，所以 Redis 需要想办法将存储在内存中的数据持久化到磁盘。</p>
@@ -56,6 +56,13 @@
 </ol>
 <p><img data-src="http://cdn.chaohang.top/20200915090522.png" alt=""></p>
 <h2 id="资料"><a href="#资料" class="headerlink" title="资料"></a>资料</h2><p><a href="https://weread.qq.com/web/reader/d35323e0597db0d35bd957bk7cb321502467cbbc409e62d" target="_blank" rel="noopener">Redis设计与实现-黄健宏-微信读书</a></p>
+<blockquote>
+<p>本文首发于我的个人博客 <a href="https://chaohang.top" target="_blank" rel="noopener">https://chaohang.top</a></p>
+<p>作者<a href="https://chaohang.top" target="_blank" rel="noopener">张小超</a></p>
+<p>转载请注明出处</p>
+</blockquote>
+<p>欢迎关注我的微信公众号 【超超不会飞】，获取第一时间的更新。</p>
+<p><img data-src="http://cdn.chaohang.top/20200812114326.png" alt=""></p>
 ]]></content>
       <tags>
         <tag>Redis</tag>
