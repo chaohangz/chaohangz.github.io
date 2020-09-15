@@ -1,6 +1,67 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>对比Redis中RDB和AOF持久化</title>
+    <url>/2020/09/15/%E5%AF%B9%E6%AF%94Redis%E4%B8%ADRDB%E5%92%8CAOF%E6%8C%81%E4%B9%85%E5%8C%96/</url>
+    <content><![CDATA[<p><img data-src="http://cdn.chaohang.top/20200915140846.jpg" alt=""></p>
+<h2 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h2><p>Redis 是内存数据库，数据存储在内存中，一旦服务器进程退出，数据就丢失了，所以 Redis 需要想办法将存储在内存中的数据持久化到磁盘。</p>
+<p>Redis 提供了两种持久化功能：</p>
+<a id="more"></a>
+<ol>
+<li>RDB (Redis Database)：生成 RDB 文件，保存的是 key-value 的形式。</li>
+<li>AOF (Append Only File)：保存 Redis 执行过程中的写命令。</li>
+</ol>
+<h2 id="生成"><a href="#生成" class="headerlink" title="生成"></a>生成</h2><h3 id="RDB-的生成"><a href="#RDB-的生成" class="headerlink" title="RDB 的生成"></a>RDB 的生成</h3><ol>
+<li><p><code>SAVE</code> 命令会阻塞 Redis 服务进程，直到 RDB 文件创建完毕为止，在服务器进程阻塞期间，服务器不能处理任何命令请求。</p>
+</li>
+<li><p><code>BGSAVE</code> 命令会派生出一个子进程，然后由子进程负责创建 RDB 文件，服务器进程（父进程）继续处理命令请求。</p>
+</li>
+</ol>
+<p>如果两个 key 值的修改具有事务性，需要手动加事务，不然备份时可能会导致两个值不一致。</p>
+<p>除了主动执行命令，我们还可以通过 save 选项设置多个保存条件，只要任意一个条件满足，服务器就会执行 <code>BGSAVE</code> 命令：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">save <span class="number">900</span> <span class="number">1</span></span><br><span class="line">save <span class="number">300</span> <span class="number">10</span></span><br><span class="line">save <span class="number">60</span> <span class="number">10000</span></span><br></pre></td></tr></table></figure>
+<p>那么只要满足以下三个条件中的任意一个，<code>BGSAVE</code> 命令就会被执行：</p>
+<ol>
+<li>服务器在900秒之内，对数据库进行了至少1次修改。</li>
+<li>服务器在300秒之内，对数据库进行了至少10次修改。</li>
+<li>服务器在60秒之内，对数据库进行了至少10000次修改。</li>
+</ol>
+<h3 id="AOF-的生成"><a href="#AOF-的生成" class="headerlink" title="AOF 的生成"></a>AOF 的生成</h3><p>只要打开 AOF 持久化功能，服务器在执行完一个写命令后，会以协议格式将被执行的写命令追加到服务器状态的 aof_buf 缓冲区的末尾。</p>
+<p>现代操作系统中，用户在写文件时，操作系统通常会将写入数据暂时保存在一个内存缓冲区里面，等到缓冲区被填满，或者超过了指定时限之后，才真正将缓冲区中的数据写入磁盘。这就有可能导致缓冲区内的数据还未写入磁盘，计算机发生停机，导致数据丢失。</p>
+<p><code>appendfsync</code> 选项的值可以决定 AOF 持久化功能的效率和安全性：</p>
+<ol>
+<li><code>always</code> 每次都同步到磁盘，效率低，安全性高；</li>
+<li><code>everysec</code> 每隔一秒同步到磁盘，效率足够快，安全性高，只丢失一秒的数据；</li>
+<li><code>no</code> 由操作系统控制同步到磁盘的时机，速度最快，安全性最低。</li>
+</ol>
+<h3 id="AOF-的重写"><a href="#AOF-的重写" class="headerlink" title="AOF 的重写"></a>AOF 的重写</h3><p>因为 AOF 保存的是写命令，随着服务器的运行，同一个键值被操作的次数越多，单个键值就会产生多条写命令，AOF 文件就会越大，还原的时间就会越久。</p>
+<p>为了解决 AOF 体积膨胀的问题，Redis 提供了 AOF 文件重写（rewrite）功能。</p>
+<p>AOF 重写并不是对旧的 AOF 文件进行压缩。Redis 会从数据库中读出数据，生成对应的写命令，并写入新的 AOF 文件中，当新的 AOF 文件重写了所有数据的写命令，就可以替换掉旧 AOF 文件。</p>
+<p>AOF 重写可以在后台进行，在重写过程中新产生的数据，会写入 AOF 重写缓冲区中，当重写结束再把缓冲区的写命令追加到新的 AOF 文件中即可。</p>
+<p><img data-src="http://cdn.chaohang.top/20200915091441.png" alt=""></p>
+<h2 id="载入"><a href="#载入" class="headerlink" title="载入"></a>载入</h2><h3 id="RDB-的载入"><a href="#RDB-的载入" class="headerlink" title="RDB 的载入"></a>RDB 的载入</h3><p>RDB 文件的载入工作是在服务器启动时自动执行的，所以 Redis 没有专门用于载入的命令。</p>
+<p>因为 AOF 文件的更新频率通常比 RDB 文件的更新频率高，所以：</p>
+<ol>
+<li>如果服务器启动了AOF 持久化功能，那么服务器会优先使用 AOF 文件来还原数据库状态。</li>
+<li>只有在 AOF 持久化功能处于关闭状态时，服务器才会使用 RDB 文件来还原数据库状态。</li>
+</ol>
+<p><img data-src="http://cdn.chaohang.top/20200914084027.png" alt="http://cdn.chaohang.top/20200914084027.png"></p>
+<h3 id="AOF-的载入"><a href="#AOF-的载入" class="headerlink" title="AOF 的载入"></a>AOF 的载入</h3><p>AOF 中包含了所有的写命令，服务器只要读入并重新执行一遍AOF文件里保存的写命令，就可以还原服务器关闭前的状态。</p>
+<p>Redis 读取 AOF 文件并还原数据库状态的详细步骤：</p>
+<ol>
+<li>创建一个不带网络连接的伪客户端：因为 Redis 的命令只能在客户端上下文中执行，而载入 AOF 文件时所使用的命令直接来源于 AOF 文件而不是网络连接，所以用来还原数据的伪客户端不需要网络连接；</li>
+<li>从 AOF 文件中分析并读取出一条写命令；</li>
+<li>使用伪客户端执行读出的写命令；</li>
+<li>循环执行步骤2和步骤3，直到 AOF 文件中的所有命令都被执行。</li>
+</ol>
+<p><img data-src="http://cdn.chaohang.top/20200915090522.png" alt=""></p>
+<h2 id="资料"><a href="#资料" class="headerlink" title="资料"></a>资料</h2><p><a href="https://weread.qq.com/web/reader/d35323e0597db0d35bd957bk7cb321502467cbbc409e62d" target="_blank" rel="noopener">Redis设计与实现-黄健宏-微信读书</a></p>
+]]></content>
+      <tags>
+        <tag>Redis</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>《搞定1》读书笔记</title>
     <url>/2020/08/27/%E3%80%8A%E6%90%9E%E5%AE%9A1%E3%80%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/</url>
     <content><![CDATA[<p><img data-src="http://cdn.chaohang.top/20200827165702.jpg" alt=""></p>

@@ -180,6 +180,97 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.chaohang.top/2017/04/16/%E3%80%8AAlgorithms-Unlocked%E3%80%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B03%E2%80%94%E2%80%94%E8%AE%A1%E6%95%B0%E6%8E%92%E5%BA%8F/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="张小超">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="张小超的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2017/04/16/%E3%80%8AAlgorithms-Unlocked%E3%80%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B03%E2%80%94%E2%80%94%E8%AE%A1%E6%95%B0%E6%8E%92%E5%BA%8F/" class="post-title-link" itemprop="url">《Algorithms Unlocked》读书笔记3——计数排序</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2017-04-16 20:55:57" itemprop="dateCreated datePublished" datetime="2017-04-16T20:55:57+08:00">2017-04-16</time>
+            </span>
+
+          
+            <span id="/2017/04/16/%E3%80%8AAlgorithms-Unlocked%E3%80%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B03%E2%80%94%E2%80%94%E8%AE%A1%E6%95%B0%E6%8E%92%E5%BA%8F/" class="post-meta-item leancloud_visitors" data-flag-title="《Algorithms Unlocked》读书笔记3——计数排序" title="Views">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine: </span>
+    
+    <a title="valine" href="/2017/04/16/%E3%80%8AAlgorithms-Unlocked%E3%80%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B03%E2%80%94%E2%80%94%E8%AE%A1%E6%95%B0%E6%8E%92%E5%BA%8F/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2017/04/16/%E3%80%8AAlgorithms-Unlocked%E3%80%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B03%E2%80%94%E2%80%94%E8%AE%A1%E6%95%B0%E6%8E%92%E5%BA%8F/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p><a href="https://book.douban.com/subject/20421419/" target="_blank" rel="noopener">《Algorithms Unlocked》</a>是 《算法导论》的合著者之一 Thomas H. Cormen 写的一本算法基础，算是啃CLRS前的开胃菜和辅助教材。如果CLRS的厚度让人望而生畏，这本200多页的小读本刚好合适带你入门。</p>
+<p>书中没有涉及编程语言，直接用文字描述算法，我用 JavaScript 对书中的算法进行描述。</p>
+<h2 id="超越下界"><a href="#超越下界" class="headerlink" title="超越下界"></a>超越下界</h2><p>之前的四个排序算法——选择排序、插入排序、归并排序、快速排序都是依赖于对排序关键字进行的比较。他们的决策依据都是“如果这个元素的排序关键字比另一个元素的排序关键字小，那么就进行相应操作，否则，进行其他操作或者什么也不做。”假如我们还是依赖这一规则，无论是简单或复杂的算法或者还没被发现的算法都无法突破这一下界（最坏情况下所需要的最小时间）。所以我们需要更改游戏规则，不让算法利用比较来进行排序。</p>
+<h2 id="计数排序"><a href="#计数排序" class="headerlink" title="计数排序"></a>计数排序</h2><p>假设我们有一个数组，该数组内的元素都是 0~m-1 范围内的整数。例如 <code>let array = [4, 1, 5, 0, 1, 6, 5, 1, 5, 3]</code> 。如果我们可以知道排序关键字为 5 的元素有三个，并且刚好有 6 个元素的排序关键字小于 5，那么三个 5 应该位于位置6、7、8上。</p>
+<p>首先我们要计算出有多少个元素的排序关键字等于某个值。比如有 3 个元素的排序关键字等于 5。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// m:定义了数组array中元素的取值范围 0~m-1</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">countKeysEqual</span>(<span class="params">array, m</span>) </span>&#123;</span><br><span class="line">  <span class="comment">// 创建一个空数组，长度为m，给每个元素赋值0</span></span><br><span class="line">  <span class="comment">// 为什么要有这一步，万一哪个值array里没有就会变成NaN</span></span><br><span class="line">  <span class="keyword">let</span> equal = [];</span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">let</span> i = <span class="number">0</span>; i &lt; m; i++) &#123;</span><br><span class="line">    equal[i] = <span class="number">0</span>;</span><br><span class="line">  &#125;;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">let</span> j = <span class="number">0</span>; j &lt; array.length; j++) &#123;</span><br><span class="line">    <span class="comment">// 把array中的元素作为equal数组的索引值</span></span><br><span class="line">    <span class="comment">// 该索引值在equal中对应的值为该元素在array中出现的次数</span></span><br><span class="line">    <span class="keyword">let</span> key = array[j];</span><br><span class="line">    equal[key] += <span class="number">1</span>;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> equal;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2017/04/16/%E3%80%8AAlgorithms-Unlocked%E3%80%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B03%E2%80%94%E2%80%94%E8%AE%A1%E6%95%B0%E6%8E%92%E5%BA%8F/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-Hans">
     <link itemprop="mainEntityOfPage" href="https://www.chaohang.top/2017/04/16/%E3%80%8AAlgorithms-Unlocked%E3%80%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B02%E2%80%94%E2%80%94%E4%BA%8C%E5%88%86%E6%9F%A5%E6%89%BE%E5%92%8C%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -603,14 +694,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">54</span>
+          <span class="site-state-item-count">55</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">36</span>
+        <span class="site-state-item-count">37</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>
