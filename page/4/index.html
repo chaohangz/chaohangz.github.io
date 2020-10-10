@@ -180,6 +180,360 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.chaohang.top/2019/06/02/%E7%90%86%E8%A7%A3%20Node.js%20%E7%9A%84%20GC%20%E6%9C%BA%E5%88%B6/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="张小超">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="张小超的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2019/06/02/%E7%90%86%E8%A7%A3%20Node.js%20%E7%9A%84%20GC%20%E6%9C%BA%E5%88%B6/" class="post-title-link" itemprop="url">理解 Node.js 的 GC 机制</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2019-06-02 17:18:36" itemprop="dateCreated datePublished" datetime="2019-06-02T17:18:36+08:00">2019-06-02</time>
+            </span>
+
+          
+            <span id="/2019/06/02/%E7%90%86%E8%A7%A3%20Node.js%20%E7%9A%84%20GC%20%E6%9C%BA%E5%88%B6/" class="post-meta-item leancloud_visitors" data-flag-title="理解 Node.js 的 GC 机制" title="Views">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine: </span>
+    
+    <a title="valine" href="/2019/06/02/%E7%90%86%E8%A7%A3%20Node.js%20%E7%9A%84%20GC%20%E6%9C%BA%E5%88%B6/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2019/06/02/%E7%90%86%E8%A7%A3%20Node.js%20%E7%9A%84%20GC%20%E6%9C%BA%E5%88%B6/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <blockquote>
+<p>《深入浅出Node.js》第五章《内存控制》阅读笔记</p>
+</blockquote>
+<p>随着 Node 的发展，JavaScript 的应用场景早已不再局限在浏览器中。本文不讨论网页应用、命令行工具等短时间执行，且只影响终端用户的场景。由于运行时间短，随着进程的退出，内存会释放，几乎没有内存管理的必要。但随着 Node 在服务端的广泛应用，JavaScript 的内存管理需要引起我们的重视。</p>
+<h2 id="V8-的内存限制"><a href="#V8-的内存限制" class="headerlink" title="V8 的内存限制"></a>V8 的内存限制</h2><p>在一般的后端开发语言中，在基本的内存使用上没有什么限制，然而在 Node 中通过 JavaScript 使用内存时就会发现只能使用部分内存（64位系统下约为1.4GB，32位系统下约为0.7GB）。在这样的限制下，将会导致 Node 无法直接操作大内存对象。</p>
+<p>造成这个问题的主要原因在于 Node 的 JavaScript 执行引擎 V8。</p>
+<p>在 V8 中，所有的 JavaScript 对象都是通过堆来进行分配的。Node 提供了 V8 中内存的使用量查看方法 <code>process.memoryUsage()</code>。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2019/06/02/%E7%90%86%E8%A7%A3%20Node.js%20%E7%9A%84%20GC%20%E6%9C%BA%E5%88%B6/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.chaohang.top/2019/05/26/LeetCode70%E2%80%94%E2%80%94%E7%88%AC%E6%A5%BC%E6%A2%AF/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="张小超">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="张小超的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2019/05/26/LeetCode70%E2%80%94%E2%80%94%E7%88%AC%E6%A5%BC%E6%A2%AF/" class="post-title-link" itemprop="url">LeetCode70——爬楼梯</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2019-05-26 16:17:45" itemprop="dateCreated datePublished" datetime="2019-05-26T16:17:45+08:00">2019-05-26</time>
+            </span>
+
+          
+            <span id="/2019/05/26/LeetCode70%E2%80%94%E2%80%94%E7%88%AC%E6%A5%BC%E6%A2%AF/" class="post-meta-item leancloud_visitors" data-flag-title="LeetCode70——爬楼梯" title="Views">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine: </span>
+    
+    <a title="valine" href="/2019/05/26/LeetCode70%E2%80%94%E2%80%94%E7%88%AC%E6%A5%BC%E6%A2%AF/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2019/05/26/LeetCode70%E2%80%94%E2%80%94%E7%88%AC%E6%A5%BC%E6%A2%AF/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="题目描述"><a href="#题目描述" class="headerlink" title="题目描述"></a>题目描述</h2><p>假设你正在爬楼梯。需要 n 阶你才能到达楼顶。</p>
+<p>每次你可以爬 1 或 2 个台阶。你有多少种不同的方法可以爬到楼顶呢？</p>
+<p>注意：给定 n 是一个正整数。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2019/05/26/LeetCode70%E2%80%94%E2%80%94%E7%88%AC%E6%A5%BC%E6%A2%AF/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.chaohang.top/2019/04/24/%E4%BD%BF%E7%94%A8-trash-%E9%81%BF%E5%85%8D-rm-rf-%E6%82%B2%E5%89%A7/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="张小超">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="张小超的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2019/04/24/%E4%BD%BF%E7%94%A8-trash-%E9%81%BF%E5%85%8D-rm-rf-%E6%82%B2%E5%89%A7/" class="post-title-link" itemprop="url">使用 trash 避免 rm -rf 悲剧</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2019-04-24 18:04:26" itemprop="dateCreated datePublished" datetime="2019-04-24T18:04:26+08:00">2019-04-24</time>
+            </span>
+
+          
+            <span id="/2019/04/24/%E4%BD%BF%E7%94%A8-trash-%E9%81%BF%E5%85%8D-rm-rf-%E6%82%B2%E5%89%A7/" class="post-meta-item leancloud_visitors" data-flag-title="使用 trash 避免 rm -rf 悲剧" title="Views">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine: </span>
+    
+    <a title="valine" href="/2019/04/24/%E4%BD%BF%E7%94%A8-trash-%E9%81%BF%E5%85%8D-rm-rf-%E6%82%B2%E5%89%A7/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2019/04/24/%E4%BD%BF%E7%94%A8-trash-%E9%81%BF%E5%85%8D-rm-rf-%E6%82%B2%E5%89%A7/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>昨晚做了一个令人痛心疾首的操作，<code>rm -rf something</code>，把我个人电脑里的重要文件夹给删掉了，懵逼了半天才缓过来。还好是个人文件，不对公司造成影响。这件事也让我意识到 <code>rm -rf</code> 确实是个高风险操作，文件备份也是重中之重。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2019/04/24/%E4%BD%BF%E7%94%A8-trash-%E9%81%BF%E5%85%8D-rm-rf-%E6%82%B2%E5%89%A7/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.chaohang.top/2019/04/14/%E5%AE%9E%E7%8E%B0%E4%B8%80%E4%B8%AA%E7%AE%80%E5%8D%95%E7%9A%84WebSocket%E8%81%8A%E5%A4%A9%E5%AE%A4/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="张小超">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="张小超的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2019/04/14/%E5%AE%9E%E7%8E%B0%E4%B8%80%E4%B8%AA%E7%AE%80%E5%8D%95%E7%9A%84WebSocket%E8%81%8A%E5%A4%A9%E5%AE%A4/" class="post-title-link" itemprop="url">实现一个简单的WebSocket聊天室</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2019-04-14 17:36:12" itemprop="dateCreated datePublished" datetime="2019-04-14T17:36:12+08:00">2019-04-14</time>
+            </span>
+
+          
+            <span id="/2019/04/14/%E5%AE%9E%E7%8E%B0%E4%B8%80%E4%B8%AA%E7%AE%80%E5%8D%95%E7%9A%84WebSocket%E8%81%8A%E5%A4%A9%E5%AE%A4/" class="post-meta-item leancloud_visitors" data-flag-title="实现一个简单的WebSocket聊天室" title="Views">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine: </span>
+    
+    <a title="valine" href="/2019/04/14/%E5%AE%9E%E7%8E%B0%E4%B8%80%E4%B8%AA%E7%AE%80%E5%8D%95%E7%9A%84WebSocket%E8%81%8A%E5%A4%A9%E5%AE%A4/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2019/04/14/%E5%AE%9E%E7%8E%B0%E4%B8%80%E4%B8%AA%E7%AE%80%E5%8D%95%E7%9A%84WebSocket%E8%81%8A%E5%A4%A9%E5%AE%A4/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="WebSocket-简介"><a href="#WebSocket-简介" class="headerlink" title="WebSocket 简介"></a>WebSocket 简介</h2><blockquote>
+<p>WebSocket 是 HTML5 开始提供的一种在单个 TCP 连接上进行全双工通讯的协议。<br>WebSocket 使得客户端和服务器之间的数据交换变得更加简单，允许服务端主动向客户端推送数据。在 WebSocket API 中，浏览器和服务器只需要完成一次握手，两者之间就直接可以创建持久性的连接，并进行双向数据传输。<br>在 WebSocket API 中，浏览器和服务器只需要做一个握手的动作，然后，浏览器和服务器之间就形成了一条快速通道。两者之间就直接可以数据互相传送。</p>
+</blockquote>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2019/04/14/%E5%AE%9E%E7%8E%B0%E4%B8%80%E4%B8%AA%E7%AE%80%E5%8D%95%E7%9A%84WebSocket%E8%81%8A%E5%A4%A9%E5%AE%A4/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-Hans">
     <link itemprop="mainEntityOfPage" href="https://www.chaohang.top/2018/11/19/%E5%BE%AE%E4%BF%A1%E6%94%AF%E4%BB%98%E5%BC%80%E5%8F%91%E5%AE%9E%E8%AE%B0/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -711,375 +1065,6 @@
   
   
 
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://www.chaohang.top/2018/10/31/%E7%99%BD%E5%A4%9C%E8%A1%8C/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="张小超">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="张小超的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2018/10/31/%E7%99%BD%E5%A4%9C%E8%A1%8C/" class="post-title-link" itemprop="url">白夜行</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2018-10-31 09:51:58" itemprop="dateCreated datePublished" datetime="2018-10-31T09:51:58+08:00">2018-10-31</time>
-            </span>
-
-          
-            <span id="/2018/10/31/%E7%99%BD%E5%A4%9C%E8%A1%8C/" class="post-meta-item leancloud_visitors" data-flag-title="白夜行" title="Views">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              <span class="post-meta-item-text">Views: </span>
-              <span class="leancloud-visitors-count"></span>
-            </span>
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="fa fa-comment-o"></i>
-      </span>
-      <span class="post-meta-item-text">Valine: </span>
-    
-    <a title="valine" href="/2018/10/31/%E7%99%BD%E5%A4%9C%E8%A1%8C/#valine-comments" itemprop="discussionUrl">
-      <span class="post-comments-count valine-comment-count" data-xid="/2018/10/31/%E7%99%BD%E5%A4%9C%E8%A1%8C/" itemprop="commentCount"></span>
-    </a>
-  </span>
-  
-  
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <blockquote>
-<p>“我呢，”雪穗继续说，“从来就没有生活在太阳底下。”<br> “我的天空里没有太阳，总是黑夜，但并不暗，因为有东西代替了太阳。虽然没有太阳那么明亮，但对我来说已经足够。凭借着这份光，我便能把黑夜当成白天。你明白吗？我从来没有太阳，所以不害怕失去。” ——《白夜行》东野圭吾。</p>
-</blockquote>
-<p><img data-src="http://cdn.chaohang.top/20200212113836.png" alt="《白夜行》"></p>
-<p>开头是一宗离奇的命案，调查以无任何结果告终。然后开始分别叙述两位主人公的生活。从十一岁到初中到高中到成人，时间跨度长达十九年。每一件事单独看都是一个精彩的故事，谁知道最后所有的事情都会串起来成为解答开头命案的线索。本来以为是两个互不相关的两个人，作者在分别叙述他们的故事，看起来毫无相关性。看到最后才知道两个人始终在一起，策划着每一个意外。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2018/10/31/%E7%99%BD%E5%A4%9C%E8%A1%8C/#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://www.chaohang.top/2018/10/28/%E3%80%8A%E7%A0%81%E5%86%9C%E7%BF%BB%E8%BA%AB%E3%80%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="张小超">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="张小超的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2018/10/28/%E3%80%8A%E7%A0%81%E5%86%9C%E7%BF%BB%E8%BA%AB%E3%80%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/" class="post-title-link" itemprop="url">《码农翻身》读书笔记</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2018-10-28 20:14:14" itemprop="dateCreated datePublished" datetime="2018-10-28T20:14:14+08:00">2018-10-28</time>
-            </span>
-
-          
-            <span id="/2018/10/28/%E3%80%8A%E7%A0%81%E5%86%9C%E7%BF%BB%E8%BA%AB%E3%80%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/" class="post-meta-item leancloud_visitors" data-flag-title="《码农翻身》读书笔记" title="Views">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              <span class="post-meta-item-text">Views: </span>
-              <span class="leancloud-visitors-count"></span>
-            </span>
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="fa fa-comment-o"></i>
-      </span>
-      <span class="post-meta-item-text">Valine: </span>
-    
-    <a title="valine" href="/2018/10/28/%E3%80%8A%E7%A0%81%E5%86%9C%E7%BF%BB%E8%BA%AB%E3%80%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/#valine-comments" itemprop="discussionUrl">
-      <span class="post-comments-count valine-comment-count" data-xid="/2018/10/28/%E3%80%8A%E7%A0%81%E5%86%9C%E7%BF%BB%E8%BA%AB%E3%80%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/" itemprop="commentCount"></span>
-    </a>
-  </span>
-  
-  
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>花了一天时间翻完了《码农翻身》（跳过了Java部分）。生动有趣的书看起来就是舒服，竟有引人入胜、手不释卷的感觉，一不小心就翻完了。是一本很好的入门科普读物，开阔技术视野。</p>
-<p>下面是书中的摘抄和笔记</p>
-<h3 id="线程"><a href="#线程" class="headerlink" title="线程"></a>线程</h3><p><a href="https://mp.weixin.qq.com/s?__biz=MzAxOTc0NzExNg==&amp;mid=416915373&amp;idx=1&amp;sn=f80a13b099237534a3ef777d511d831a&amp;scene=21#wechat_redirect" target="_blank" rel="noopener">我是一个线程</a></p>
-<ol>
-<li>不知道什么时候会被挑中执行</li>
-<li>在执行的过程中随时可能被打断，让出CPU</li>
-<li>一旦出现硬盘、数据库这样耗时的操作，也得让出CPU</li>
-<li>数据来了，也不一定马上执行，还得等着被CPU挑选</li>
-</ol>
-<h3 id="三次握手"><a href="#三次握手" class="headerlink" title="三次握手"></a>三次握手</h3><p><a href="https://mp.weixin.qq.com/s?__biz=MzAxOTc0NzExNg==&amp;mid=2665513375&amp;idx=1&amp;sn=e11745d5cb28fa1f89465f8d0e5fae1a&amp;chksm=80d679dcb7a1f0cadec0a1db45b3fa3f6eabde4a9e56a77acf551fbc1511e6b8f055ee2c97e3&amp;scene=27#wechat_redirect" target="_blank" rel="noopener">TCP/IP之大明内阁</a><br><a href="https://mp.weixin.qq.com/s?__biz=MzAxOTc0NzExNg==&amp;mid=2665513384&amp;idx=1&amp;sn=82c45e4430618270a744e212d2f57990&amp;chksm=80d679ebb7a1f0fd27fe1814765a0e60b1c293ca4e09403271b4bb3f38f317439956fdca1bc1&amp;scene=27#wechat_redirect" target="_blank" rel="noopener">TCP/IP之蓟辽督师</a><br><a href="https://mp.weixin.qq.com/s?__biz=MzAxOTc0NzExNg==&amp;mid=2665513094&amp;idx=1&amp;sn=a2accfc41107ac08d74ec3317995955e&amp;scene=27#wechat_redirect" target="_blank" rel="noopener">TCP/IP 之 大明王朝邮差</a></p>
-<p><img data-src="http://cdn.chaohang.top/20200212113500.png" alt="三次握手"></p>
-<p>发送的信息被拆分成小包裹，编上序号，打乱顺序后发送，由服务端发送，客户端接收，接收后返回确认接收信息。如果一定时间内没有收到确认信息，则代表信息丢失（可能是发出的包裹丢失，也可能是返回的确认信息丢失），重新发送该包裹。全部接收完成后按照序号重新组装成完整信息。</p>
-<h3 id="HTTPS"><a href="#HTTPS" class="headerlink" title="HTTPS"></a>HTTPS</h3><p><a href="https://mp.weixin.qq.com/s?__biz=MzAxOTc0NzExNg==&amp;mid=2665513779&amp;idx=1&amp;sn=a1de58690ad4f95111e013254a026ca2&amp;chksm=80d67b70b7a1f26697fa1626b3e9830dbdf4857d7a9528d22662f2e43af149265c4fd1b60024&amp;scene=27#wechat_redirect" target="_blank" rel="noopener">一个故事讲完https</a></p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2018/10/28/%E3%80%8A%E7%A0%81%E5%86%9C%E7%BF%BB%E8%BA%AB%E3%80%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://www.chaohang.top/2018/10/20/%E7%9C%8B%E8%A7%81/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="张小超">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="张小超的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2018/10/20/%E7%9C%8B%E8%A7%81/" class="post-title-link" itemprop="url">看见</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2018-10-20 00:38:46" itemprop="dateCreated datePublished" datetime="2018-10-20T00:38:46+08:00">2018-10-20</time>
-            </span>
-
-          
-            <span id="/2018/10/20/%E7%9C%8B%E8%A7%81/" class="post-meta-item leancloud_visitors" data-flag-title="看见" title="Views">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              <span class="post-meta-item-text">Views: </span>
-              <span class="leancloud-visitors-count"></span>
-            </span>
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="fa fa-comment-o"></i>
-      </span>
-      <span class="post-meta-item-text">Valine: </span>
-    
-    <a title="valine" href="/2018/10/20/%E7%9C%8B%E8%A7%81/#valine-comments" itemprop="discussionUrl">
-      <span class="post-comments-count valine-comment-count" data-xid="/2018/10/20/%E7%9C%8B%E8%A7%81/" itemprop="commentCount"></span>
-    </a>
-  </span>
-  
-  
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p><img data-src="http://cdn.chaohang.top/20200212113904.png" alt="《看见》"></p>
-<p>花了半个月断断续续看完了柴静的《看见》。这本书值得重新再看一次。</p>
-<p>这次看这本书，用手机看，一目十行，有时候看着看着走神了，有时候动动手指就多翻了几页，或者在电梯里地铁里吃饭排队时匆匆看两眼。碎片时间让文章没了上下文，没了沉浸感。用手机看书是方便，随时随地，但不适合看一些有深度的书。</p>
-<p>这本书是一个时代的记忆——非典，汶川地震，奥运。也记录了各式各样的人和群体——双城集体服毒的小学生，戒毒所里被卖去卖淫的女人，采访同性恋，不知道犯了什么罪就被关了二十八年的人，因家庭暴力杀死丈夫的女人，山西的环境污染，采访用高跟鞋踩死小猫拍成视频传到网上的女人，华南虎照片真假事件，福建涂岭拆迁户不同意搬迁，户主的儿子——一个刚复员回来的年轻人，二十三岁——被开发商砍死，农村征地问题，采访卢安克，药家鑫事件。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2018/10/20/%E7%9C%8B%E8%A7%81/#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://www.chaohang.top/2018/09/25/Node-js-%E4%BD%BF%E7%94%A8-RSA-%E5%81%9A%E5%8A%A0%E5%AF%86/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="张小超">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="张小超的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2018/09/25/Node-js-%E4%BD%BF%E7%94%A8-RSA-%E5%81%9A%E5%8A%A0%E5%AF%86/" class="post-title-link" itemprop="url">Node.js 使用 RSA 做加密</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2018-09-25 18:41:42" itemprop="dateCreated datePublished" datetime="2018-09-25T18:41:42+08:00">2018-09-25</time>
-            </span>
-
-          
-            <span id="/2018/09/25/Node-js-%E4%BD%BF%E7%94%A8-RSA-%E5%81%9A%E5%8A%A0%E5%AF%86/" class="post-meta-item leancloud_visitors" data-flag-title="Node.js 使用 RSA 做加密" title="Views">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              <span class="post-meta-item-text">Views: </span>
-              <span class="leancloud-visitors-count"></span>
-            </span>
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="fa fa-comment-o"></i>
-      </span>
-      <span class="post-meta-item-text">Valine: </span>
-    
-    <a title="valine" href="/2018/09/25/Node-js-%E4%BD%BF%E7%94%A8-RSA-%E5%81%9A%E5%8A%A0%E5%AF%86/#valine-comments" itemprop="discussionUrl">
-      <span class="post-comments-count valine-comment-count" data-xid="/2018/09/25/Node-js-%E4%BD%BF%E7%94%A8-RSA-%E5%81%9A%E5%8A%A0%E5%AF%86/" itemprop="commentCount"></span>
-    </a>
-  </span>
-  
-  
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="RSA"><a href="#RSA" class="headerlink" title="RSA"></a>RSA</h2><p>RSA加密算法是一种非对称加密算法。</p>
-<p>假设 A 与 B 通信。A 和 B 都提供一个公开的公钥。A 把需要传递的信息，先用自己的私钥签名，再用 B 的公钥加密。B 接收到这串密文后，用自己的私钥解密，用 A 提供的公钥验签。</p>
-<p>为什么要先签名后加密？如果你先加密后签名，非法用户通过获取的公钥就可以破解签名，破解之后就可以替换签名。</p>
-<p>详细的原理可以参考以下文档：<br><a href="http://www.ruanyifeng.com/blog/2013/06/rsa_algorithm_part_one.html" target="_blank" rel="noopener">RSA算法原理（一）</a><br><a href="http://www.ruanyifeng.com/blog/2013/07/rsa_algorithm_part_two.html" target="_blank" rel="noopener">RSA算法原理（二）</a></p>
-<h2 id="node-rsa"><a href="#node-rsa" class="headerlink" title="node-rsa"></a>node-rsa</h2><p>在 node.js 中使用 rsa 算法，我们使用的是 <a href="https://github.com/rzcoder/node-rsa" target="_blank" rel="noopener">node-rsa</a> 这个包。</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> NodeRSA = <span class="built_in">require</span>(<span class="string">'node-rsa'</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> a_public_key_data = <span class="string">'-----BEGIN PUBLIC KEY----- ... -----END PUBLIC KEY-----'</span>;</span><br><span class="line"><span class="keyword">const</span> a_private_key_data = <span class="string">'-----BEGIN PRIVATE KEY----- ... -----END PRIVATE KEY-----'</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> b_public_key_data = <span class="string">'-----BEGIN PUBLIC KEY----- ... -----END PUBLIC KEY-----'</span>;</span><br><span class="line"><span class="keyword">const</span> b_private_key_data = <span class="string">'-----BEGIN PRIVATE KEY----- ... -----END PRIVATE KEY-----'</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 生成 A 的公私钥对象</span></span><br><span class="line"><span class="keyword">const</span> a_public_key = <span class="keyword">new</span> NodeRSA(a_public_key_data);</span><br><span class="line"><span class="keyword">const</span> a_private_key = <span class="keyword">new</span> NodeRSA(a_private_key_data);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 生成 B 的公私钥对象</span></span><br><span class="line"><span class="keyword">const</span> a_public_key = <span class="keyword">new</span> NodeRSA(a_public_key_data);</span><br><span class="line"><span class="keyword">const</span> a_private_key = <span class="keyword">new</span> NodeRSA(a_private_key_data);</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> text = <span class="string">'Hello RSA!'</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 加签并加密</span></span><br><span class="line"><span class="keyword">const</span> sign = a_private_key.sign(text, <span class="string">'base64'</span>, <span class="string">'utf8'</span>);</span><br><span class="line"><span class="built_in">console</span>.log(<span class="string">'A 私钥加签:'</span>, sign);</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> encrypted = a_public_key.encrypt(sign, <span class="string">'base64'</span>);</span><br><span class="line"><span class="built_in">console</span>.log(<span class="string">'B 公钥加密:'</span>, encrypted);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 解密并验签</span></span><br><span class="line"><span class="keyword">const</span> decrypted = a_public_key.decrypt(encrypted, <span class="string">'utf8'</span>);</span><br><span class="line"><span class="built_in">console</span>.log(<span class="string">'B 私钥解密:'</span>, decrypted);</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> verify = a_public_key.verify(text, decrypted, <span class="string">'utf8'</span>, <span class="string">'base64'</span>);</span><br><span class="line"><span class="built_in">console</span>.log(<span class="string">'A 公钥验签:'</span>, verify);</span><br></pre></td></tr></table></figure>
-<h2 id="serialize"><a href="#serialize" class="headerlink" title="serialize"></a>serialize</h2>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2018/09/25/Node-js-%E4%BD%BF%E7%94%A8-RSA-%E5%81%9A%E5%8A%A0%E5%AF%86/#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
   </div>
 
   
@@ -1150,14 +1135,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">55</span>
+          <span class="site-state-item-count">59</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">37</span>
+        <span class="site-state-item-count">36</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>
