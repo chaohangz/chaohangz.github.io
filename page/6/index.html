@@ -180,6 +180,450 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.chaohang.top/2018/08/07/%E4%B8%83%E7%89%9B%E8%A7%86%E9%A2%91%E5%88%87%E7%89%87%E6%96%B9%E6%A1%88/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="张小超">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="张小超的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2018/08/07/%E4%B8%83%E7%89%9B%E8%A7%86%E9%A2%91%E5%88%87%E7%89%87%E6%96%B9%E6%A1%88/" class="post-title-link" itemprop="url">七牛视频切片方案</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2018-08-07 22:23:28" itemprop="dateCreated datePublished" datetime="2018-08-07T22:23:28+08:00">2018-08-07</time>
+            </span>
+
+          
+            <span id="/2018/08/07/%E4%B8%83%E7%89%9B%E8%A7%86%E9%A2%91%E5%88%87%E7%89%87%E6%96%B9%E6%A1%88/" class="post-meta-item leancloud_visitors" data-flag-title="七牛视频切片方案" title="Views">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine: </span>
+    
+    <a title="valine" href="/2018/08/07/%E4%B8%83%E7%89%9B%E8%A7%86%E9%A2%91%E5%88%87%E7%89%87%E6%96%B9%E6%A1%88/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2018/08/07/%E4%B8%83%E7%89%9B%E8%A7%86%E9%A2%91%E5%88%87%E7%89%87%E6%96%B9%E6%A1%88/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>使用七牛 sdk 上传视频并做分片操作。</p>
+<h3 id="step1-生成-token"><a href="#step1-生成-token" class="headerlink" title="step1 生成 token"></a>step1 生成 token</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> qiniu = <span class="built_in">require</span>(<span class="string">"qiniu"</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> accessKey = proc.env.QINIU_ACCESS_KEY;</span><br><span class="line"><span class="keyword">var</span> secretKey = proc.env.QINIU_SECRET_KEY;</span><br><span class="line"><span class="keyword">var</span> mac = <span class="keyword">new</span> qiniu.auth.digest.Mac(accessKey, secretKey);</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> bucket = proc.env.QINIU_TEST_BUCKET;  <span class="comment">// 对象存储空间</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//带数据处理的凭证</span></span><br><span class="line"><span class="keyword">var</span> origin_filename = <span class="string">"avthumb_test_target.mp4"</span>;  <span class="comment">// 源文件名</span></span><br><span class="line"><span class="keyword">var</span> save_as_filename = <span class="string">`<span class="subst">$&#123;origin_filename&#125;</span>.m3n8`</span>;  <span class="comment">// 分片后的文件名</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> saveMp4Entry = qiniu.util.urlsafeBase64Encode(<span class="string">`<span class="subst">$&#123;bucket&#125;</span>:<span class="subst">$&#123;save_as_filename&#125;</span>`</span>);</span><br><span class="line"><span class="keyword">var</span> avthumbMp4Fop = <span class="string">"avthumb/m3u8/noDomain/1/segtime/15/vb/440k|saveas/"</span> + saveMp4Entry;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> options = &#123;</span><br><span class="line">  scope: bucket,</span><br><span class="line">  expires: <span class="number">3600</span>,  <span class="comment">// 凭证有效时间</span></span><br><span class="line">  persistentOps: avthumbMp4Fop,  <span class="comment">// 视频上传后触发预转持久化，切片处理</span></span><br><span class="line">  persistentPipeline: <span class="string">"video-pipe"</span>,  <span class="comment">// 多媒体处理队列</span></span><br><span class="line">  persistentNotifyUrl: <span class="string">"http://api.example.com/qiniu/pfop/notify"</span>,  <span class="comment">// 回调通知地址</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">var</span> putPolicy = <span class="keyword">new</span> qiniu.rs.PutPolicy(options);</span><br><span class="line"><span class="built_in">console</span>.log(putPolicy.uploadToken(mac));</span><br></pre></td></tr></table></figure>
+<p>生成不同作用的凭证可以查看官方提供的示例<a href="https://github.com/qiniu/nodejs-sdk/blob/master/examples/create_uptoken.js" target="_blank" rel="noopener">nodejs-sdk example</a>。</p>
+<p>以上代码为生成上传视频并进行切片处理的凭证。上传相关的文档查看<a href="https://developer.qiniu.com/kodo/manual/1206/put-policy" target="_blank" rel="noopener">七牛上传策略</a>。</p>
+<p>切片动作是由<code>persistentOps</code>参数触发并启动一个异步任务，</p>
+<h2 id="persistentOps-详解"><a href="#persistentOps-详解" class="headerlink" title="persistentOps 详解"></a><strong>persistentOps 详解</strong></h2>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2018/08/07/%E4%B8%83%E7%89%9B%E8%A7%86%E9%A2%91%E5%88%87%E7%89%87%E6%96%B9%E6%A1%88/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.chaohang.top/2018/01/10/Sequelize-%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="张小超">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="张小超的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2018/01/10/Sequelize-%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C/" class="post-title-link" itemprop="url">Sequelize 基本操作</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2018-01-10 19:11:31" itemprop="dateCreated datePublished" datetime="2018-01-10T19:11:31+08:00">2018-01-10</time>
+            </span>
+
+          
+            <span id="/2018/01/10/Sequelize-%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C/" class="post-meta-item leancloud_visitors" data-flag-title="Sequelize 基本操作" title="Views">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine: </span>
+    
+    <a title="valine" href="/2018/01/10/Sequelize-%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2018/01/10/Sequelize-%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="sequelize-基本操作"><a href="#sequelize-基本操作" class="headerlink" title="sequelize 基本操作"></a>sequelize 基本操作</h1><p><a href="http://docs.sequelizejs.com/" target="_blank" rel="noopener">Sequelize</a> 是 Node 的一个 ORM(Object-Relational Mapping) 框架，用来方便数据库操作。</p>
+<h2 id="配置-sequelize"><a href="#配置-sequelize" class="headerlink" title="配置 sequelize"></a>配置 sequelize</h2><blockquote>
+<p>以 mysql 为例</p>
+</blockquote>
+<p>首先我们要引入npm包，sequelize 依赖 mysql2 作为底层驱动，暴露出自己的 API 让我们调用，在转成 mysql 语句进行执行。</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">"mysql2": "^1.5.1",</span><br><span class="line">"sequelize": "^4.28.6"</span><br></pre></td></tr></table></figure>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> Sequelize = <span class="built_in">require</span>(<span class="string">'sequelize'</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">// 连接数据库</span></span><br><span class="line"><span class="keyword">const</span> sequelize = <span class="keyword">new</span> Sequelize(<span class="string">'database'</span>, <span class="string">'username'</span>, <span class="string">'password'</span>, &#123;</span><br><span class="line">  host: sqlconf.host,</span><br><span class="line">  dialect: <span class="string">'mysql'</span>, <span class="comment">// 这里可以改成任意一种关系型数据库</span></span><br><span class="line"></span><br><span class="line">  pool: &#123;</span><br><span class="line">    max: <span class="number">5</span>,</span><br><span class="line">    min: <span class="number">0</span>,</span><br><span class="line">    acquire: <span class="number">30000</span>,</span><br><span class="line">    idle: <span class="number">10000</span>,</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line"><span class="comment">// 测试连接是否成功</span></span><br><span class="line">sequelize</span><br><span class="line">  .authenticate()</span><br><span class="line">  .then(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">'Connection has been established successfully.'</span>)</span><br><span class="line">  &#125;)</span><br><span class="line">  .catch(<span class="function"><span class="params">err</span> =&gt;</span> &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">'Unable to connect to the database'</span>, err)</span><br><span class="line">  &#125;)</span><br><span class="line"></span><br><span class="line"><span class="comment">// 根据 model自动创建表</span></span><br><span class="line">sequelize</span><br><span class="line">  .sync()</span><br><span class="line">  .then(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">'init db ok'</span>)</span><br><span class="line">  &#125;)</span><br><span class="line">  .catch(<span class="function"><span class="params">err</span> =&gt;</span> &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">'init db error'</span>, err)</span><br><span class="line">  &#125;)</span><br></pre></td></tr></table></figure>
+<p>我们可以调用<code>sync()</code>根据 model自动在数据库中创建表，也可以不调用，自己手动创。如果使用了 Sequelize 的 <a href="http://docs.sequelizejs.com/manual/tutorial/associations.html" target="_blank" rel="noopener">Associations</a>，这必须通过 <code>sync()</code> 生成表结构。</p>
+<h2 id="创建-model"><a href="#创建-model" class="headerlink" title="创建 model"></a>创建 model</h2><p>创建模型，告诉 Sequelize 如何映射数据库表</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2018/01/10/Sequelize-%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.chaohang.top/2017/11/29/%E8%A7%A3%E5%86%B3-iPhone-%E5%BE%AE%E4%BF%A1-H5-%E6%97%A0%E6%B3%95%E8%87%AA%E5%8A%A8%E6%92%AD%E6%94%BE%E9%9F%B3%E4%B9%90%E9%97%AE%E9%A2%98/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="张小超">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="张小超的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2017/11/29/%E8%A7%A3%E5%86%B3-iPhone-%E5%BE%AE%E4%BF%A1-H5-%E6%97%A0%E6%B3%95%E8%87%AA%E5%8A%A8%E6%92%AD%E6%94%BE%E9%9F%B3%E4%B9%90%E9%97%AE%E9%A2%98/" class="post-title-link" itemprop="url">解决 iPhone 微信 H5 无法自动播放音乐问题</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2017-11-29 17:29:26" itemprop="dateCreated datePublished" datetime="2017-11-29T17:29:26+08:00">2017-11-29</time>
+            </span>
+
+          
+            <span id="/2017/11/29/%E8%A7%A3%E5%86%B3-iPhone-%E5%BE%AE%E4%BF%A1-H5-%E6%97%A0%E6%B3%95%E8%87%AA%E5%8A%A8%E6%92%AD%E6%94%BE%E9%9F%B3%E4%B9%90%E9%97%AE%E9%A2%98/" class="post-meta-item leancloud_visitors" data-flag-title="解决 iPhone 微信 H5 无法自动播放音乐问题" title="Views">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine: </span>
+    
+    <a title="valine" href="/2017/11/29/%E8%A7%A3%E5%86%B3-iPhone-%E5%BE%AE%E4%BF%A1-H5-%E6%97%A0%E6%B3%95%E8%87%AA%E5%8A%A8%E6%92%AD%E6%94%BE%E9%9F%B3%E4%B9%90%E9%97%AE%E9%A2%98/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2017/11/29/%E8%A7%A3%E5%86%B3-iPhone-%E5%BE%AE%E4%BF%A1-H5-%E6%97%A0%E6%B3%95%E8%87%AA%E5%8A%A8%E6%92%AD%E6%94%BE%E9%9F%B3%E4%B9%90%E9%97%AE%E9%A2%98/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>使用 wx sdk 在html导入sdk js文件。（<strong>如果网站是https导入的sdk也要使用https！</strong>）<br>然后在 <code>wx.ready</code> 中设置 play 方法并复制给全局变量 fm，当需要使用的时候再调用 fm()</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 全局变量 fm2</span></span><br><span class="line"><span class="keyword">var</span> fm2;</span><br><span class="line"></span><br><span class="line">wx.config(&#123;</span><br><span class="line">  debug : <span class="literal">false</span>, <span class="comment">// 这里为false</span></span><br><span class="line">  appId : <span class="string">''</span>, <span class="comment">// 以下随意填写即可</span></span><br><span class="line">  timestamp : (<span class="keyword">new</span> <span class="built_in">Date</span>()).getTime(),</span><br><span class="line">  nonceStr : <span class="string">''</span>,</span><br><span class="line">  signature : <span class="string">''</span>,</span><br><span class="line">  jsApiList : [<span class="string">'checkJsApi'</span>]</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">wx.ready(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  $(<span class="string">'#music1'</span>).play();  <span class="comment">// 第一段音乐页面加载后自动播放</span></span><br><span class="line">  $(<span class="string">'#music2'</span>).load();  <span class="comment">// 第二段音乐等待，触发 fm2 时播放</span></span><br><span class="line"></span><br><span class="line">  fm2 = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">    music2.play();</span><br><span class="line">  &#125;;</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">fm2(); <span class="comment">//调用之后即可播放</span></span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>本文首发于我的个人博客 <a href="https://chaohang.top" target="_blank" rel="noopener">https://chaohang.top</a></p>
+<p>作者<a href="https://chaohang.top" target="_blank" rel="noopener">张小超</a></p>
+<p>转载请注明出处</p>
+</blockquote>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.chaohang.top/2017/10/27/promise-%E5%92%8C-async-%E7%9A%84%E7%94%A8%E6%B3%95/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="张小超">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="张小超的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2017/10/27/promise-%E5%92%8C-async-%E7%9A%84%E7%94%A8%E6%B3%95/" class="post-title-link" itemprop="url">promise 和 async 的用法</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2017-10-27 09:56:34" itemprop="dateCreated datePublished" datetime="2017-10-27T09:56:34+08:00">2017-10-27</time>
+            </span>
+
+          
+            <span id="/2017/10/27/promise-%E5%92%8C-async-%E7%9A%84%E7%94%A8%E6%B3%95/" class="post-meta-item leancloud_visitors" data-flag-title="promise 和 async 的用法" title="Views">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine: </span>
+    
+    <a title="valine" href="/2017/10/27/promise-%E5%92%8C-async-%E7%9A%84%E7%94%A8%E6%B3%95/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2017/10/27/promise-%E5%92%8C-async-%E7%9A%84%E7%94%A8%E6%B3%95/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h3 id="promise"><a href="#promise" class="headerlink" title="promise"></a>promise</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 先构造一个 promise 函数</span></span><br><span class="line"><span class="comment">// resolve 和 reject 都是一个函数</span></span><br><span class="line"><span class="comment">// resolve 在成功时调用</span></span><br><span class="line"><span class="comment">// reject 在失败时调用</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">promise</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="keyword">new</span> <span class="built_in">Promise</span>(<span class="function">(<span class="params">resolve, reject</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">let</span> tar = <span class="built_in">Math</span>.random(<span class="number">0</span>, <span class="number">1</span>)</span><br><span class="line">    <span class="keyword">if</span> (tar &gt; <span class="number">0.5</span>) &#123;</span><br><span class="line">      <span class="built_in">console</span>.log(<span class="string">'suceess'</span>)</span><br><span class="line">      setTimeout(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">        resolve(<span class="string">'resolve'</span>)  </span><br><span class="line">      &#125;, <span class="number">1000</span>)</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      <span class="built_in">console</span>.log(<span class="string">'fail'</span>)</span><br><span class="line">      setTimeout(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">        reject(<span class="string">'reject'</span>)</span><br><span class="line">      &#125;, <span class="number">1000</span>)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// then 和 catch 第一个参数为resolve状态时的回调，第二个参数为reject状态时的回调</span></span><br><span class="line"><span class="comment">// catch 相当于 then(null, reject)</span></span><br><span class="line">promise().then(</span><br><span class="line">  (resolve) =&gt; <span class="built_in">console</span>.log(<span class="string">'then'</span>, resolve)</span><br><span class="line">).catch(</span><br><span class="line">  (reject) =&gt; <span class="built_in">console</span>.log(<span class="string">'catch'</span>, reject)</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">// then 后面还可以接 then 一直链式调用</span></span><br><span class="line"><span class="comment">// 第一个 then 接受的参数是 resolve 函数传过来的参数</span></span><br><span class="line"><span class="comment">// 第二个 then 接受一个参数是第一个 then 返回的值</span></span><br><span class="line">promise().then(</span><br><span class="line">  (resolve) =&gt; (resolve + <span class="number">1</span>)  <span class="comment">// 接受 resolve 返回 resolve + 1</span></span><br><span class="line">).then(</span><br><span class="line">  (plusOne) =&gt; <span class="built_in">console</span>.log(plusOne)  <span class="comment">// 接受 resolve +1 并打印</span></span><br><span class="line">).catch(</span><br><span class="line">  (reject) =&gt; <span class="built_in">console</span>.log(<span class="string">'catch'</span>, reject)</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2017/10/27/promise-%E5%92%8C-async-%E7%9A%84%E7%94%A8%E6%B3%95/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.chaohang.top/2017/05/23/%E9%98%BF%E9%87%8C%E4%BA%91%E4%BA%91%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%9A%84%E7%AB%AF%E5%8F%A3%E9%85%8D%E7%BD%AE%E9%97%AE%E9%A2%98/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="张小超">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="张小超的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2017/05/23/%E9%98%BF%E9%87%8C%E4%BA%91%E4%BA%91%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%9A%84%E7%AB%AF%E5%8F%A3%E9%85%8D%E7%BD%AE%E9%97%AE%E9%A2%98/" class="post-title-link" itemprop="url">阿里云云服务器的端口配置问题</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2017-05-23 14:26:28" itemprop="dateCreated datePublished" datetime="2017-05-23T14:26:28+08:00">2017-05-23</time>
+            </span>
+
+          
+            <span id="/2017/05/23/%E9%98%BF%E9%87%8C%E4%BA%91%E4%BA%91%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%9A%84%E7%AB%AF%E5%8F%A3%E9%85%8D%E7%BD%AE%E9%97%AE%E9%A2%98/" class="post-meta-item leancloud_visitors" data-flag-title="阿里云云服务器的端口配置问题" title="Views">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine: </span>
+    
+    <a title="valine" href="/2017/05/23/%E9%98%BF%E9%87%8C%E4%BA%91%E4%BA%91%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%9A%84%E7%AB%AF%E5%8F%A3%E9%85%8D%E7%BD%AE%E9%97%AE%E9%A2%98/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2017/05/23/%E9%98%BF%E9%87%8C%E4%BA%91%E4%BA%91%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%9A%84%E7%AB%AF%E5%8F%A3%E9%85%8D%E7%BD%AE%E9%97%AE%E9%A2%98/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>心血来潮花了9块9（学生价）买了个阿里云。因为后端只会一点 Node，所以上来第一件事就是按照<a href="https://help.aliyun.com/document_detail/50775.html?spm=5176.doc52806.6.661.QHbNL5" target="_blank" rel="noopener">官方教程</a>把部署 Node 项目这个教程撸了一遍。</p>
+<h3 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h3><h4 id="官方教程代码"><a href="#官方教程代码" class="headerlink" title="官方教程代码"></a>官方教程代码</h4><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> http = <span class="built_in">require</span>(<span class="string">'http'</span>);</span><br><span class="line"><span class="keyword">const</span> hostname = <span class="string">'ECS公网IP地址'</span>;  <span class="comment">// 这里把文字换成自己的公网IP地址</span></span><br><span class="line"><span class="keyword">const</span> port = <span class="number">3000</span>;</span><br><span class="line"><span class="keyword">const</span> server = http.createServer(<span class="function">(<span class="params">req, res</span>) =&gt;</span> &#123;</span><br><span class="line">  res.statusCode = <span class="number">200</span>;</span><br><span class="line">  res.setHeader(<span class="string">'Content-Type'</span>, <span class="string">'text/plain'</span>);</span><br><span class="line">  res.end(<span class="string">'Hello World\n'</span>);</span><br><span class="line">&#125;);</span><br><span class="line">server.listen(port, hostname, () =&gt; &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">`Server running at http://<span class="subst">$&#123;hostname&#125;</span>:<span class="subst">$&#123;port&#125;</span>/`</span>);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<p>一段简单最简单的 Node http服务器，成功运行后可以在页面输出 Hello World。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2017/05/23/%E9%98%BF%E9%87%8C%E4%BA%91%E4%BA%91%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%9A%84%E7%AB%AF%E5%8F%A3%E9%85%8D%E7%BD%AE%E9%97%AE%E9%A2%98/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-Hans">
     <link itemprop="mainEntityOfPage" href="https://www.chaohang.top/2017/04/23/%E3%80%8A%E5%9B%BE%E8%A7%A3HTTP%E3%80%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -628,368 +1072,11 @@
   
   
 
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://www.chaohang.top/2017/04/16/%E3%80%8AAlgorithms-Unlocked%E3%80%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B02%E2%80%94%E2%80%94%E4%BA%8C%E5%88%86%E6%9F%A5%E6%89%BE%E5%92%8C%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="张小超">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="张小超的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2017/04/16/%E3%80%8AAlgorithms-Unlocked%E3%80%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B02%E2%80%94%E2%80%94%E4%BA%8C%E5%88%86%E6%9F%A5%E6%89%BE%E5%92%8C%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95/" class="post-title-link" itemprop="url">《Algorithms Unlocked》读书笔记2——二分查找和排序算法</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2017-04-16 20:43:49" itemprop="dateCreated datePublished" datetime="2017-04-16T20:43:49+08:00">2017-04-16</time>
-            </span>
-
-          
-            <span id="/2017/04/16/%E3%80%8AAlgorithms-Unlocked%E3%80%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B02%E2%80%94%E2%80%94%E4%BA%8C%E5%88%86%E6%9F%A5%E6%89%BE%E5%92%8C%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95/" class="post-meta-item leancloud_visitors" data-flag-title="《Algorithms Unlocked》读书笔记2——二分查找和排序算法" title="Views">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              <span class="post-meta-item-text">Views: </span>
-              <span class="leancloud-visitors-count"></span>
-            </span>
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="fa fa-comment-o"></i>
-      </span>
-      <span class="post-meta-item-text">Valine: </span>
-    
-    <a title="valine" href="/2017/04/16/%E3%80%8AAlgorithms-Unlocked%E3%80%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B02%E2%80%94%E2%80%94%E4%BA%8C%E5%88%86%E6%9F%A5%E6%89%BE%E5%92%8C%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95/#valine-comments" itemprop="discussionUrl">
-      <span class="post-comments-count valine-comment-count" data-xid="/2017/04/16/%E3%80%8AAlgorithms-Unlocked%E3%80%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B02%E2%80%94%E2%80%94%E4%BA%8C%E5%88%86%E6%9F%A5%E6%89%BE%E5%92%8C%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95/" itemprop="commentCount"></span>
-    </a>
-  </span>
-  
-  
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p><a href="https://book.douban.com/subject/20421419/" target="_blank" rel="noopener">《Algorithms Unlocked》</a>是 《算法导论》的合著者之一 Thomas H. Cormen 写的一本算法基础，算是啃CLRS前的开胃菜和辅助教材。如果CLRS的厚度让人望而生畏，这本200多页的小读本刚好合适带你入门。</p>
-<p>书中没有涉及编程语言，直接用文字描述算法，我用 JavaScript 对书中的算法进行描述。</p>
-<h2 id="二分查找"><a href="#二分查找" class="headerlink" title="二分查找"></a>二分查找</h2><p>在排好序的数组中查找目标值x。在p到r区间中，总是取索引为q的中间值与x进行比较，如果array[q]大于x，则比较p到q-1区间，否则比较q+1到r区间，直到array[q]等于x或p&gt;r。</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 利用二分法在已经排好序的数组中查找值x</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">binarySearch</span>(<span class="params">array, x</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">let</span> p = <span class="number">1</span>;</span><br><span class="line">  <span class="keyword">let</span> r = array.length - <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">while</span> (p &lt;= r) &#123;</span><br><span class="line">    <span class="keyword">let</span> q = <span class="built_in">Math</span>.round((p + r) / <span class="number">2</span>);  <span class="comment">//四舍五入取整</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (array[q] === x) &#123;</span><br><span class="line">      <span class="keyword">return</span> q;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      <span class="keyword">if</span> (array[q] &gt; x) &#123;</span><br><span class="line">        <span class="comment">// 如果q没有减一，遇到找不到x的情况，</span></span><br><span class="line">        <span class="comment">// 就会陷入while循环中出不来，因为p会一直等于r</span></span><br><span class="line">        r = q - <span class="number">1</span>; </span><br><span class="line">      &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        p = q + <span class="number">1</span>;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> <span class="string">'NOT-FOUND'</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2017/04/16/%E3%80%8AAlgorithms-Unlocked%E3%80%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B02%E2%80%94%E2%80%94%E4%BA%8C%E5%88%86%E6%9F%A5%E6%89%BE%E5%92%8C%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95/#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://www.chaohang.top/2017/04/10/%E3%80%8AAlgorithms-Unlocked%E3%80%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B01%E2%80%94%E2%80%94%E5%BE%AA%E7%8E%AF%E5%92%8C%E9%80%92%E5%BD%92/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="张小超">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="张小超的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2017/04/10/%E3%80%8AAlgorithms-Unlocked%E3%80%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B01%E2%80%94%E2%80%94%E5%BE%AA%E7%8E%AF%E5%92%8C%E9%80%92%E5%BD%92/" class="post-title-link" itemprop="url">《Algorithms Unlocked》读书笔记1——循环和递归</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2017-04-10 21:35:03" itemprop="dateCreated datePublished" datetime="2017-04-10T21:35:03+08:00">2017-04-10</time>
-            </span>
-
-          
-            <span id="/2017/04/10/%E3%80%8AAlgorithms-Unlocked%E3%80%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B01%E2%80%94%E2%80%94%E5%BE%AA%E7%8E%AF%E5%92%8C%E9%80%92%E5%BD%92/" class="post-meta-item leancloud_visitors" data-flag-title="《Algorithms Unlocked》读书笔记1——循环和递归" title="Views">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              <span class="post-meta-item-text">Views: </span>
-              <span class="leancloud-visitors-count"></span>
-            </span>
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="fa fa-comment-o"></i>
-      </span>
-      <span class="post-meta-item-text">Valine: </span>
-    
-    <a title="valine" href="/2017/04/10/%E3%80%8AAlgorithms-Unlocked%E3%80%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B01%E2%80%94%E2%80%94%E5%BE%AA%E7%8E%AF%E5%92%8C%E9%80%92%E5%BD%92/#valine-comments" itemprop="discussionUrl">
-      <span class="post-comments-count valine-comment-count" data-xid="/2017/04/10/%E3%80%8AAlgorithms-Unlocked%E3%80%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B01%E2%80%94%E2%80%94%E5%BE%AA%E7%8E%AF%E5%92%8C%E9%80%92%E5%BD%92/" itemprop="commentCount"></span>
-    </a>
-  </span>
-  
-  
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>《Algorithms Unlocked》是 《算法导论》的合著者之一 Thomas H. Cormen 写的一本算法基础。</p>
-<p>书中没有涉及编程语言，直接用文字描述算法，我用 JavaScript 对书中的算法进行描述。</p>
-<h2 id="循环和查找"><a href="#循环和查找" class="headerlink" title="循环和查找"></a>循环和查找</h2><p>首先是三个简单的查找。目的是从数组中查找一个特定的值。</p>
-<p>array: 一个数组</p>
-<p>x: 要查找的值</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 简单的线性查找</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">linearSearch</span>(<span class="params">array, x</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">let</span> answer = <span class="string">'NOT-FOUND'</span>;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">let</span> i = <span class="number">0</span>; i &lt; array.length; i++) &#123;</span><br><span class="line">    <span class="keyword">if</span> (array[i] === x) &#123;</span><br><span class="line">      <span class="comment">// 虽然找到了i, 但没有返回继续查找，直到 for 结束</span></span><br><span class="line">      answer = i;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="built_in">console</span>.log(answer);</span><br><span class="line">  <span class="keyword">return</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>虽然找到了目标值，但for循环依然继续遍历直到结束，下面是优化</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2017/04/10/%E3%80%8AAlgorithms-Unlocked%E3%80%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B01%E2%80%94%E2%80%94%E5%BE%AA%E7%8E%AF%E5%92%8C%E9%80%92%E5%BD%92/#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://www.chaohang.top/2016/11/20/Git-%E7%9A%84%E7%AE%80%E5%8D%95%E4%BD%BF%E7%94%A8/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="张小超">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="张小超的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2016/11/20/Git-%E7%9A%84%E7%AE%80%E5%8D%95%E4%BD%BF%E7%94%A8/" class="post-title-link" itemprop="url">Git 的简单使用</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2016-11-20 19:59:39" itemprop="dateCreated datePublished" datetime="2016-11-20T19:59:39+08:00">2016-11-20</time>
-            </span>
-
-          
-            <span id="/2016/11/20/Git-%E7%9A%84%E7%AE%80%E5%8D%95%E4%BD%BF%E7%94%A8/" class="post-meta-item leancloud_visitors" data-flag-title="Git 的简单使用" title="Views">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              <span class="post-meta-item-text">Views: </span>
-              <span class="leancloud-visitors-count"></span>
-            </span>
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="fa fa-comment-o"></i>
-      </span>
-      <span class="post-meta-item-text">Valine: </span>
-    
-    <a title="valine" href="/2016/11/20/Git-%E7%9A%84%E7%AE%80%E5%8D%95%E4%BD%BF%E7%94%A8/#valine-comments" itemprop="discussionUrl">
-      <span class="post-comments-count valine-comment-count" data-xid="/2016/11/20/Git-%E7%9A%84%E7%AE%80%E5%8D%95%E4%BD%BF%E7%94%A8/" itemprop="commentCount"></span>
-    </a>
-  </span>
-  
-  
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>一直在使用Git，仅限于简单的使用，但还是记不住几个简单。在这边总结一下，加深印象，也方便查找。</p>
-<h3 id="安装Git"><a href="#安装Git" class="headerlink" title="安装Git"></a>安装Git</h3><p>平常主要在windows和ubuntu上工作，就以windows为例，Linux和Mac平台应该也差不多，反而是windows上坑比较多。</p>
-<p>在windows上首先要下载Git，谷歌上搜一下，傻瓜式下载安装。Linux上不同发行版会有点小差异，不过你可以输入git，系统会提示你如何进行安装。</p>
-<p>我们可以简单的把Git看成三个部分：本地、暂存区、远程仓库。下面我们来简单介绍各部分的作用。</p>
-<h3 id="存入暂存区"><a href="#存入暂存区" class="headerlink" title="存入暂存区"></a>存入暂存区</h3>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2016/11/20/Git-%E7%9A%84%E7%AE%80%E5%8D%95%E4%BD%BF%E7%94%A8/#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://www.chaohang.top/2016/11/17/%E6%B5%85%E8%B0%88JavaScript%E4%B8%AD%E7%9A%84apply%E3%80%81call%E3%80%81bind/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="张小超">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="张小超的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2016/11/17/%E6%B5%85%E8%B0%88JavaScript%E4%B8%AD%E7%9A%84apply%E3%80%81call%E3%80%81bind/" class="post-title-link" itemprop="url">浅谈JavaScript中的apply、call、bind</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2016-11-17 15:17:19" itemprop="dateCreated datePublished" datetime="2016-11-17T15:17:19+08:00">2016-11-17</time>
-            </span>
-
-          
-            <span id="/2016/11/17/%E6%B5%85%E8%B0%88JavaScript%E4%B8%AD%E7%9A%84apply%E3%80%81call%E3%80%81bind/" class="post-meta-item leancloud_visitors" data-flag-title="浅谈JavaScript中的apply、call、bind" title="Views">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              <span class="post-meta-item-text">Views: </span>
-              <span class="leancloud-visitors-count"></span>
-            </span>
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="fa fa-comment-o"></i>
-      </span>
-      <span class="post-meta-item-text">Valine: </span>
-    
-    <a title="valine" href="/2016/11/17/%E6%B5%85%E8%B0%88JavaScript%E4%B8%AD%E7%9A%84apply%E3%80%81call%E3%80%81bind/#valine-comments" itemprop="discussionUrl">
-      <span class="post-comments-count valine-comment-count" data-xid="/2016/11/17/%E6%B5%85%E8%B0%88JavaScript%E4%B8%AD%E7%9A%84apply%E3%80%81call%E3%80%81bind/" itemprop="commentCount"></span>
-    </a>
-  </span>
-  
-  
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>apply,call,bine 这三兄弟经常让初学者感到疑惑。前两天准备面试时特地做了个比较，其实理解起来也不会太难。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2016/11/17/%E6%B5%85%E8%B0%88JavaScript%E4%B8%AD%E7%9A%84apply%E3%80%81call%E3%80%81bind/#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
   </div>
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/5/"><i class="fa fa-angle-left" aria-label="Previous page"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/5/">5</a><span class="page-number current">6</span>
+    <a class="extend prev" rel="prev" href="/page/5/"><i class="fa fa-angle-left" aria-label="Previous page"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/5/">5</a><span class="page-number current">6</span><a class="page-number" href="/page/7/">7</a><a class="extend next" rel="next" href="/page/7/"><i class="fa fa-angle-right" aria-label="Next page"></i></a>
   </nav>
 
 
@@ -1055,14 +1142,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">59</span>
+          <span class="site-state-item-count">64</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">36</span>
+        <span class="site-state-item-count">38</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>
