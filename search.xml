@@ -1,9 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>为什么 redo log 具有 crash-safe 的能力，是 binlog 无法替代的？</title>
+    <url>/2020/11/18/%E4%B8%BA%E4%BB%80%E4%B9%88redo%20log%E5%85%B7%E6%9C%89crash-safe%E7%9A%84%E8%83%BD%E5%8A%9B/</url>
+    <content><![CDATA[<p>昨天在复习 MySQL 日志相关的知识，学的东西过一段时间后就会遗忘，遗忘后再重新思考，往往会有新的收获。想到几个问题，把它记录下来。</p>
+<h2 id="为什么-redo-log-具有-crash-safe-的能力，而-binlog-没有？"><a href="#为什么-redo-log-具有-crash-safe-的能力，而-binlog-没有？" class="headerlink" title="为什么 redo log 具有 crash-safe 的能力，而 binlog 没有？"></a>为什么 redo log 具有 crash-safe 的能力，而 binlog 没有？</h2><p>redo log 是什么？</p>
+<p>一个固定大小，<strong>“循环写”</strong>的日志文件，记录的是物理日志——“在某个数据页上做了某个修改”。</p>
+<p>binlog 是什么？</p>
+<p>一个无限大小，<strong>“追加写”</strong>的日志文件，记录的是逻辑日志——“给 ID=2 这一行的 c 字段加1”。</p>
+<p>redo log 和 binlog 有一个很大的区别就是，一个是循环写，一个是追加写。也就是说 redo log 只会记录未刷盘的日志，已经刷入磁盘的数据都会从 redo log 这个有限大小的日志文件里删除。binlog 是追加日志，保存的是全量的日志。</p>
+<p>当数据库 crash 后，想要恢复<strong>未刷盘但已经写入 redo log 和 binlog 的数据</strong>到内存时，binlog 是无法恢复的。虽然 binlog 拥有全量的日志，但没有一个标志让 innoDB 判断哪些数据已经刷盘，哪些数据还没有。</p>
+<a id="more"></a>
+<p>举个栗子，binlog 记录了两条日志：</p>
+<ol>
+<li>给 ID=2 这一行的 c 字段加1</li>
+<li>给 ID=2 这一行的 c 字段加1</li>
+</ol>
+<p>在记录1刷盘后，记录2未刷盘时，数据库 crash。重启后，只通过 binlog 数据库无法判断这两条记录哪条已经写入磁盘，哪条没有写入磁盘，不管是两条都恢复至内存，还是都不恢复，对 ID=2 这行数据来说，都不对。</p>
+<p>但 redo log 不一样，只要刷入磁盘的数据，都会从 redo log 中抹掉，数据库重启后，直接把 redo log 中的数据都恢复至内存就可以了。这就是为什么 redo log 具有 crash-safe 的能力，而 binlog 不具备。</p>
+<h2 id="当数据库-crash-后，如何恢复未刷盘的数据到内存中？"><a href="#当数据库-crash-后，如何恢复未刷盘的数据到内存中？" class="headerlink" title="当数据库 crash 后，如何恢复未刷盘的数据到内存中？"></a>当数据库 crash 后，如何恢复未刷盘的数据到内存中？</h2><p>根据 redo log 和 binlog 的两阶段提交，未持久化的数据分为几种情况：</p>
+<ol>
+<li>change buffer 写入，redo log 虽然做了 fsync 但未 commit，binlog 未 fsync 到磁盘，这部分数据丢失。</li>
+<li>change buffer 写入，redo log fsync 未 commit，binlog 已经 fsync 到磁盘，先从 binlog 恢复 redo log，再从 redo log 恢复 change buffer。</li>
+<li>change buffer 写入，redo log 和 binlog 都已经 fsync，直接从 redo log 里恢复。</li>
+</ol>
+<p>(全文完)</p>
+<blockquote>
+<p>本文首发于我的个人博客 <a href="https://chaohang.top" target="_blank" rel="noopener">https://chaohang.top</a><br>作者 <a href="https://chaohang.top" target="_blank" rel="noopener">张超航</a>，公众号【超超不会飞】<br>转载本站文章请注明作者和出处 <a href="https://chaohang.top" target="_blank" rel="noopener"><strong>超超不会飞</strong></a> ，请勿用于任何商业用途</p>
+</blockquote>
+<p>欢迎关注我的微信公众号 【超超不会飞】，获取第一时间的更新。</p>
+<p><img data-src="http://cdn.chaohang.top/20200812114326.png" alt=""></p>
+]]></content>
+      <tags>
+        <tag>MySQL</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>我的第一台咖啡机</title>
     <url>/2020/11/03/%E6%88%91%E7%9A%84%E7%AC%AC%E4%B8%80%E5%8F%B0%E5%92%96%E5%95%A1%E6%9C%BA/</url>
-    <content><![CDATA[<p><img data-src="http://cdn.chaohang.top/20201103090810.png" alt=""></p>
+    <content><![CDATA[<p><img data-src="http://cdn.chaohang.top/20201109164211.jpg" alt=""></p>
 <p>自从开始早起，每天一杯咖啡就成了标配，在我的另一篇文章<a href="https://chaohang.top/archives/463" target="_blank" rel="noopener">《咖啡+奶》</a>中聊过，从一开始的3+1速溶进阶到黑咖啡+鲜牛奶，这次我的咖啡体验又升级啦。入了一台胶囊咖啡机 Nespresso Inissia C40，爱喝咖啡星人终于有了一台属于自己的咖啡机啦。</p>
 <a id="more"></a>
 <h2 id="起因"><a href="#起因" class="headerlink" title="起因"></a>起因</h2><p>在这之前我对胶囊咖啡一无所知，在我的认知范围内，想要快速喝到黑咖啡，要么就是各种速溶黑咖啡，要么就是便利店或者咖啡店。</p>
@@ -12,6 +47,7 @@
 <h2 id="来一杯-Espresso"><a href="#来一杯-Espresso" class="headerlink" title="来一杯 Espresso"></a>来一杯 Espresso</h2><p>趁着双十一有优惠，1号下单，2号晚上就到了。按捺住激动的心，让新机器过几遍水，清洗一下，毕竟大晚上的，喝咖啡下去就睡不着了，等明早起床再来做。事实证明晚上睡得也不太安稳，半夜醒来，以为睡得差不多，该起床了，结果一看表，3点半。</p>
 <p>自打天气变冷，我的早起就变得有点拖延，往往会赖床20多分钟。但是今天不一样，闹钟一响就起了。</p>
 <p>加水，加热。先来一杯温和的口味，110ml，产地埃萨俄比亚，介绍说有淡淡的花香。和速溶美式不一样的地方在于，咖啡机是通过高压萃取，表面有一层厚厚的油脂，专业术语叫 Crema，是咖啡豆里萃取出来的植物油脂。咖啡的味道和美式有点像，喝起来很润，不会涩涩的。等我再研究点咖啡知识，看以后能不能喝出不同的豆的香味。</p>
+<p><img data-src="http://cdn.chaohang.top/20201109164755.jpg" alt=""></p>
 <p>又做了一杯拿铁，用专门做拿铁的胶囊，萃取出40ml的浓缩咖啡液，加上加热好的热牛奶，因为没有买奶泡机的预算，就直接加鲜牛奶了。味道比较淡，不知道是不是牛奶加多了，还是说 Nespresso 对于奶咖的理解就是奶味大于咖啡味？</p>
 <p>总得来说，花两分钟就能出来一杯品质很好的浓缩咖啡，非常适合我早起喝咖啡的场景，有各种各样不同产地不同烘培程度的胶囊可供挑选，可以顺便研究一下咖啡的各种知识。</p>
 <p>(全文完)</p>
